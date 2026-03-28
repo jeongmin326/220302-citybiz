@@ -2,6 +2,13 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <jsp:include page="../common/header.jsp" />
 
+
+
+aaaaaaaaaaaaaaaaaaaaaaaaaa
+
+
+
+
 <div class="max-w-7xl mx-auto px-4 py-12">
     <section class="text-center mb-16">
         <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">도시의 비즈니스 자원을 한 곳에서</h2>
