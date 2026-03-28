@@ -1,0 +1,39 @@
+03/28
+create database publicservice;
+
+use publicservice;
+
+CREATE TABLE users (
+    user_id BIGINT AUTO_INCREMENT PRIMARY KEY 
+        COMMENT '사용자 고유 ID (기본키, 자동 증가)',
+    email VARCHAR(100) NOT NULL UNIQUE 
+        COMMENT '로그인에 사용하는 이메일 (아이디 역할, 중복 불가)',
+    password_hash VARCHAR(255) NOT NULL 
+        COMMENT '비밀번호 저장용 컬럼 (현재는 평문, 추후 암호화 필요)',
+    name VARCHAR(50) NOT NULL 
+        COMMENT '사용자 이름',
+    phone VARCHAR(20) NULL 
+        COMMENT '사용자 연락처 (선택 입력)',
+    role VARCHAR(20) NOT NULL DEFAULT 'USER' 
+        COMMENT '사용자 권한 (USER: 일반 사용자, ADMIN: 관리자)',
+    business_stage VARCHAR(30) NULL 
+        COMMENT '사업 단계 (예비창업자, 스타트업, 소상공인 등 구분)',
+    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' 
+        COMMENT '계정 상태 (ACTIVE: 사용 가능, INACTIVE: 비활성, SUSPENDED: 정지)',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP 
+        COMMENT '회원 가입 시간',
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP 
+        ON UPDATE CURRENT_TIMESTAMP 
+        COMMENT '회원 정보 수정 시간'
+) COMMENT='사용자 계정 정보를 저장하는 테이블';
+
+show tables;
+
+INSERT INTO users (email, password_hash, name)
+VALUES ('admin@test.com', '1234', '관리자');
+
+INSERT INTO users (email, password_hash, name)
+VALUES ('test@test.com', '1234', '관리자');
+
+
+select * from users
