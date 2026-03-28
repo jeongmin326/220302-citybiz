@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HomeController {
-
-    @GetMapping("/")
+    // 03/29 07:20 /main이 없어져서 다시 추가했어용
+    @GetMapping("/main")
     public String mainPage() {
         return "home/main";
     }
