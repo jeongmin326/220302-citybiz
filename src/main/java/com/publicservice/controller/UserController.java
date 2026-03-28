@@ -60,6 +60,13 @@ public class UserController {
         return "redirect:/login?error=true";
     }
 
+    //회원가입메핑추가
+    @GetMapping("/join")
+    public String joinPage() {
+        return "user/join";
+    }
+    
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();

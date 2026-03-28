@@ -63,7 +63,7 @@
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600">
                 아직 계정이 없으신가요? 
-                <a href="#" class="font-medium text-blue-600 hover:text-blue-500 transition">회원가입</a>
+                <a href="/join" class="font-medium text-blue-600 hover:text-blue-500 transition">회원가입</a>
             </p>
         </div>
     </div>
