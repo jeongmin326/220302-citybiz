@@ -10,4 +10,10 @@ public class HomeController {
     public String mainPage() {
         return "home/main";
     }
+
+    // 공간 대여 페이지 매핑
+    @GetMapping("/space")
+    public String spacePage() {
+        return "home/space"; 
+    }
 }
