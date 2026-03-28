@@ -26,7 +26,7 @@
             <div class="flex justify-between h-20 items-center">
                 
                 <div class="flex items-center gap-8">
-                    <a href="/" class="text-3xl font-extrabold tracking-tight flex items-center gap-2 group">
+                    <a href="/main" class="text-3xl font-extrabold tracking-tight flex items-center gap-2 group">
                         <div class="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
                             <i data-lucide="building-2" class="w-6 h-6"></i>
                         </div>
