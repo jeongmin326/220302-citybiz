@@ -20,27 +20,33 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-8">
-                    <a href="/" class="text-2xl font-bold text-blue-600 flex items-center gap-2">
+                    <a href="/" class="text-2xl font-bold text-blue-600 flex items-center gap-2 hover:opacity-80 transition">
                         <i data-lucide="building-2"></i> CityBiz
                     </a>
-                    <div class="hidden md:flex space-x-6 text-gray-600 font-medium">
-                        <a href="/facility/list" class="hover:text-blue-600 transition">자원지도</a>
-                        <a href="#" class="hover:text-blue-600 transition">지원사업</a>
-                        <a href="#" class="hover:text-blue-600 transition">AI컨설팅</a>
-                    </div>
                 </div>
+                
                 <div class="flex items-center gap-4">
-                    <!-- ***** -->
-                    <!-- 03/28 18:42 로그인했을때, 안했을때 각 상황에서 뜨는 멘트 수정(이쁘게해주세요) -->
-                    <!-- ***** -->
                     <c:choose>
+                        <%-- [Backend] 로그인 성공 시 세션에 loginUser 객체와 loginName이 있는지 확인 --%>
                         <c:when test="${not empty sessionScope.loginUser}">
-                            <span>${sessionScope.loginName}님</span>
-                            <a href="/logout">로그아웃</a>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm font-medium">
+                                    <i data-lucide="user-circle" class="w-4 h-4 text-blue-500"></i>
+                                    <span><strong class="text-blue-600">${sessionScope.loginName}</strong>님 환영합니다</span>
+                                </div>
+                                <a href="/logout" class="text-sm font-medium text-gray-500 hover:text-red-500 transition flex items-center gap-1">
+                                    <i data-lucide="log-out" class="w-4 h-4"></i> 로그아웃
+                                </a>
+                            </div>
                         </c:when>
+                        
                         <c:otherwise>
-                            <a href="/login" class="text-sm font-medium text-gray-700 hover:text-blue-600 transition">로그인</a>
-                            <a href="/logout" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm font-medium">회원가입</a>
+                            <a href="/login" class="text-sm font-medium text-gray-600 hover:text-blue-600 transition flex items-center gap-1">
+                                <i data-lucide="log-in" class="w-4 h-4"></i> 로그인
+                            </a>
+                            <a href="/signup" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm font-medium flex items-center gap-1">
+                                회원가입
+                            </a>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -49,3 +55,10 @@
     </nav>
     
     <main class="flex-grow">
+        </main>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

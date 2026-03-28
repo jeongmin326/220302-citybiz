@@ -1,90 +1,156 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<jsp:include page="../common/header.jsp" />
-<div class="max-w-7xl mx-auto px-4 py-12">
-    <section class="text-center mb-16">
-        <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 tracking-tight">도시의 비즈니스 자원을 한 곳에서</h2>
-        <p class="text-xl text-gray-600 mb-10">AI가 당신의 사업 단계에 맞는 공간, 지원금, 컨설팅을 추천합니다.</p>
-        
-        <div class="max-w-3xl mx-auto relative group">
-            <input type="text" id="mainSearch" placeholder="어떤 자원이 필요하신가요? (예: 판교 회의실, 시드 투자)" 
-                   class="w-full p-5 pl-14 rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 outline-none shadow-sm transition text-lg">
-            <i data-lucide="search" class="absolute left-5 top-5 text-gray-400 group-focus-within:text-blue-500 transition"></i>
-            <button class="absolute right-3 top-3 bg-blue-600 text-white px-6 py-2 rounded-xl hover:bg-blue-700 transition font-medium">검색</button>
-        </div>
-    </section>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section class="lg:col-span-2 space-y-6">
-            <div class="flex items-center gap-2 border-b pb-4">
-                <i data-lucide="sparkles" class="text-blue-600 w-6 h-6"></i>
-                <h3 class="text-2xl font-bold text-gray-900">AI 맞춤 추천 자원</h3>
-            </div>
-            <div id="ai-recommendations" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                </div>
-        </section>
-
-        <section class="space-y-6">
-            <div class="flex items-center gap-2 border-b pb-4">
-                <i data-lucide="bar-chart-3" class="text-blue-600 w-6 h-6"></i>
-                <h3 class="text-2xl font-bold text-gray-900">주요 공간 실시간 수요 예측</h3>
-            </div>
-            <div class="bg-white p-6 rounded-2xl border shadow-sm h-64 flex flex-col justify-end relative">
-                <div id="congestion-chart" class="flex items-end justify-between h-40 gap-2">
-                    </div>
-            </div>
-        </section>
-    </div>
-</div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        loadRecommendations();
-        loadCongestionChart();
-    });
-
-    // AI 추천 데이터 로드 함수 일단 임시임 가짜
-    function loadRecommendations() {
-        const container = document.getElementById('ai-recommendations');
-        const mockData = [
-            { type: '지원사업', title: '청년창업사관학교 입교생 모집', desc: '최대 1억 원 사업화 자금 지원', badge: 'bg-green-100 text-green-700' },
-            { type: '공간/예약', title: '강남스타트업센터 4인 회의실', desc: '오후 2시 예약 가능', badge: 'bg-blue-100 text-blue-700' },
-            { type: 'AI 컨설팅', title: '기술신용보증기금 맞춤형 보증', desc: 'IT/소프트웨어 분야 특화', badge: 'bg-purple-100 text-purple-700' },
-            { type: '네트워크', title: '초기 창업자 네트워킹 데이', desc: '판교 테크원, 이번주 금요일', badge: 'bg-orange-100 text-orange-700' }
-        ];
-
-        container.innerHTML = mockData.map(item => `
-            <div class="bg-white p-5 rounded-xl border hover:shadow-md transition cursor-pointer group">
-                <span class="text-xs font-bold px-2.5 py-1 rounded-full \${item.badge}">\${item.type}</span>
-                <h4 class="font-bold mt-3 text-lg text-gray-900 group-hover:text-blue-600 transition">\${item.title}</h4>
-                <p class="text-gray-500 text-sm mt-1">\${item.desc}</p>
-            </div>
-        `).join('');
-    }
-
-    // Spring Boot API(/api/chart/congestion) 연동 이것도...임시...
-    async function loadCongestionChart() {
-        try {
-            const response = await axios.get('/api/chart/congestion');
-            const data = response.data;
-            const chart = document.getElementById('congestion-chart');
-            
-            chart.innerHTML = data.values.map((val, i) => {
-                // 혼잡도가 80 이상이면 빨간색, 아니면 파란색
-                const colorClass = val >= 80 ? 'bg-red-400' : 'bg-blue-400';
-                return `
-                <div class="flex flex-col items-center w-full group relative">
-                    <span class="absolute -top-8 text-xs font-bold text-gray-600 opacity-0 group-hover:opacity-100 transition">\${val}%</span>
-                    <div class="w-full \${colorClass} rounded-t-md transition-all duration-500 ease-in-out hover:brightness-110" style="height: \${val}%"></div>
-                    <span class="text-xs text-gray-500 mt-2 font-medium">\${data.labels[i]}시</span>
-                </div>
-                `;
-            }).join('');
-        } catch(error) {
-            console.error("차트 데이터 로드 실패", error);
-            document.getElementById('congestion-chart').innerHTML = '<p class="text-sm text-red-500">데이터를 불러오지 못했습니다.</p>';
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Biz Hub - 프리미엄 비즈니스 자원 플랫폼</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-    }
-</script>
+    </style>
+</head>
+<body class="bg-[#F8FAFC] flex flex-col min-h-screen text-slate-800 selection:bg-blue-100 selection:text-blue-900">
 
-<jsp:include page="../common/footer.jsp" />
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                
+                <div class="flex items-center gap-8">
+                    <a href="/" class="text-3xl font-extrabold tracking-tight flex items-center gap-2 group">
+                        <div class="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
+                            <i data-lucide="building-2" class="w-6 h-6"></i>
+                        </div>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700">CityBiz</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center gap-5">
+                    <c:choose>
+                        <%-- [Backend] 세션의 로그인 유저 확인 로직 --%>
+                        <c:when test="${not empty sessionScope.loginUser}">
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm text-sm font-medium">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-inner">
+                                        ${fn:substring(sessionScope.loginName, 0, 1)}
+                                    </div>
+                                    <span class="text-slate-700"><strong class="text-slate-900">${sessionScope.loginName}</strong> 님</span>
+                                </div>
+                                <a href="/logout" class="text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors flex items-center gap-1.5">
+                                    <i data-lucide="log-out" class="w-4 h-4"></i> 로그아웃
+                                </a>
+                            </div>
+                        </c:when>
+                        
+                        <c:otherwise>
+                            <a href="/login" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
+                                로그인
+                            </a>
+                            <a href="/signup" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5">
+                                시작하기
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="flex-grow flex flex-col items-center pt-24 pb-32 px-4 relative overflow-hidden">
+        
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-400/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="text-center mb-20 relative z-10">
+            <span class="inline-block py-1 px-3 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-sm font-semibold mb-6 tracking-wide">
+                도시 비즈니스 인프라 통합 플랫폼
+            </span>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
+                비즈니스의 성공,<br>
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">올바른 자원</span>에서 시작됩니다.
+            </h1>
+            <p class="text-xl text-slate-500 max-w-2xl mx-auto font-light">
+                흩어져 있던 창업 공간, 정책 지원금, 전문가 네트워크를 한 곳에서.<br>당신에게 가장 필요한 비즈니스 자원을 지금 만나보세요.
+            </p>
+        </div>
+
+        <div class="max-w-6xl w-full grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+            
+            <a href="/space" class="group bg-white p-10 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
+                <i data-lucide="building" class="absolute -bottom-6 -right-6 w-40 h-40 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+                
+                <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-8 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 z-10 shadow-sm">
+                    <i data-lucide="map-pin" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-4 text-slate-900 z-10">공간 대여</h2>
+                <p class="text-slate-500 leading-relaxed z-10 flex-grow">
+                    회의실부터 공유오피스까지.<br>지도 기반으로 가까운 창업 지원 공간을 찾고 실시간으로 예약하세요.
+                </p>
+                <div class="mt-8 flex items-center text-blue-600 font-semibold text-sm z-10 group-hover:gap-2 transition-all">
+                    자세히 보기 <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                </div>
+            </a>
+            
+            <a href="/policy" class="group bg-white p-10 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
+                <i data-lucide="banknote" class="absolute -bottom-6 -right-6 w-40 h-40 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+                
+                <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 z-10 shadow-sm">
+                    <i data-lucide="pie-chart" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-4 text-slate-900 z-10">정책 지원</h2>
+                <p class="text-slate-500 leading-relaxed z-10 flex-grow">
+                    중소벤처진흥공단, 기술보증기금 등 내 기업 규모와 상황에 딱 맞는 맞춤형 지원 사업을 찾아드립니다.
+                </p>
+                <div class="mt-8 flex items-center text-indigo-600 font-semibold text-sm z-10 group-hover:gap-2 transition-all">
+                    자세히 보기 <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                </div>
+            </a>
+
+            <a href="/consulting" class="group bg-white p-10 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
+                <i data-lucide="users" class="absolute -bottom-6 -right-6 w-40 h-40 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
+                
+                <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-8 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 z-10 shadow-sm">
+                    <i data-lucide="network" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-bold mb-4 text-slate-900 z-10">컨설팅 네트워크</h2>
+                <p class="text-slate-500 leading-relaxed z-10 flex-grow">
+                    세무, 법률, 마케팅까지.<br>전문성이 검증된 컨설팅 기업과 네트워크를 형성하고 역량을 강화하세요.
+                </p>
+                <div class="mt-8 flex items-center text-purple-600 font-semibold text-sm z-10 group-hover:gap-2 transition-all">
+                    자세히 보기 <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white py-12 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2 opacity-50">
+                <i data-lucide="building-2" class="w-5 h-5 text-slate-900"></i>
+                <span class="text-xl font-bold text-slate-900">CityBiz</span>
+            </div>
+            <div class="text-center md:text-left">
+                <p class="text-slate-400 text-sm">AI 소프트웨어 학과 졸업작품 프로젝트</p>
+                <p class="text-slate-400 text-sm mt-1">&copy; 2026 CityBiz Team. All rights reserved.</p>
+            </div>
+            <div class="flex gap-4">
+                <a href="#" class="text-slate-400 hover:text-slate-600 transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
