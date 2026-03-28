@@ -48,8 +48,11 @@
                         <c:if test="${not empty cookie.rememberEmail.value}">checked</c:if>>
                     <label for="remember-id" class="ml-2 block text-sm text-gray-700">아이디 저장</label>
                 </div>
+
+                <!-- 아이디찾기추가 -->
                 <div class="text-sm">
-                    <a href="#" class="font-medium text-blue-600 hover:text-blue-500">비밀번호 찾기</a>
+                    <a href="/findID" class="font-medium text-blue-600 hover:text-blue-500">아이디 찾기</a>
+                    <a href="/findPWD" class="font-medium text-blue-600 hover:text-blue-500">비밀번호 찾기</a>
                 </div>
             </div>
 
