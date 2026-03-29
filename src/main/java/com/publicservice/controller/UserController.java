@@ -66,19 +66,18 @@ public class UserController {
         return "user/join";
     }
 
-    //회원가입메핑추가
+    //아이디찾기추가
     @GetMapping("/findID")
     public String findID() {
         return "user/findID";
     }
 
-    //아이디찾기추가
+    //비밀번호찾기추가
     @GetMapping("/findPWD")
     public String findPWD() {
         return "user/findPWD";
     }
     
-    //비밀번호찾기추가
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
