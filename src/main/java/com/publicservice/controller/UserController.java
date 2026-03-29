@@ -83,4 +83,9 @@ public class UserController {
         session.invalidate();
         return "redirect:/login";
     }
+
+    @GetMapping("/signup")
+    public String signup() {
+        return "user/signup"; 
+    }
 }
