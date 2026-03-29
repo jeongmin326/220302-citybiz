@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<jsp:include page="../common/header.jsp" />
+<%-- 헤더 파일 로드 --%>
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
+
 
 <div class="flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
@@ -72,4 +74,5 @@
     </div>
 </div>
 
-<jsp:include page="../common/footer.jsp" />
+<%-- 푸터 파일 로드 --%>
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />

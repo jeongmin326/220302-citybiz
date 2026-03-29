@@ -21,7 +21,8 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E2E8F0; border-radius: 20px; }
         .hidden-checkbox:checked + label {
-            background-color: #EFF6FF; border-color: #BFDBFE; color: #2563EB; font-weight: 600;
+            background-color: #EFF6FF;
+            border-color: #BFDBFE; color: #2563EB; font-weight: 600;
         }
     </style>
 </head>
@@ -31,7 +32,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center gap-8">
-                    <a href="/" class="text-3xl font-extrabold tracking-tight flex items-center gap-2 group">
+                    <a href="/main" class="text-3xl font-extrabold tracking-tight flex items-center gap-2 group">
                         <div class="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
                             <i data-lucide="building-2" class="w-6 h-6"></i>
                         </div>
@@ -39,15 +40,15 @@
                     </a>
                 </div>
                 
-                <nav class="hidden md:flex space-x-9">
-                    <a href="/space" class="text-base font-semibold text-blue-600 relative after:content-[''] after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-blue-600 after:rounded-full">공간 대여</a>
-                    <a href="/policy" class="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">정책 지원</a>
-                    <a href="/consulting" class="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">컨설팅 네트워크</a>
+                <nav class="hidden md:flex space-x-9" id="gnb-menu">
+                    <a href="/space" class="nav-link text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">공간 대여</a>
+                    <a href="/policy" class="nav-link text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">정책 지원</a>
+                    <a href="/consulting" class="nav-link text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">컨설팅 네트워크</a>
                 </nav>
 
                 <div class="flex items-center gap-5">
                     <c:choose>
-                        <%-- [Backend] Spring Security 또는 SessionInterceptor를 통해 세션 주입 필요 --%>
+                        <%-- [Backend/DB] Spring Security 적용 또는 HttpSession에 로그인 사용자 정보(loginUser, loginName)가 담겨 넘어오는 시점에 활성화됩니다. --%>
                         <c:when test="${not empty sessionScope.loginUser}">
                             <div class="flex items-center gap-4">
                                 <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm text-sm font-medium">
@@ -70,3 +71,26 @@
             </div>
         </div>
     </nav>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 현재 브라우저 URL의 경로를 가져옴 (예: /space, /policy)
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            // 활성화 되었을 때의 Tailwind 클래스
+            const activeClasses = ['font-semibold', 'text-blue-600', 'relative', 'after:content-[""]', 'after:absolute', 'after:bottom-[-6px]', 'after:left-0', 'after:w-full', 'after:h-[2px]', 'after:bg-blue-600', 'after:rounded-full'];
+            // 비활성화(기본) 되었을 때의 Tailwind 클래스
+            const inactiveClasses = ['font-medium', 'text-slate-600'];
+
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                
+                // 현재 URL이 href 경로를 포함하고 있다면 해당 메뉴 활성화
+                if (currentPath.startsWith(href)) {
+                    link.classList.remove(...inactiveClasses);
+                    link.classList.add(...activeClasses);
+                }
+            });
+        });
+    </script>
