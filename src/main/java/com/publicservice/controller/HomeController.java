@@ -17,13 +17,13 @@ public class HomeController {
         return "home/space"; 
     }
 
-    // 공간 대여 페이지 매핑
+    // 정책 페이지 매핑
     @GetMapping("/policy")
     public String policyPage() {
         return "home/policy"; 
     }
 
-    // 공간 대여 페이지 매핑
+    // 컨설팅 페이지 매핑
     @GetMapping("/consulting")
     public String consultingPage() {
         return "home/consulting"; 
