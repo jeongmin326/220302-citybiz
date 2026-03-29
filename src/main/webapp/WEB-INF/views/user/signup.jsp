@@ -4,7 +4,7 @@
 <%-- 헤더 파일 로드 --%>
 <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
-<main class="flex-grow flex flex-col justify-center w-full relative overflow-hidden px-4 sm:px-6 lg:px-8 py-12">
+<main class="flex-grow w-full px-4 sm:px-6 lg:px-8 py-20 flex flex-col justify-center relative overflow-hidden min-h-[85vh]">
     
     <div class="absolute top-[-10%] left-[-5%] w-[40rem] h-[40rem] bg-blue-400/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute bottom-[-10%] right-[-5%] w-[40rem] h-[40rem] bg-purple-400/10 rounded-full blur-3xl pointer-events-none"></div>
