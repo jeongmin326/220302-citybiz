@@ -1,64 +1,72 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Biz Hub - 도시 비즈니스 통합 플랫폼</title>
+    <title>CityBiz - 프리미엄 비즈니스 자원 플랫폼</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap');
-        body { font-family: 'Pretendard', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E2E8F0; border-radius: 20px; }
+        .hidden-checkbox:checked + label {
+            background-color: #EFF6FF; border-color: #BFDBFE; color: #2563EB; font-weight: 600;
+        }
     </style>
 </head>
-<body class="bg-gray-50 flex flex-col min-h-screen">
+<body class="bg-[#F8FAFC] flex flex-col min-h-screen text-slate-800">
 
-    <nav class="bg-white border-b sticky top-0 z-50">
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
+            <div class="flex justify-between h-20 items-center">
                 <div class="flex items-center gap-8">
-                    <a href="/" class="text-2xl font-bold text-blue-600 flex items-center gap-2 hover:opacity-80 transition">
-                        <i data-lucide="building-2"></i> CityBiz
+                    <a href="/" class="text-3xl font-extrabold tracking-tight flex items-center gap-2 group">
+                        <div class="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
+                            <i data-lucide="building-2" class="w-6 h-6"></i>
+                        </div>
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 hover:opacity-80 transition">CityBiz</span>
                     </a>
                 </div>
                 
-                <div class="flex items-center gap-4">
+                <nav class="hidden md:flex space-x-9">
+                    <a href="/space" class="text-base font-semibold text-blue-600 relative after:content-[''] after:absolute after:bottom-[-6px] after:left-0 after:w-full after:h-[2px] after:bg-blue-600 after:rounded-full">공간 대여</a>
+                    <a href="/policy" class="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">정책 지원</a>
+                    <a href="/consulting" class="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">컨설팅 네트워크</a>
+                </nav>
+
+                <div class="flex items-center gap-5">
                     <c:choose>
-                        <%-- [Backend] 로그인 성공 시 세션에 loginUser 객체와 loginName이 있는지 확인 --%>
+                        <%-- [Backend] Spring Security 또는 SessionInterceptor를 통해 세션 주입 필요 --%>
                         <c:when test="${not empty sessionScope.loginUser}">
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center gap-2 bg-gray-100 text-gray-700 px-3 py-1.5 rounded-full text-sm font-medium">
-                                    <i data-lucide="user-circle" class="w-4 h-4 text-blue-500"></i>
-                                    <span><strong class="text-blue-600">${sessionScope.loginName}</strong>님 환영합니다</span>
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm text-sm font-medium">
+                                    <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-inner">
+                                        ${fn:substring(sessionScope.loginName, 0, 1)}
+                                    </div>
+                                    <span class="text-slate-700"><strong class="text-slate-900">${sessionScope.loginName}</strong> 님</span>
                                 </div>
-                                <a href="/logout" class="text-sm font-medium text-gray-500 hover:text-red-500 transition flex items-center gap-1">
+                                <a href="/logout" class="text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors flex items-center gap-1.5">
                                     <i data-lucide="log-out" class="w-4 h-4"></i> 로그아웃
                                 </a>
                             </div>
                         </c:when>
-                        
                         <c:otherwise>
-                            <a href="/login" class="text-sm font-medium text-gray-600 hover:text-blue-600 transition flex items-center gap-1">
-                                <i data-lucide="log-in" class="w-4 h-4"></i> 로그인
-                            </a>
-                            <a href="/signup" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition shadow-sm font-medium flex items-center gap-1">
-                                회원가입
-                            </a>
+                            <a href="/login" class="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">로그인</a>
+                            <a href="/signup" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5">시작하기</a>
                         </c:otherwise>
                     </c:choose>
                 </div>
             </div>
         </div>
     </nav>
-    
-    <main class="flex-grow">
-        </main>
-
-    <script>
-        lucide.createIcons();
-    </script>
-</body>
-</html>
