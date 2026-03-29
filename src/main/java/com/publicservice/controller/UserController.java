@@ -61,9 +61,9 @@ public class UserController {
     }
 
     //회원가입메핑추가
-    @GetMapping("/join")
+    @GetMapping("/signup")
     public String joinPage() {
-        return "user/join";
+        return "user/signup";
     }
 
     //아이디찾기추가
