@@ -2,6 +2,7 @@ package com.publicservice.controller;
 
 import com.publicservice.entity.User;
 import com.publicservice.repository.UserRepository;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -82,10 +83,5 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
-    }
-
-    @GetMapping("/signup")
-    public String signup() {
-        return "user/signup"; 
     }
 }
