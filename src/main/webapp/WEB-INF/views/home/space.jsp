@@ -103,7 +103,7 @@
                 <%-- 공간 카드 리스트 영역 --%>
                 <div id="spaceCardContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <%-- 하드코딩 데이터 (JS에서 동적 생성 전 초기 모습) --%>
-                    <div class="bg-white rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] cursor-pointer group">
+                    <!-- <div class="bg-white rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] cursor-pointer group">
                         <div class="h-56 bg-slate-100 relative overflow-hidden">
                             <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=600" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                             <div class="absolute top-4 left-4 bg-white/80 px-3 py-1.5 rounded-full text-xs font-bold text-blue-600 backdrop-blur-sm shadow-inner">회의실</div>
@@ -116,7 +116,7 @@
                                 <i data-lucide="arrow-right" class="w-5 h-5 text-blue-600 opacity-0 group-hover:opacity-100 transition duration-300 group-hover:translate-x-1"></i>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <%-- 추가 카드는 비워두거나 JS에서 렌더링 --%>
                 </div>
             </div>
@@ -153,6 +153,71 @@
         if(val > parseInt(priceRange.max)) val = priceRange.max;
         priceRange.value = val;
     });
+
+    async function loadSpaces() {
+        try {
+            const response = await fetch('/api/spaces');
+            const spaces = await response.json();
+
+            const container = document.getElementById('spaceCardContainer');
+            container.innerHTML = '';
+
+            spaces.forEach(space => {
+                const card =
+                    '<div class="bg-white rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] cursor-pointer group">' +
+                        '<div class="h-56 bg-slate-100 relative overflow-hidden">' +
+                            '<img src="' + space.mainImageUrl + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="' + space.name + '">' +
+                            '<div class="absolute top-4 left-4 bg-white/80 px-3 py-1.5 rounded-full text-xs font-bold text-blue-600 backdrop-blur-sm shadow-inner">' +
+                                getSpaceTypeLabel(space.spaceType) +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="p-6">' +
+                            '<h4 class="font-extrabold text-xl mb-1.5 truncate text-slate-900 group-hover:text-blue-600 transition">' + space.name + '</h4>' +
+                            '<p class="text-sm text-slate-500 flex items-center gap-1.5 mb-4 font-light">' +
+                                '<i data-lucide="map-pin" class="w-4 h-4"></i> ' + space.address +
+                            '</p>' +
+                            '<div class="flex justify-between items-end border-t border-slate-100 pt-4 mt-auto">' +
+                                '<p class="text-2xl font-extrabold text-slate-900 tracking-tight">' +
+                                    Number(space.pricePerHour).toLocaleString() +
+                                    '<span class="text-sm font-normal text-slate-500">원 / 시간</span>' +
+                                '</p>' +
+                                '<i data-lucide="arrow-right" class="w-5 h-5 text-blue-600 opacity-0 group-hover:opacity-100 transition duration-300 group-hover:translate-x-1"></i>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+
+                container.innerHTML += card;
+            });
+
+            const resultCount = document.getElementById('resultCount');
+            if (resultCount) {
+                resultCount.textContent = spaces.length;
+            }
+
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+
+        } catch (error) {
+            console.error('공간 목록 로딩 오류:', error);
+        }
+    }
+
+    function getSpaceTypeLabel(spaceType) {
+        switch (spaceType) {
+            case 'shop': return '상점';
+            case 'warehouse': return '창고';
+            case 'studio': return '스튜디오';
+            case 'meeting': return '회의실';
+            case 'consulting': return '상담실';
+            case 'office': return '사무실';
+            default: return spaceType;
+        }
+    }
+
+    loadSpaces();
+
+    
 </script>
 
 <%-- 푸터 파일 로드 --%>
