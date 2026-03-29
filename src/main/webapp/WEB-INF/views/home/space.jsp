@@ -94,7 +94,7 @@
             <div class="flex-grow flex flex-col gap-8">
                 <div class="flex justify-between items-center px-4 py-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
                     <%-- [Backend] 검색 결과 카운트 반영 --%>
-                    <p class="text-slate-600">총 <strong class="text-blue-600 font-bold" id="resultCount">24</strong>개의 공간을 발견했습니다.</p>
+                    <p class="text-slate-600">총 <strong class="text-blue-600 font-bold" id="resultCount"></strong>개의 공간을 발견했습니다.</p>
                     <div class="flex items-center gap-1.5 text-sm font-medium text-slate-600 cursor-pointer hover:text-blue-600 transition">
                         추천순 <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </div>
@@ -154,6 +154,7 @@
         priceRange.value = val;
     });
 
+    // db 공간가져오기
     async function loadSpaces() {
         try {
             const response = await fetch('/api/spaces');
