@@ -2,6 +2,7 @@ package com.publicservice.dao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -33,9 +34,12 @@ public class UserDAO {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String encodedPassword = encoder.encode(password);
 
             ps.setString(1, email);
-            ps.setString(2, password);
+            ps.setString(2, encodedPassword);
             ps.setString(3, name);
             ps.setString(4, phone);
             ps.setString(5, role);

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ public class UserController {
         return "user/login";
     }
 
-    @PostMapping("/login")
+   @PostMapping("/login")
     public String loginProcess(@RequestParam("email") String email,
                             @RequestParam("password") String password,
                             @RequestParam(value = "rememberId", required = false) String rememberId,
@@ -43,7 +44,9 @@ public class UserController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
 
-            if (user.getPasswordHash().equals(password)) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            if (encoder.matches(password, user.getPasswordHash())) {
                 session.setAttribute("loginUser", user.getEmail());
                 session.setAttribute("loginName", user.getName());
                 session.setAttribute("loginRole", user.getRole());
