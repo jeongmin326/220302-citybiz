@@ -13,6 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.Optional;
 
@@ -91,6 +95,10 @@ public class UserController {
                 status = "ACTIVE";
             }
 
+            if (userDAO.existsByEmail(email)) {
+                return "redirect:/signup?error=duplicate";
+            }
+
             userDAO.insertUser(
                     email,
                     password,
@@ -110,6 +118,25 @@ public class UserController {
             return "redirect:/signup";
         }
     }
+
+    // 이메일 중복 체크
+    @GetMapping("/check-email")
+    @ResponseBody
+    public Map<String, Object> checkEmail(@RequestParam("email") String email) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            boolean exists = userDAO.existsByEmail(email);
+            result.put("exists", exists);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("exists", false);
+            result.put("error", true);
+        }
+
+        return result;
+    }
+    
 
     //아이디찾기추가
     @GetMapping("/findID")

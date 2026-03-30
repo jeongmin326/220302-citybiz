@@ -71,7 +71,7 @@
                             required
                             class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                             placeholder="example@email.com">
-                        <button type="button" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">
+                        <button type="button" id="checkEmailBtn" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">
                             중복 확인
                         </button>
                     </div>
@@ -143,6 +143,8 @@
     const dynamicFields = document.getElementById('dynamicFields');
     const subtitle = document.getElementById('subtitle');
 
+    let isEmailChecked = false;
+
     function selectRole(role) {
         document.getElementById('userRole').value = role;
         roleSelectionSection.classList.add('hidden');
@@ -201,6 +203,76 @@
         alert('회원가입이 완료되었습니다! 메인 페이지로 이동합니다.');
         location.href = "/main.jsp";
     }
+
+    const contextPath = '${pageContext.request.contextPath}';
+    const checkEmailBtn = document.getElementById('checkEmailBtn');
+
+    if (checkEmailBtn) {
+        checkEmailBtn.addEventListener('click', async function () {
+            const emailInput = document.getElementById('email');
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                alert('이메일을 입력해주세요.');
+                emailInput.focus();
+                return;
+            }
+
+            try {
+                const response = await fetch(contextPath + '/check-email?email=' + encodeURIComponent(email), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('서버 응답 오류');
+                }
+
+                const data = await response.json();
+
+                if (data.exists) {
+                    alert('이미 사용 중인 이메일입니다.');
+                    isEmailChecked = false;
+                    emailInput.focus();
+                    checkEmailBtn.innerText = '중복 확인';
+                    checkEmailBtn.classList.remove('bg-green-600');
+                    checkEmailBtn.classList.add('bg-slate-800');
+                } else {
+                    alert('사용 가능한 이메일입니다.');
+                    isEmailChecked = true;
+                    checkEmailBtn.innerText = '확인 완료';
+                    checkEmailBtn.classList.remove('bg-slate-800');
+                    checkEmailBtn.classList.add('bg-green-600');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('중복 확인 중 오류가 발생했습니다.');
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', function () {
+            isEmailChecked = false;
+        });
+    }
+
+    signupForm.addEventListener('submit', function (e) {
+        if (!isEmailChecked) {
+            alert('이메일 중복 확인을 먼저 해주세요.');
+            e.preventDefault();
+        }
+    });
+
+    document.getElementById('email').addEventListener('input', function () {
+        isEmailChecked = false;
+
+        // 버튼 원상 복구
+        checkEmailBtn.innerText = '중복 확인';
+        checkEmailBtn.classList.remove('bg-green-600');
+        checkEmailBtn.classList.add('bg-slate-800');
+    });
+
 </script>
 
 <style>

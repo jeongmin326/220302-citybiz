@@ -48,4 +48,25 @@ public class UserDAO {
             ps.executeUpdate();
         }
     }
+
+    // 이메일 중복 체크
+    public boolean existsByEmail(String email) throws Exception {
+    String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+
+    try (Connection conn = dataSource.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setString(1, email);
+
+        try (java.sql.ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    return false;
+}
+
+
 }
