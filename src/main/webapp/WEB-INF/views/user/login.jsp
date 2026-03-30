@@ -76,3 +76,15 @@
 
 <%-- 푸터 파일 로드 --%>
 <jsp:include page="/WEB-INF/views/common/footer.jsp" />
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('signup') === 'success') {
+        alert('회원가입이 완료되었습니다!');
+    }
+
+    if (params.get('signup') === 'fail') {
+        alert('회원가입 중 오류가 발생했습니다.');
+    }
+</script>

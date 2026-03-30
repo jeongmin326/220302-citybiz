@@ -112,10 +112,10 @@ public class UserController {
                     status
             );
 
-            return "redirect:/login";
+            return "redirect:/login?signup=success";
         } catch (Exception e) {
             e.printStackTrace();
-            return "redirect:/signup";
+            return "redirect:/signup?signup=fail";
         }
     }
 
