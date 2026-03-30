@@ -99,6 +99,10 @@ public class UserController {
                 return "redirect:/signup?error=duplicate";
             }
 
+            if (userDAO.existsByPhone(phone)) {
+                return "redirect:/signup?error=duplicatePhone";
+            }
+
             userDAO.insertUser(
                     email,
                     password,
@@ -127,6 +131,24 @@ public class UserController {
 
         try {
             boolean exists = userDAO.existsByEmail(email);
+            result.put("exists", exists);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("exists", false);
+            result.put("error", true);
+        }
+
+        return result;
+    }
+
+    // 전화번호 중복 체크
+    @GetMapping("/check-phone")
+    @ResponseBody
+    public Map<String, Object> checkPhone(@RequestParam("phone") String phone) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            boolean exists = userDAO.existsByPhone(phone);
             result.put("exists", exists);
         } catch (Exception e) {
             e.printStackTrace();

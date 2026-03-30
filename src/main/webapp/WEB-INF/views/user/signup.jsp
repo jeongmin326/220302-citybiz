@@ -104,9 +104,12 @@
                             id="phone"
                             name="phone"
                             required
+                            maxlength="11"
+                            pattern="^01[0-9]{9}$"
+                            inputmode="numeric"
                             class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                            placeholder="010-0000-0000">
-                        <button type="button" onclick="alert('인증번호가 발송되었습니다.(기능추가예정)')" class="px-4 py-3 bg-blue-600 text-white text-xs font-bold rounded-xl whitespace-nowrap">
+                            placeholder="01012345678">
+                        <button type="button" id="verifyPhoneBtn" class="px-4 py-3 bg-blue-600 text-white text-xs font-bold rounded-xl whitespace-nowrap">
                             본인 인증
                         </button>
                     </div>
@@ -204,6 +207,7 @@
         location.href = "/main.jsp";
     }
 
+    // 이메일 중복체크
     const contextPath = '${pageContext.request.contextPath}';
     const checkEmailBtn = document.getElementById('checkEmailBtn');
 
@@ -264,6 +268,7 @@
         }
     });
 
+    // mail 중복 체크를 했는데 다시 바꾸면 초기화
     document.getElementById('email').addEventListener('input', function () {
         isEmailChecked = false;
 
@@ -271,6 +276,79 @@
         checkEmailBtn.innerText = '중복 확인';
         checkEmailBtn.classList.remove('bg-green-600');
         checkEmailBtn.classList.add('bg-slate-800');
+    });
+
+    document.getElementById('phone').addEventListener('input', function () {
+        // 숫자만 남기기
+        this.value = this.value.replace(/[^0-9]/g, '');
+
+        // 11자리 제한
+        if (this.value.length > 11) {
+            this.value = this.value.slice(0, 11);
+        }
+    });
+
+    // 휴대폰 번호 형식 검증 & 중복 확인
+    const verifyPhoneBtn = document.getElementById('verifyPhoneBtn');
+
+    if (verifyPhoneBtn) {
+        verifyPhoneBtn.addEventListener('click', async function () {
+            const phoneInput = document.getElementById('phone');
+            const phone = phoneInput.value.trim();
+
+            if (!phone) {
+                alert('전화번호를 입력해주세요.');
+                phoneInput.focus();
+                return;
+            }
+
+            if (!/^01[0-9]{9}$/.test(phone)) {
+                alert('전화번호는 01로 시작하는 11자리 숫자로 입력해주세요.');
+                phoneInput.focus();
+                return;
+            }
+
+            try {
+                const response = await fetch(contextPath + '/check-phone?phone=' + encodeURIComponent(phone));
+
+                if (!response.ok) {
+                    throw new Error('서버 오류');
+                }
+
+                const data = await response.json();
+
+                if (data.exists) {
+                    alert('이미 사용 중인 전화번호입니다.');
+
+                    // ❌ 중복 → 버튼 원상복구
+                    verifyPhoneBtn.innerText = '본인 인증';
+                    verifyPhoneBtn.classList.remove('bg-green-600');
+                    verifyPhoneBtn.classList.add('bg-blue-600');
+
+                    phoneInput.focus();
+
+                } else {
+                    alert('본인인증 기능은 아직 준비 중입니다.');
+
+                    // ✔ 사용 가능 → 확인 완료
+                    verifyPhoneBtn.innerText = '확인 완료';
+                    verifyPhoneBtn.classList.remove('bg-blue-600');
+                    verifyPhoneBtn.classList.add('bg-green-600');
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert('본인 인증 중 오류가 발생했습니다.');
+            }
+        });
+    }
+    // 전화번호 중복 체크를 했는데 다시 바꾸면 초기화
+    document.getElementById('phone').addEventListener('input', function () {
+
+        verifyPhoneBtn.innerText = '본인 인증';
+        verifyPhoneBtn.classList.remove('bg-green-600');
+        verifyPhoneBtn.classList.add('bg-blue-600');
+
     });
 
 </script>
