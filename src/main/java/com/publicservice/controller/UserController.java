@@ -2,8 +2,10 @@ package com.publicservice.controller;
 
 import com.publicservice.entity.User;
 import com.publicservice.repository.UserRepository;
+import com.publicservice.dao.UserDAO;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +67,48 @@ public class UserController {
     @GetMapping("/signup")
     public String joinPage() {
         return "user/signup";
+    }
+
+    //회원가입
+    @Autowired
+    private UserDAO userDAO;
+
+    @PostMapping("/signup")
+    public String signup(HttpServletRequest request) {
+        try {
+            String email = request.getParameter("email");
+            String password = request.getParameter("password");
+            String name = request.getParameter("name");
+            String phone = request.getParameter("phone");
+            String role = request.getParameter("role");
+            String companyName = request.getParameter("company_name");
+            String bizNo = request.getParameter("biz_no");
+            String businessStage = request.getParameter("business_stage");
+            String industry = request.getParameter("industry");
+            String status = request.getParameter("status");
+
+            if (status == null || status.trim().isEmpty()) {
+                status = "ACTIVE";
+            }
+
+            userDAO.insertUser(
+                    email,
+                    password,
+                    name,
+                    phone,
+                    role,
+                    companyName,
+                    bizNo,
+                    businessStage,
+                    industry,
+                    status
+            );
+
+            return "redirect:/login";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/signup";
+        }
     }
 
     //아이디찾기추가
