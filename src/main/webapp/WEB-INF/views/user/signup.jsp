@@ -195,21 +195,22 @@
         dynamicFields.innerHTML = html;
 }
 
-    function goBack() {
-        signupForm.classList.add('hidden');
-        roleSelectionSection.classList.remove('hidden');
-        subtitle.innerText = "CityBiz 플랫폼에서 활동하실 역할을 선택해주세요.";
-    }
+        function goBack() {
+            signupForm.classList.add('hidden');
+            roleSelectionSection.classList.remove('hidden');
+            subtitle.innerText = "CityBiz 플랫폼에서 활동하실 역할을 선택해주세요.";
+        }
 
-    async function handleSignup(e) {
-        e.preventDefault();
-        alert('회원가입이 완료되었습니다! 메인 페이지로 이동합니다.');
-        location.href = "/main.jsp";
-    }
+        async function handleSignup(e) {
+            e.preventDefault();
+            alert('회원가입이 완료되었습니다! 메인 페이지로 이동합니다.');
+            location.href = "/main.jsp";
+        }
 
-    // 이메일 중복체크
-    const contextPath = '${pageContext.request.contextPath}';
-    const checkEmailBtn = document.getElementById('checkEmailBtn');
+        // 이메일 중복체크
+        const contextPath = '${pageContext.request.contextPath}';
+        const checkEmailBtn = document.getElementById('checkEmailBtn');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (checkEmailBtn) {
         checkEmailBtn.addEventListener('click', async function () {
@@ -218,6 +219,12 @@
 
             if (!email) {
                 alert('이메일을 입력해주세요.');
+                emailInput.focus();
+                return;
+            }
+
+            if (!emailRegex.test(email)) {
+                alert('올바른 이메일 형식이 아닙니다.');
                 emailInput.focus();
                 return;
             }
@@ -236,20 +243,32 @@
 
                 const data = await response.json();
 
-                if (data.exists) {
-                    alert('이미 사용 중인 이메일입니다.');
-                    isEmailChecked = false;
-                    emailInput.focus();
-                    checkEmailBtn.innerText = '중복 확인';
-                    checkEmailBtn.classList.remove('bg-green-600');
-                    checkEmailBtn.classList.add('bg-slate-800');
-                } else {
-                    alert('사용 가능한 이메일입니다.');
-                    isEmailChecked = true;
-                    checkEmailBtn.innerText = '확인 완료';
-                    checkEmailBtn.classList.remove('bg-slate-800');
-                    checkEmailBtn.classList.add('bg-green-600');
-                }
+               if (!data.valid) {
+                alert('올바른 이메일 형식이 아닙니다.');
+                isEmailChecked = false;
+                emailInput.focus();
+
+                checkEmailBtn.innerText = '중복 확인';
+                checkEmailBtn.classList.remove('bg-green-600');
+                checkEmailBtn.classList.add('bg-slate-800');
+
+            } else if (data.exists) {
+                alert('이미 사용 중인 이메일입니다.');
+                isEmailChecked = false;
+                emailInput.focus();
+
+                checkEmailBtn.innerText = '중복 확인';
+                checkEmailBtn.classList.remove('bg-green-600');
+                checkEmailBtn.classList.add('bg-slate-800');
+
+            } else {
+                alert('사용 가능한 이메일입니다.');
+                isEmailChecked = true;
+
+                checkEmailBtn.innerText = '확인 완료';
+                checkEmailBtn.classList.remove('bg-slate-800');
+                checkEmailBtn.classList.add('bg-green-600');
+            }
             } catch (error) {
                 console.error(error);
                 alert('중복 확인 중 오류가 발생했습니다.');
@@ -265,6 +284,16 @@
         if (!isEmailChecked) {
             alert('이메일 중복 확인을 먼저 해주세요.');
             e.preventDefault();
+        }
+    });
+
+    signupForm.addEventListener('submit', function (e) {
+        const email = document.getElementById('email').value.trim();
+
+        if (!emailRegex.test(email)) {
+            alert('올바른 이메일 형식을 입력해주세요.');
+            e.preventDefault();
+            return;
         }
     });
 

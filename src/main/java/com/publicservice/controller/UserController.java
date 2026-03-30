@@ -129,11 +129,19 @@ public class UserController {
     public Map<String, Object> checkEmail(@RequestParam("email") String email) {
         Map<String, Object> result = new HashMap<>();
 
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            result.put("valid", false);
+            result.put("exists", false);
+            return result;
+        }
+
         try {
             boolean exists = userDAO.existsByEmail(email);
+            result.put("valid", true);
             result.put("exists", exists);
         } catch (Exception e) {
             e.printStackTrace();
+            result.put("valid", false);
             result.put("exists", false);
             result.put("error", true);
         }
