@@ -44,6 +44,14 @@ ALTER TABLE users
     ADD COLUMN industry VARCHAR(50) NULL
         COMMENT '업종 또는 관심 분야';
 
+// 번호 중복 방지
+ALTER TABLE users
+ADD CONSTRAINT uq_users_phone UNIQUE (phone);
+
+// 기존 계정 로그인 불가능 user_id로 기존 계정 삭제 후 새로 회원가입하시길..
+DELETE FROM users
+WHERE user_id IN (1, 3, 4);
+
 
 select * from users
 
