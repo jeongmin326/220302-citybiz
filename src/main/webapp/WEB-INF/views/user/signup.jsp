@@ -106,7 +106,7 @@
                             required
                             class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                             placeholder="010-0000-0000">
-                        <button type="button" onclick="alert('인증번호가 발송되었습니다.')" class="px-4 py-3 bg-blue-600 text-white text-xs font-bold rounded-xl whitespace-nowrap">
+                        <button type="button" onclick="alert('인증번호가 발송되었습니다.(기능추가예정)')" class="px-4 py-3 bg-blue-600 text-white text-xs font-bold rounded-xl whitespace-nowrap">
                             본인 인증
                         </button>
                     </div>
