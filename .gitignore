@@ -31,3 +31,16 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# build
+target/
