@@ -134,5 +134,3 @@ VALUES
  '/img_space/spaces/space3_main.jpg',
  '촬영과 콘텐츠 제작에 적합한 스튜디오입니다.', 'Y');
 
-
- test
