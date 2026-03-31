@@ -11,6 +11,12 @@ public class HomeController {
         return "home/main";
     }
 
+    // 교수님이 말하는 사이트 구조
+    @GetMapping("/prof")
+    public String profPage() {
+        return "home/prof";
+    }
+
     // 공간 대여 페이지 매핑
     @GetMapping("/space")
     public String spacePage() {
