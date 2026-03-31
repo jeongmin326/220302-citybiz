@@ -2,8 +2,10 @@ package com.publicservice.controller;
 
 import com.publicservice.entity.User;
 import com.publicservice.repository.UserRepository;
+import com.publicservice.dao.UserDAO;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.Optional;
 
@@ -25,7 +32,7 @@ public class UserController {
         return "user/login";
     }
 
-    @PostMapping("/login")
+   @PostMapping("/login")
     public String loginProcess(@RequestParam("email") String email,
                             @RequestParam("password") String password,
                             @RequestParam(value = "rememberId", required = false) String rememberId,
@@ -37,7 +44,9 @@ public class UserController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
 
-            if (user.getPasswordHash().equals(password)) {
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+            if (encoder.matches(password, user.getPasswordHash())) {
                 session.setAttribute("loginUser", user.getEmail());
                 session.setAttribute("loginName", user.getName());
                 session.setAttribute("loginRole", user.getRole());
@@ -66,6 +75,101 @@ public class UserController {
     public String joinPage() {
         return "user/signup";
     }
+
+    //회원가입
+    @Autowired
+    private UserDAO userDAO;
+
+    @PostMapping("/signup")
+    public String signup(HttpServletRequest request) {
+        try {
+            String email = request.getParameter("email");
+            String password = request.getParameter("password");
+            String name = request.getParameter("name");
+            String phone = request.getParameter("phone");
+            String role = request.getParameter("role");
+            String companyName = request.getParameter("company_name");
+            String bizNo = request.getParameter("biz_no");
+            String businessStage = request.getParameter("business_stage");
+            String industry = request.getParameter("industry");
+            String status = request.getParameter("status");
+
+            if (status == null || status.trim().isEmpty()) {
+                status = "ACTIVE";
+            }
+
+            if (userDAO.existsByEmail(email)) {
+                return "redirect:/signup?error=duplicate";
+            }
+
+            if (userDAO.existsByPhone(phone)) {
+                return "redirect:/signup?error=duplicatePhone";
+            }
+
+            userDAO.insertUser(
+                    email,
+                    password,
+                    name,
+                    phone,
+                    role,
+                    companyName,
+                    bizNo,
+                    businessStage,
+                    industry,
+                    status
+            );
+
+            return "redirect:/login?signup=success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "redirect:/signup?signup=fail";
+        }
+    }
+
+    // 이메일 중복 체크
+    @GetMapping("/check-email")
+    @ResponseBody
+    public Map<String, Object> checkEmail(@RequestParam("email") String email) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+            result.put("valid", false);
+            result.put("exists", false);
+            return result;
+        }
+
+        try {
+            boolean exists = userDAO.existsByEmail(email);
+            result.put("valid", true);
+            result.put("exists", exists);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("valid", false);
+            result.put("exists", false);
+            result.put("error", true);
+        }
+
+        return result;
+    }
+
+    // 전화번호 중복 체크
+    @GetMapping("/check-phone")
+    @ResponseBody
+    public Map<String, Object> checkPhone(@RequestParam("phone") String phone) {
+        Map<String, Object> result = new HashMap<>();
+
+        try {
+            boolean exists = userDAO.existsByPhone(phone);
+            result.put("exists", exists);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("exists", false);
+            result.put("error", true);
+        }
+
+        return result;
+    }
+    
 
     //아이디찾기추가
     @GetMapping("/findID")
