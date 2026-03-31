@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="space-y-6 border-t lg:border-t-0 lg:border-l border-slate-100 pt-8 lg:pt-0 lg:pl-12">
-                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-6">
+                    <h2 id="rightSectionTitle" class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-6">
                         <span class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm">2</span>
                         기업 및 프로젝트 정보
                     </h2>
@@ -108,6 +108,7 @@
     const signupForm = document.getElementById('signupForm');
     const dynamicFields = document.getElementById('dynamicFields');
     const subtitle = document.getElementById('subtitle');
+    const rightSectionTitle = document.getElementById('rightSectionTitle');
 
     function selectRole(role) {
         document.getElementById('userRole').value = role;
@@ -118,6 +119,7 @@
         let html = '';
         if (role === 'USER') {
             subtitle.innerText = "스타트업 성장을 위한 기업 정보를 입력해주세요.";
+            rightSectionTitle.innerHTML = '<span class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm">2</span>기업 및 프로젝트 정보';
             html = `
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">기업명 (또는 팀명)</label>
@@ -149,11 +151,55 @@
                     </select>
                 </div>
             `;
+        } else if (role === 'PROVIDER') {
+            subtitle.innerText = "공간 및 시설 공급을 위한 파트너 정보를 입력해주세요.";
+            // 제목도 공급자에 맞게 변경
+            rightSectionTitle.innerHTML = '<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm">2</span>시설 및 사업자 정보';
+            html = `
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">운영 기관/시설명</label>
+                    <input type="text" id="facilityName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="예: 시티비즈 공유오피스 강남점">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">사업자 등록번호</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="providerBizNo" required class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="000-00-00000">
+                        <button type="button" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">진위 확인</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">사업자 등록증 첨부</label>
+                    <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition-all">
+                        <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
+                        <span class="text-xs text-slate-500">클릭하여 PDF 또는 이미지 업로드</span>
+                        <input type="file" class="hidden">
+                    </label>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">정산 은행</label>
+                        <select class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option>신한은행</option>
+                            <option>국민은행</option>
+                            <option>우리은행</option>
+                            <option>농협은행</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">계좌 번호</label>
+                        <input type="text" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" placeholder="'-' 제외 입력">
+                    </div>
+                </div>
+            `;
         } else {
-            // PROVIDER, EXPERT용 로직은 이전과 비슷하게 구성 (생략)
+            subtitle.innerText = "전문가 풀 등록을 위한 정보를 입력해주세요.";
+            rightSectionTitle.innerHTML = '<span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">2</span>전문가 정보';
             html = `<p class='text-slate-400 pt-10 text-center'>해당 역할에 맞는 필드를 준비 중입니다.</p>`;
         }
         dynamicFields.innerHTML = html;
+        
+        // 동적으로 추가된 lucide 아이콘 렌더링
+        if (window.lucide) { lucide.createIcons(); }
     }
 
     function goBack() {
@@ -164,7 +210,12 @@
 
     async function handleSignup(e) {
         e.preventDefault();
-        alert('회원가입이 완료되었습니다! 메인 페이지로 이동합니다.');
+        const role = document.getElementById('userRole').value;
+        if(role === 'PROVIDER') {
+            alert('공급자 가입 신청이 완료되었습니다! 관리자 승인 후 안내 메일을 보내드립니다.');
+        } else {
+            alert('회원가입이 완료되었습니다! 메인 페이지로 이동합니다.');
+        }
         location.href = "/main.jsp";
     }
 </script>
