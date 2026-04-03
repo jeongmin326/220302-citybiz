@@ -45,7 +45,6 @@
             </button>
         </div>
 
-        <!-- db에 맞추어서 수정 -->
         <form id="signupForm"
         class="hidden max-w-4xl mx-auto bg-white/90 backdrop-blur-md p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-slate-100"
         action="${pageContext.request.contextPath}/signup"
@@ -117,12 +116,12 @@
             </div>
 
                 <div class="space-y-6 border-t lg:border-t-0 lg:border-l border-slate-100 pt-8 lg:pt-0 lg:pl-12">
-                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-6">
+                    <h2 id="rightSectionTitle" class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-6">
                         <span class="w-8 h-8 rounded-lg bg-green-100 text-green-600 flex items-center justify-center text-sm">2</span>
                         기업 및 프로젝트 정보
                     </h2>
                     <div id="dynamicFields" class="space-y-6">
-                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -145,6 +144,9 @@
     const signupForm = document.getElementById('signupForm');
     const dynamicFields = document.getElementById('dynamicFields');
     const subtitle = document.getElementById('subtitle');
+    
+    // 수정됨: rightSectionTitle 변수 선언 추가
+    const rightSectionTitle = document.getElementById('rightSectionTitle');
 
     function selectRole(role) {
         document.getElementById('userRole').value = role;
@@ -235,11 +237,11 @@
         dynamicFields.innerHTML = html;
     }
 
-        function goBack() {
-            signupForm.classList.add('hidden');
-            roleSelectionSection.classList.remove('hidden');
-            subtitle.innerText = "CityBiz 플랫폼에서 활동하실 역할을 선택해주세요.";
-        }
+    function goBack() {
+        signupForm.classList.add('hidden');
+        roleSelectionSection.classList.remove('hidden');
+        subtitle.innerText = "CityBiz 플랫폼에서 활동하실 역할을 선택해주세요.";
+    }
 
     async function handleSignup(e) {
         e.preventDefault();
