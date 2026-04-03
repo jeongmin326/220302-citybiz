@@ -16,17 +16,18 @@
             <div>
                 <label for="email" class="block text-sm font-medium text-slate-700 mb-1.5">이메일(아이디)</label>
                 <input type="email" id="email" name="email" required
-                       class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm"
+                       class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm shadow-sm"
                        placeholder="you@example.com">
             </div>
             <div>
                 <label for="name" class="block text-sm font-medium text-slate-700 mb-1.5">이름</label>
                 <input type="text" id="name" name="name" required
-                       class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm"
+                       class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm shadow-sm"
                        placeholder="성함을 입력해주세요">
             </div>
+            <%-- 버튼 색상을 로그인 버튼과 동일한 bg-slate-900으로 수정 --%>
             <button type="submit" 
-                    class="w-full py-3.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition shadow-lg hover:-translate-y-0.5 mt-2">
+                    class="w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-md transform hover:-translate-y-0.5 mt-2">
                 임시 비밀번호 발송
             </button>
         </form>
@@ -35,7 +36,7 @@
             <a href="/login" class="text-slate-400 hover:text-slate-600 transition flex items-center gap-1">
                 <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> 로그인으로 돌아가기
             </a>
-            <a href="/findID" class="text-indigo-600 font-semibold hover:underline">아이디 찾기</a>
+            <a href="/findID" class="text-blue-600 font-semibold hover:underline">아이디 찾기</a>
         </div>
     </div>
 </main>

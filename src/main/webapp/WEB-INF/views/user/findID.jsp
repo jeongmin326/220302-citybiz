@@ -25,8 +25,9 @@
                        class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm shadow-sm"
                        placeholder="010-0000-0000">
             </div>
+            <%-- 버튼 색상을 로그인 버튼과 동일한 bg-slate-900으로 수정 --%>
             <button type="submit" 
-                    class="w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition shadow-lg hover:-translate-y-0.5 mt-2">
+                    class="w-full py-3.5 bg-slate-900 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition-all shadow-md transform hover:-translate-y-0.5 mt-2">
                 아이디 확인하기
             </button>
         </form>
