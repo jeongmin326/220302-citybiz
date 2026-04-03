@@ -48,7 +48,8 @@
         <form id="signupForm"
         class="hidden max-w-4xl mx-auto bg-white/90 backdrop-blur-md p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-slate-100"
         action="${pageContext.request.contextPath}/signup"
-        method="post">
+        method="post"
+        onsubmit="return handleSignup(event)">
 
         <input type="hidden" id="userRole" name="role" value="">
         <input type="hidden" name="status" value="ACTIVE">
@@ -144,9 +145,52 @@
     const signupForm = document.getElementById('signupForm');
     const dynamicFields = document.getElementById('dynamicFields');
     const subtitle = document.getElementById('subtitle');
-    
-    // 수정됨: rightSectionTitle 변수 선언 추가
     const rightSectionTitle = document.getElementById('rightSectionTitle');
+
+    // 변수 추가: 검증 상태 확인용
+    let isEmailChecked = false;
+    let isPhoneVerified = false;
+
+    // 1. 중복 확인 버튼 로직
+    document.getElementById('checkEmailBtn').addEventListener('click', function() {
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!email) {
+            alert('이메일을 입력해주세요.');
+            return;
+        }
+        if (!emailRegex.test(email)) {
+            alert('올바른 이메일 형식이 아닙니다.');
+            return;
+        }
+
+        // 실제 서버 통신 대신 시뮬레이션
+        alert(email + '은(는) 사용 가능한 아이디입니다.');
+        isEmailChecked = true;
+    });
+
+    // 2. 본인 인증 버튼 로직
+    document.getElementById('verifyPhoneBtn').addEventListener('click', function() {
+        const phone = document.getElementById('phone').value;
+        if (!phone || phone.length < 10) {
+            alert('올바른 휴대폰 번호를 입력해주세요.');
+            return;
+        }
+
+        alert('인증번호가 발송되었습니다. (테스트 번호: 1234)');
+        
+        const userInput = prompt('휴대폰으로 전송된 인증번호 4자리를 입력해주세요.');
+        if (userInput === '1234') {
+            alert('본인 인증이 완료되었습니다.');
+            isPhoneVerified = true;
+            this.innerText = '인증 완료';
+            this.classList.replace('bg-blue-600', 'bg-green-600');
+            this.disabled = true;
+        } else if (userInput !== null) {
+            alert('인증번호가 일치하지 않습니다. 다시 시도해주세요.');
+        }
+    });
 
     function selectRole(role) {
         document.getElementById('userRole').value = role;
@@ -167,7 +211,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">사업자 등록번호</label>
                     <div class="flex gap-2">
                         <input type="text" id="bizNo" name="biz_no" class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" placeholder="000-00-00000">
-                        <button type="button" onclick="alert('정상적인 사업자입니다.')" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">진위 확인</button>
+                        <button type="button" onclick="alert('정상적인 사업자 등록번호입니다.')" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">진위 확인</button>
                     </div>
                     <p class="text-[10px] text-slate-400 mt-1">* 예비창업자는 입력하지 않아도 됩니다.</p>
                 </div>
@@ -191,7 +235,6 @@
             `;
         } else if (role === 'PROVIDER') {
             subtitle.innerText = "공간 및 시설 공급을 위한 파트너 정보를 입력해주세요.";
-            // 제목도 공급자에 맞게 변경
             rightSectionTitle.innerHTML = '<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm">2</span>시설 및 사업자 정보';
             html = `
                 <div>
@@ -202,7 +245,7 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">사업자 등록번호</label>
                     <div class="flex gap-2">
                         <input type="text" id="providerBizNo" required class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="000-00-00000">
-                        <button type="button" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">진위 확인</button>
+                        <button type="button" onclick="alert('사업자 확인이 완료되었습니다.')" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">진위 확인</button>
                     </div>
                 </div>
                 <div>
@@ -235,6 +278,7 @@
             html = `<p class='text-slate-400 pt-10 text-center'>해당 역할에 맞는 필드를 준비 중입니다.</p>`;
         }
         dynamicFields.innerHTML = html;
+        if (window.lucide) { lucide.createIcons(); } // 동적 생성된 아이콘 로드
     }
 
     function goBack() {
@@ -243,10 +287,28 @@
         subtitle.innerText = "CityBiz 플랫폼에서 활동하실 역할을 선택해주세요.";
     }
 
+    // 3. 가입 완료하기 로직
     async function handleSignup(e) {
         e.preventDefault();
-        alert('회원가입이 완료되었습니다! 메인 페이지로 이동합니다.');
-        location.href = "/main.jsp";
+
+        // 검증 로직 추가
+        if (!isEmailChecked) {
+            alert('이메일 중복 확인을 진행해주세요.');
+            return false;
+        }
+        if (!isPhoneVerified) {
+            alert('휴대폰 본인 인증을 완료해주세요.');
+            return false;
+        }
+
+        const confirmSignup = confirm('입력하신 정보로 회원가입을 완료하시겠습니까?');
+        if (confirmSignup) {
+            alert('회원가입이 성공적으로 완료되었습니다! 환영합니다.');
+            // 실제 서비스에서는 폼 데이터를 서버로 전송
+            // e.target.submit(); 
+            location.href = "${pageContext.request.contextPath}/main.jsp";
+        }
+        return false;
     }
 </script>
 
