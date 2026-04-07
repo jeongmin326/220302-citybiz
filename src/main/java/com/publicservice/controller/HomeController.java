@@ -60,4 +60,10 @@ public class HomeController {
     public String expertProfilePage() {
         return "mypage/expertProfile"; 
     }
+
+    // 전문가(Expert) 컨설팅 신청 관리 페이지 매핑
+    @GetMapping("/mypage/expertManagement")
+    public String expertManagementPage() {
+        return "mypage/expertManagement"; 
+    }
 }
