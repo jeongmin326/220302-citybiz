@@ -86,7 +86,7 @@
                             <h2 class="text-2xl font-bold text-slate-900">안녕하세요, ${sessionScope.loginName}님!</h2>
                             <p class="text-slate-500 mt-1">
                                 <c:choose>
-                                    <c:when test="${sessionScope.loginRole == 'HOST'}">운영 중인 공간의 새로운 예약 건이 있는지 확인해보세요.</c:when>
+                                    <c:when test="${sessionScope.loginRole == 'PROVIDER'}">운영 중인 공간의 새로운 예약 건이 있는지 확인해보세요.</c:when>
                                     <c:when test="${sessionScope.loginRole == 'EXPERT'}">전문가 매칭 시스템을 통해 비즈니스 기회를 발견하세요.</c:when>
                                     <c:otherwise>오늘 ${sessionScope.loginName}님께 딱 맞는 지원사업 3건이 새로 올라왔습니다.</c:otherwise>
                                 </c:choose>
@@ -96,7 +96,7 @@
                     
                     <div class="flex gap-3 w-full md:w-auto">
                         <c:choose>
-                            <c:when test="${sessionScope.loginRole == 'HOST'}">
+                            <c:when test="${sessionScope.loginRole == 'PROVIDER'}">
                                 <a href="/host/register" class="flex-1 md:flex-none text-center bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">공간 등록하기</a>
                                 <a href="/host/dashboard" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">예약 관리</a>
                             </c:when>
