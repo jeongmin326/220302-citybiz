@@ -54,4 +54,10 @@ public class HomeController {
     public String spaceManagementPage() {
         return "mypage/spaceManagement"; 
     }
+
+    // 전문가(Expert) 프로필 수정 페이지 매핑
+    @GetMapping("/mypage/expertProfile")
+    public String expertProfilePage() {
+        return "mypage/expertProfile"; 
+    }
 }
