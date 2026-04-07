@@ -98,7 +98,7 @@
                         <c:choose>
                             <c:when test="${sessionScope.loginRole == 'PROVIDER'}">
                                 <a href="/mypage/spaceRegi" class="flex-1 md:flex-none text-center bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">공간 등록하기</a>
-                                <a href="/mypage/dashboard" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">예약 관리</a>
+                                <a href="/mypage/spaceManagement" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">예약 관리</a>
                             </c:when>
                             <c:when test="${sessionScope.loginRole == 'EXPERT'}">
                                 <a href="/pro/profile" class="flex-1 md:flex-none text-center bg-purple-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">전문가 프로필 수정</a>

@@ -48,4 +48,10 @@ public class HomeController {
         // views/mypage 폴더 안의 spaceRegi.jsp를 화면에 띄우라는 뜻입니다.
         return "mypage/spaceRegi"; 
     }
+
+    // 공급자(Host) 예약 관리(대시보드) 페이지 매핑
+    @GetMapping("/mypage/spaceManagement")
+    public String spaceManagementPage() {
+        return "mypage/spaceManagement"; 
+    }
 }
