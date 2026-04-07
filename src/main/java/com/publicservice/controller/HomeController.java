@@ -34,4 +34,11 @@ public class HomeController {
     public String consultingPage() {
         return "home/consulting"; 
     }
+
+    // 마이페이지(활동 내역) 매핑 추가
+    @GetMapping("/mypage/status")
+    public String statusPage() {
+        // views/mypage 폴더 안의 status.jsp를 화면에 띄우라는 뜻입니다.
+        return "mypage/status"; 
+    }
 }
