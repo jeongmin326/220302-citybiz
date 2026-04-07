@@ -34,36 +34,4 @@ public class HomeController {
     public String consultingPage() {
         return "home/consulting"; 
     }
-
-    // 마이페이지(User) 매핑
-    @GetMapping("/mypage/status")
-    public String statusPage() {
-        // views/mypage 폴더 안의 status.jsp를 화면에 띄우라는 뜻입니다.
-        return "mypage/status"; 
-    }
-
-    // 공급자(Host) 공간 등록 페이지 매핑
-    @GetMapping("/mypage/spaceRegi") // 웹 브라우저에 입력할 주소 (예: localhost:8080/mypage/spaceRegi)
-    public String spaceRegisterPage() {
-        // views/mypage 폴더 안의 spaceRegi.jsp를 화면에 띄우라는 뜻입니다.
-        return "mypage/spaceRegi"; 
-    }
-
-    // 공급자(Host) 예약 관리(대시보드) 페이지 매핑
-    @GetMapping("/mypage/spaceManagement")
-    public String spaceManagementPage() {
-        return "mypage/spaceManagement"; 
-    }
-
-    // 전문가(Expert) 프로필 수정 페이지 매핑
-    @GetMapping("/mypage/expertProfile")
-    public String expertProfilePage() {
-        return "mypage/expertProfile"; 
-    }
-
-    // 전문가(Expert) 컨설팅 신청 관리 페이지 매핑
-    @GetMapping("/mypage/expertManagement")
-    public String expertManagementPage() {
-        return "mypage/expertManagement"; 
-    }
 }

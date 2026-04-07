@@ -45,8 +45,7 @@
                                     </div>
                                     <span class="text-slate-700">
                                         <strong class="text-slate-900">${sessionScope.loginName}</strong> 님
-                                        <%-- 백엔드 변수명 loginRole로 수정 --%>
-                                        <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded ml-1 text-slate-500">${sessionScope.loginRole}</span>
+                                        <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded ml-1 text-slate-500">${sessionScope.userRole}</span>
                                     </span>
                                 </div>
                                 <a href="/logout" class="text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors flex items-center gap-1.5">
@@ -74,7 +73,7 @@
         <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-400/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        <%-- 로그인 유저의 역할(Role)별 맞춤형 대시보드 배너 --%>
+        <%-- [추가] 로그인 유저의 역할(Role)별 맞춤형 대시보드 배너 --%>
         <c:if test="${not empty sessionScope.loginUser}">
             <div class="max-w-6xl w-full mb-16 z-10 animate-in fade-in slide-in-from-top-4 duration-700">
                 <div class="bg-white/60 backdrop-blur-sm border border-white/50 rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row justify-between items-center gap-8">
@@ -86,8 +85,8 @@
                             <h2 class="text-2xl font-bold text-slate-900">안녕하세요, ${sessionScope.loginName}님!</h2>
                             <p class="text-slate-500 mt-1">
                                 <c:choose>
-                                    <c:when test="${sessionScope.loginRole == 'PROVIDER'}">운영 중인 공간의 새로운 예약 건이 있는지 확인해보세요.</c:when>
-                                    <c:when test="${sessionScope.loginRole == 'EXPERT'}">전문가 매칭 시스템을 통해 비즈니스 기회를 발견하세요.</c:when>
+                                    <c:when test="${sessionScope.userRole == 'HOST'}">운영 중인 공간의 새로운 예약 건이 있는지 확인해보세요.</c:when>
+                                    <c:when test="${sessionScope.userRole == 'PRO'}">전문가 매칭 시스템을 통해 비즈니스 기회를 발견하세요.</c:when>
                                     <c:otherwise>오늘 ${sessionScope.loginName}님께 딱 맞는 지원사업 3건이 새로 올라왔습니다.</c:otherwise>
                                 </c:choose>
                             </p>
@@ -96,13 +95,12 @@
                     
                     <div class="flex gap-3 w-full md:w-auto">
                         <c:choose>
-                            <c:when test="${sessionScope.loginRole == 'PROVIDER'}">
-                                <a href="/mypage/spaceRegi" class="flex-1 md:flex-none text-center bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">공간 등록하기</a>
-                                <a href="/mypage/spaceManagement" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">예약 관리</a>
+                            <c:when test="${sessionScope.userRole == 'HOST'}">
+                                <a href="/host/register" class="flex-1 md:flex-none text-center bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">공간 등록하기</a>
+                                <a href="/host/dashboard" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">예약 관리</a>
                             </c:when>
-                            <c:when test="${sessionScope.loginRole == 'EXPERT'}">
-                                <a href="/mypage/expertProfile" class="flex-1 md:flex-none text-center bg-purple-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">전문가 프로필 수정</a>
-                                <a href="/mypage/expertManagement" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">컨설팅 관리</a>
+                            <c:when test="${sessionScope.userRole == 'PRO'}">
+                                <a href="/pro/profile" class="flex-1 md:flex-none text-center bg-purple-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">전문가 프로필 수정</a>
                             </c:when>
                             <c:otherwise>
                                 <a href="/mypage/status" class="flex-1 md:flex-none text-center bg-slate-900 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200">내 활동 내역</a>
@@ -195,6 +193,12 @@
     <script>
         // 루사이드 아이콘 초기화
         lucide.createIcons();
+
+        /* [Backend/AI 협업 포인트]
+           1. Backend: 사용자가 로그인할 때 DB의 'role' 값을 세션의 'userRole' 속성에 저장해야 함.
+           2. AI: FastAPI 서버는 사용자의 role과 선호 데이터를 바탕으로 지원 사업 추천 리스트를 JSON으로 제공해야 함.
+           3. Axios: 페이지 하단이나 특정 액션 발생 시 FastAPI의 추천 API를 호출하도록 설계.
+        */
     </script>
 </body>
 </html>
