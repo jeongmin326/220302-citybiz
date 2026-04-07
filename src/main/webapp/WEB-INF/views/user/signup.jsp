@@ -109,7 +109,7 @@
                             inputmode="numeric"
                             class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                             placeholder="01012345678">
-                        <button type="button" id="verifyPhoneBtn" class="px-4 py-3 bg-blue-600 text-white text-xs font-bold rounded-xl whitespace-nowrap">
+                        <button type="button" id="verifyPhoneBtn" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">
                             본인 인증
                         </button>
                     </div>
@@ -146,13 +146,14 @@
     const dynamicFields = document.getElementById('dynamicFields');
     const subtitle = document.getElementById('subtitle');
     const rightSectionTitle = document.getElementById('rightSectionTitle');
+    const contextPath = '${pageContext.request.contextPath}';
 
     // 변수 추가: 검증 상태 확인용
     let isEmailChecked = false;
     let isPhoneVerified = false;
 
     // 1. 중복 확인 버튼 로직
-    document.getElementById('checkEmailBtn').addEventListener('click', function() {
+    document.getElementById('checkEmailBtn').addEventListener('click', async function() {
         const email = document.getElementById('email').value;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -160,36 +161,110 @@
             alert('이메일을 입력해주세요.');
             return;
         }
+
         if (!emailRegex.test(email)) {
             alert('올바른 이메일 형식이 아닙니다.');
             return;
         }
 
-        // 실제 서버 통신 대신 시뮬레이션
-        alert(email + '은(는) 사용 가능한 아이디입니다.');
-        isEmailChecked = true;
+        try {
+            const response = await fetch(contextPath + '/check-email?email=' + encodeURIComponent(email));
+            const data = await response.json();
+
+            if (data.error) {
+                alert('이메일 중복 확인 중 오류가 발생했습니다.');
+                isEmailChecked = false;
+                return;
+            }
+
+            if (!data.valid) {
+                alert('올바른 이메일 형식이 아닙니다.');
+                isEmailChecked = false;
+                return;
+            }
+
+            if (data.exists) {
+                alert('이미 사용 중인 이메일입니다.');
+                isEmailChecked = false;
+                return;
+            }
+
+            alert('사용 가능한 이메일입니다.');
+            this.innerText = '확인 완료';
+            this.classList.remove('bg-blue-600');
+            this.classList.add('bg-green-600');
+            this.disabled = true;
+            isEmailChecked = true;
+        } catch (e) {
+            console.error(e);
+            alert('이메일 중복 확인 중 서버 통신에 실패했습니다.');
+            isEmailChecked = false;
+        }
     });
 
     // 2. 본인 인증 버튼 로직
-    document.getElementById('verifyPhoneBtn').addEventListener('click', function() {
+    document.getElementById('verifyPhoneBtn').addEventListener('click', async function() {
         const phone = document.getElementById('phone').value;
-        if (!phone || phone.length < 10) {
+
+        if (!phone || !/^01[0-9]{9}$/.test(phone)) {
             alert('올바른 휴대폰 번호를 입력해주세요.');
             return;
         }
 
-        alert('인증번호가 발송되었습니다. (테스트 번호: 1234)');
-        
-        const userInput = prompt('휴대폰으로 전송된 인증번호 4자리를 입력해주세요.');
-        if (userInput === '1234') {
-            alert('본인 인증이 완료되었습니다.');
-            isPhoneVerified = true;
-            this.innerText = '인증 완료';
-            this.classList.replace('bg-blue-600', 'bg-green-600');
-            this.disabled = true;
-        } else if (userInput !== null) {
-            alert('인증번호가 일치하지 않습니다. 다시 시도해주세요.');
+        try {
+            const response = await fetch(contextPath + '/check-phone?phone=' + encodeURIComponent(phone));
+            const data = await response.json();
+
+            if (data.error) {
+                alert('전화번호 확인 중 오류가 발생했습니다.');
+                isPhoneVerified = false;
+                return;
+            }
+
+            if (data.exists) {
+                alert('이미 사용 중인 전화번호입니다.');
+                isPhoneVerified = false;
+                return;
+            }
+
+            alert('인증번호가 발송되었습니다. (테스트 번호: 1234)');
+
+            const userInput = prompt('휴대폰으로 전송된 인증번호 4자리를 입력해주세요.');
+            if (userInput === '1234') {
+                alert('본인 인증이 완료되었습니다.');
+                isPhoneVerified = true;
+                this.innerText = '인증 완료';
+                this.classList.remove('bg-blue-600');
+                this.classList.add('bg-green-600');
+                this.disabled = true;
+            } else if (userInput !== null) {
+                alert('인증번호가 일치하지 않습니다. 다시 시도해주세요.');
+                isPhoneVerified = false;
+            }
+        } catch (e) {
+            console.error(e);
+            alert('전화번호 확인 중 서버 통신에 실패했습니다.');
+            isPhoneVerified = false;
         }
+    });
+
+    document.getElementById('email').addEventListener('input', function() {
+        isEmailChecked = false;
+        const checkEmailBtn = document.getElementById('checkEmailBtn');
+        checkEmailBtn.innerText = '중복 확인';
+        checkEmailBtn.disabled = false;
+        checkEmailBtn.classList.remove('bg-green-600');
+        checkEmailBtn.classList.add('bg-slate-800');
+    });
+
+    document.getElementById('phone').addEventListener('input', function() {
+        isPhoneVerified = false;
+
+        const verifyPhoneBtn = document.getElementById('verifyPhoneBtn');
+        verifyPhoneBtn.innerText = '본인 인증';
+        verifyPhoneBtn.disabled = false;
+        verifyPhoneBtn.classList.remove('bg-green-600');
+        verifyPhoneBtn.classList.add('bg-slate-800');
     });
 
     function selectRole(role) {
@@ -302,13 +377,11 @@
         }
 
         const confirmSignup = confirm('입력하신 정보로 회원가입을 완료하시겠습니까?');
-        if (confirmSignup) {
-            alert('회원가입이 성공적으로 완료되었습니다! 환영합니다.');
-            // 실제 서비스에서는 폼 데이터를 서버로 전송
-            // e.target.submit(); 
-            location.href = "${pageContext.request.contextPath}/main.jsp";
+        if (!confirmSignup) {
+             return false;
         }
-        return false;
+        e.target.submit();
+        return true;
     }
 </script>
 

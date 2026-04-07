@@ -1,7 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <jsp:include page="/WEB-INF/views/common/header.jsp" />
-
+<c:if test="${not empty msg}">
+    <script>
+        alert("${msg}");
+    </script>
+</c:if>
 <main class="flex-1 flex items-center justify-center bg-[#F8FAFC] py-10 px-4 mb-[-64px]">
     <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
         <div class="text-center mb-8">
@@ -21,9 +25,13 @@
             </div>
             <div>
                 <label for="phone" class="block text-sm font-medium text-slate-700 mb-1.5">휴대폰 번호</label>
-                <input type="tel" id="phone" name="phone" required
-                       class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm shadow-sm"
-                       placeholder="010-0000-0000">
+                <input type="tel" id="phone" name="phone" required maxlength="11"
+                    inputmode="numeric"
+                    pattern="[0-9]{11}"
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 11);"
+                    class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm shadow-sm"
+                    placeholder="01012341234">
+                <p class="mt-1 text-xs text-slate-400">- 없이 숫자 11자리로 입력해주세요.</p>
             </div>
             <%-- 버튼 색상을 로그인 버튼과 동일한 bg-slate-900으로 수정 --%>
             <button type="submit" 
@@ -31,7 +39,7 @@
                 아이디 확인하기
             </button>
         </form>
-
+        
         <div class="mt-8 pt-6 border-t border-slate-50 flex justify-between items-center text-xs">
             <a href="/login" class="text-slate-400 hover:text-slate-600 transition flex items-center gap-1">
                 <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> 로그인으로 돌아가기

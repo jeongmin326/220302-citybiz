@@ -2,6 +2,7 @@ package com.publicservice.controller;
 
 import com.publicservice.entity.User;
 import com.publicservice.repository.UserRepository;
+import com.publicservice.service.UserService;
 import com.publicservice.dao.UserDAO;
 
 import jakarta.servlet.http.Cookie;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +28,8 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -83,6 +87,7 @@ public class UserController {
     @PostMapping("/signup")
     public String signup(HttpServletRequest request) {
         try {
+            
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             String name = request.getParameter("name");
@@ -177,10 +182,49 @@ public class UserController {
         return "user/findID";
     }
 
+    @PostMapping("/findID")
+    public String findID(
+            @RequestParam String name,
+            @RequestParam String phone,
+            RedirectAttributes redirectAttributes
+    ) {
+        phone = phone.replaceAll("[^0-9]", "");
+
+        String email = userService.findEmailByNameAndPhone(name, phone);
+
+        if (email != null) {
+            redirectAttributes.addFlashAttribute("msg", "아이디는 " + email + " 입니다.");
+        } else {
+            redirectAttributes.addFlashAttribute("msg", "일치하는 회원 정보를 찾을 수 없습니다.");
+        }
+
+        return "redirect:/findID";
+    }
+
     //비밀번호찾기추가
     @GetMapping("/findPWD")
     public String findPWD() {
         return "user/findPWD";
+    }
+
+    @PostMapping("/findPWD")
+    public String findPWD(
+            @RequestParam String email,
+            @RequestParam String name,
+            @RequestParam String phone,
+            RedirectAttributes redirectAttributes
+    ) {
+        phone = phone.replaceAll("[^0-9]", "");
+
+        boolean success = userService.resetPassword(email, name, phone);
+
+        if (success) {
+            redirectAttributes.addFlashAttribute("msg", "비밀번호는 1234로 초기화되었습니다.");
+        } else {
+            redirectAttributes.addFlashAttribute("msg", "일치하는 회원 정보를 찾을 수 없습니다.");
+        }
+
+        return "redirect:/findPWD";
     }
     
     @GetMapping("/logout")
@@ -188,4 +232,5 @@ public class UserController {
         session.invalidate();
         return "redirect:/login";
     }
+
 }

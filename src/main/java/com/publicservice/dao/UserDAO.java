@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 @Repository
 public class UserDAO {
@@ -89,6 +90,41 @@ public class UserDAO {
         }
 
         return false;
+    }
+
+    public String findEmailByNameAndPhone(String name, String phone) throws Exception {
+        String sql = "SELECT email FROM users WHERE name = ? AND phone = ?";
+
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+            ps.setString(2, phone);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("email");
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public void updatePassword(String email, String newPassword) throws Exception {
+        String sql = "UPDATE users SET password_hash = ?, updated_at = NOW() WHERE email = ?";
+
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String encodedPassword = encoder.encode(newPassword);
+
+            ps.setString(1, encodedPassword);
+            ps.setString(2, email);
+
+            ps.executeUpdate();
+        }
     }
 
 }
