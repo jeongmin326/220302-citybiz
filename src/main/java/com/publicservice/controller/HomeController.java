@@ -35,10 +35,17 @@ public class HomeController {
         return "home/consulting"; 
     }
 
-    // 마이페이지(활동 내역) 매핑 추가
+    // 마이페이지(User) 매핑
     @GetMapping("/mypage/status")
     public String statusPage() {
         // views/mypage 폴더 안의 status.jsp를 화면에 띄우라는 뜻입니다.
         return "mypage/status"; 
+    }
+
+    // 공급자(Host) 공간 등록 페이지 매핑
+    @GetMapping("/mypage/spaceRegi") // 웹 브라우저에 입력할 주소 (예: localhost:8080/mypage/spaceRegi)
+    public String spaceRegisterPage() {
+        // views/mypage 폴더 안의 spaceRegi.jsp를 화면에 띄우라는 뜻입니다.
+        return "mypage/spaceRegi"; 
     }
 }
