@@ -134,3 +134,24 @@ VALUES
  '/img_space/spaces/space3_main.jpg',
  '촬영과 콘텐츠 제작에 적합한 스튜디오입니다.', 'Y');
 
+--04/07 변리사 디비--
+  CREATE TABLE patent_attorneys (
+    id INT AUTO_INCREMENT PRIMARY KEY
+        COMMENT '변리사 고유 ID (PK)',
+    name VARCHAR(50) NOT NULL
+        COMMENT '성명',
+    status INT
+        COMMENT '상태 (1: 개업, 0: 휴업, -1: 폐업)',
+    office VARCHAR(100)
+        COMMENT '사무소명',
+    addr VARCHAR(150)
+        COMMENT '주소',
+    phone VARCHAR(30)
+        COMMENT '연락처',
+    field VARCHAR(20) NOT NULL
+        COMMENT '전문분야 코드 (ELEC, CHEM, MECH, DESIGN)',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        COMMENT '생성일시',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        COMMENT '수정일시'
+) COMMENT='변리사 정보 테이블'; 
