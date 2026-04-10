@@ -414,16 +414,15 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
     let selectedSubs = [];
 
     function selectMainCategory(key) {
-        // 왼쪽 사이드바 대분류 버튼 스타일 초기화 및 선택 효과 적용
+        // 기존 버튼 스타일 초기화
         document.querySelectorAll('.main-cat-btn').forEach(btn => {
             btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
-            btn.querySelector('i').classList.remove('text-blue-600', 'rotate-90');
         });
 
+        // 클릭된 버튼 스타일 적용
         const selectedBtn = document.getElementById(`btn-\${key}`); 
         if(selectedBtn) {
             selectedBtn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
-            selectedBtn.querySelector('i').classList.add('text-blue-600', 'rotate-90');
         }
 
         selectedMain = key;
@@ -453,7 +452,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         }
     }
 
-    // '전체' 버튼 클릭 시 선택 초기화용 
+    // '전체' 버튼 클릭 시 선택 초기화용
     function selectAllSubs(el) {
         selectedSubs = [];
         const container = document.getElementById('subCategoryContainer');
@@ -463,6 +462,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         });
     }
 
+    // 초기화 폼 제출 시
     document.getElementById('consultingSearchForm').addEventListener('reset', function() {
         selectedMain = null;
         selectedSubs = [];
@@ -480,7 +480,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
         document.querySelectorAll('.main-cat-btn').forEach(btn => {
             btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
-            btn.querySelector('i').classList.remove('text-blue-600', 'rotate-90');
         });
     });
 
@@ -506,6 +505,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         alert('선택한 조건 및 지역 정보를 바탕으로 서버에 전문가 데이터를 요청합니다.\n선택된 소분류: ' + (selectedSubs.length > 0 ? selectedSubs.join(', ') : '전체'));
     }
 
+    // AI 챗봇 스크립트 부분
     function openChatWithInput() {
         const input = document.getElementById('heroSearchInput').value;
         if(input.trim() !== '') {
