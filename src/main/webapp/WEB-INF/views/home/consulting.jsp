@@ -43,23 +43,19 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
          
                 <%-- 대분류 필터 (왼쪽 사이드바) --%>
                 <div>
-                     <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">상담 분야 (대분류)</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">상담 분야 (대분류)</label>
                     <div class="grid grid-cols-1 gap-2.5">
-                        <button type="button" onclick="selectMainCategory('IT')" id="btn-IT" class="main-cat-btn flex items-center justify-between px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-purple-300 hover:bg-white shadow-sm">
-                             <span>IT / 기술 컨설팅</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                        <button type="button" onclick="selectMainCategory('IT')" id="btn-IT" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
+                            <span>IT / 기술 컨설팅</span>
                         </button>
-                        <button type="button" onclick="selectMainCategory('BIO')" id="btn-BIO" class="main-cat-btn flex items-center justify-between px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-purple-300 hover:bg-white shadow-sm">
+                        <button type="button" onclick="selectMainCategory('BIO')" id="btn-BIO" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
                             <span>바이오 / 인증 컨설팅</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
                         </button>
-                         <button type="button" onclick="selectMainCategory('MANU')" id="btn-MANU" class="main-cat-btn flex items-center justify-between px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-purple-300 hover:bg-white shadow-sm">
+                        <button type="button" onclick="selectMainCategory('MANU')" id="btn-MANU" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
                             <span>제조 / R&D 지원</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
                         </button>
-                        <button type="button" onclick="selectMainCategory('BRAND')" id="btn-BRAND" class="main-cat-btn flex items-center justify-between px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-purple-300 hover:bg-white shadow-sm">
+                        <button type="button" onclick="selectMainCategory('BRAND')" id="btn-BRAND" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
                             <span>브랜딩 / 디자인 / 특허</span>
-                            <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
                         </button>
                     </div>
                 </div>
@@ -171,12 +167,12 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             </div>
 
             <%-- 전문가 그리드 리스트 (사진 참고형 3단 레이아웃 + 호버 효과) --%>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="consultantListContainer">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full" id="consultantListContainer">
                 
                 <%-- [BACKEND/AI 연동] JSP forEach 문을 활용해 DB 또는 FastAPI의 추천 결과를 렌더링해야 합니다. --%>
                 
                 <%-- 카드 1 : 비오케이파트너스 --%>
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 hover:border-blue-500 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col gap-3 relative h-max">
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">
                     <div class="flex items-center gap-2">
                         <h3 class="text-lg font-bold text-slate-800">비오케이파트너스</h3>
                         <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">서울</span>
@@ -218,26 +214,32 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                         <span class="px-3 py-1 bg-slate-50 border border-slate-200 text-slate-400 rounded-full text-[11px]">... + 4</span>
                     </div>
 
-                    <%-- Hover State (마우스를 올렸을 때 전체 태그 및 버튼 표시) --%>
-                    <div class="hidden group-hover:flex flex-col gap-3 mt-1">
+                    <%-- Hover State (PC에서는 호버 시, 모바일에서는 항상 표시) --%>
+                    <div class="hidden md:group-hover:flex flex-col gap-3 mt-1 md:hidden">
                         <div class="flex flex-wrap gap-1.5">
                             <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">특허</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">지원금</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">정책자금</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">연구소</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">벤처인증</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">경영청구</span>
-                        </div>
+                            </div>
                         <div class="flex gap-2 mt-2">
                             <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>
                             <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>
                         </div>
                     </div>
+
+                    <div class="flex md:hidden flex-col gap-3 mt-1">
+                        <div class="flex flex-wrap gap-1.5">
+                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
+                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">연구소</span>
+                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">벤처인증</span>
+                        </div>
+                        <div class="flex gap-2 mt-2">
+                            <button class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>
+                            <button class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>
+                        </div>
+                    </div>
                 </div>
 
                 <%-- 카드 2 : 클라비스원 --%>
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 hover:border-blue-500 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col gap-3 relative h-max">
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">
                     <div class="flex items-center gap-2">
                         <h3 class="text-lg font-bold text-slate-800">클라비스원</h3>
                         <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">경기</span>
@@ -297,7 +299,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 </div>
 
                 <%-- 카드 3 : 미래금융파트너스 --%>
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 hover:border-blue-500 shadow-sm hover:shadow-xl transition-all duration-300 group flex flex-col gap-3 relative h-max">
+                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">
                     <div class="flex items-center gap-2">
                         <h3 class="text-lg font-bold text-slate-800">미래금융파트너스</h3>
                         <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">서울</span>
