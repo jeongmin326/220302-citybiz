@@ -1,9 +1,10 @@
 package com.publicservice.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "patent_attorneys")
@@ -30,6 +31,16 @@ public class PatentAttorney {
 
     @Column(nullable = false)
     private String field;
+
+    private BigDecimal rating;
+
+    @Column(name = "consult_time")
+    private String consultTime;
+
+    @Column(name = "experience_years")
+    private Integer experienceYears;
+
+    private Integer price;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

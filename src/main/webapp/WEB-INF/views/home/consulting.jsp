@@ -28,7 +28,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
     <div class="flex flex-col md:flex-row gap-10 items-start relative z-10">
         
-        <aside class="w-full md:w-[320px] flex-shrink-0 bg-white rounded-3xl border border-slate-100 p-8 sticky top-28 max-h-[calc(100vh-10rem)] overflow-y-auto custom-scrollbar shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
+        <aside class="w-full md:w-[320px] flex-shrink-0 bg-white rounded-3xl border border-slate-100 p-8 sticky top-28 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
             <div class="flex justify-between items-center mb-8 pb-4 border-b border-slate-100">
                
  <h3 class="font-extrabold text-xl flex items-center gap-2.5 text-slate-900">
@@ -69,12 +69,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                             <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="rating" value="4.5" class="accent-purple-600 w-4 h-4"> 
-                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors flex items-center gap-1">
-                                <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i> 4.5 이상
-                            </span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
                             <input type="radio" name="rating" value="4.0" class="accent-purple-600 w-4 h-4"> 
                             <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors flex items-center gap-1">
                                 <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i> 4.0 이상
@@ -83,53 +77,59 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                     </div>
                 </div>
 
-                <%-- 상담 방식 필터 --%>
+                <%-- 상담 가능 시간 필터 --%>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">상담 방식</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">상담 가능 시간</label>
                     <div class="flex flex-col gap-3">
                         <label class="flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                            <input type="radio" name="method" value="face" class="accent-purple-600 w-4 h-4"> 
-                            <span class="text-sm font-medium text-slate-700 flex-grow">대면 상담</span>
-                            <i data-lucide="users" class="w-4 h-4 text-slate-400"></i>
+                            <input type="checkbox" name="consultTimeOption" value="주말" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 flex-grow">주말</span>
+                            <i data-lucide="calendar-days" class="w-4 h-4 text-slate-400"></i>
                         </label>
                         <label class="flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                            <input type="radio" name="method" value="video" class="accent-purple-600 w-4 h-4"> 
-                            <span class="text-sm font-medium text-slate-700 flex-grow">화상 상담</span>
-                            <i data-lucide="video" class="w-4 h-4 text-slate-400"></i>
-                        </label>
-                        <label class="flex items-center gap-3 p-3 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
-                            <input type="radio" name="method" value="call" class="accent-purple-600 w-4 h-4"> 
-                            <span class="text-sm font-medium text-slate-700 flex-grow">전화 상담</span>
+                            <input type="checkbox" name="consultTimeOption" value="야간" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 flex-grow">야간</span>
                             <i data-lucide="phone" class="w-4 h-4 text-slate-400"></i>
                         </label>
                     </div>
                 </div>
 
-                <%-- 지역 및 거리 필터 (대면 선택 시 활성화) --%>
-                <div id="distanceFilter" class="bg-purple-50/50 p-5 rounded-xl border border-purple-100 hidden transition-all">
-                    <label class="block text-sm font-bold text-purple-900 mb-3 flex items-center gap-1.5">
-                        <i data-lucide="map-pin" class="w-4 h-4"></i> 대면 상담 지역 설정
-                    </label>
-                    
-                    <div class="grid grid-cols-2 gap-2 mb-4">
-                        <select class="w-full bg-white border border-purple-200 text-xs rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-purple-400 text-slate-600">
-                            <option>시/도 전체</option>
-                            <option>서울특별시</option>
-                            <option>경기도</option>
-                            <option>인천광역시</option>
-                        </select>
-                        <select class="w-full bg-white border border-purple-200 text-xs rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-purple-400 text-slate-600">
-                             <option>시/군/구</option>
-                            <option>강남구</option>
-                            <option>서초구</option>
-                        </select>
+                <%-- 경력 필터 --%>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">경력</label>
+                    <div class="flex flex-col gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="experienceYears" value="all" class="accent-purple-600 w-4 h-4" checked>
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="experienceYears" value="5" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">5년 이상</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="experienceYears" value="10" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">10년 이상</span>
+                        </label>
                     </div>
+                </div>
 
-                    <label class="flex justify-between items-center mb-2 text-xs font-semibold text-slate-600">
-                        <span>현재 내 위치 반경</span>
-                        <span id="distanceValue" class="text-purple-600 font-bold">5km</span>
-                    </label>
-                    <input type="range" id="radiusRange" min="1" max="20" step="1" value="5" class="w-full h-1.5 bg-purple-200 rounded-full appearance-none cursor-pointer accent-purple-600 mb-2">
+                <%-- 상담 비용 필터 --%>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">상담 비용</label>
+                    <div class="flex flex-col gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="price" value="all" class="accent-purple-600 w-4 h-4" checked>
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="price" value="3" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">3만원 이하</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="price" value="5" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">5만원 이하</span>
+                        </label>
+                    </div>
                 </div>
 
                 <button type="button" onclick="searchConsultants()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 tracking-wide">
@@ -252,10 +252,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         const consultingSearchForm = document.getElementById('consultingSearchForm');
         const loadMoreContainer = document.getElementById('loadMoreContainer');
         const loadMoreButton = document.getElementById('loadMoreButton');
-        const methodRadios = document.querySelectorAll('input[name="method"]');
-        const distanceFilter = document.getElementById('distanceFilter');
-        const radiusRange = document.getElementById('radiusRange');
-        const distanceValue = document.getElementById('distanceValue');
 
         let selectedMain = null;
         let selectedSubs = [];
@@ -291,6 +287,34 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             return first || '전국';
         }
 
+        function getConsultTimeLabel(consultTime) {
+            if (consultTime === '주말야간') {
+                return '주말 야간';
+            }
+            return consultTime || '상담시간 문의';
+        }
+
+        function getExperienceLabel(experienceYears) {
+            if (experienceYears === null || experienceYears === undefined) {
+                return '경력 문의';
+            }
+            return String(experienceYears) + '년';
+        }
+
+        function getPriceLabel(price) {
+            if (price === null || price === undefined) {
+                return '비용 문의';
+            }
+            return String(price) + '만원';
+        }
+
+        function getRatingLabel(rating) {
+            if (rating === null || rating === undefined || rating === '') {
+                return '평점 미등록';
+            }
+            return String(rating) + '점';
+        }
+
         function getCurrentFields() {
             if (selectedSubs.length > 0) {
                 return selectedSubs.slice();
@@ -301,6 +325,30 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 });
             }
             return [];
+        }
+
+        function getSelectedFilters() {
+            const rating = document.querySelector('input[name="rating"]:checked');
+            const consultTimeOptions = Array.from(document.querySelectorAll('input[name="consultTimeOption"]:checked'))
+                .map(function (input) {
+                    return input.value;
+                });
+            const experienceYears = document.querySelector('input[name="experienceYears"]:checked');
+            const price = document.querySelector('input[name="price"]:checked');
+
+            let consultTime = '';
+            if (consultTimeOptions.length === 2) {
+                consultTime = '주말야간';
+            } else if (consultTimeOptions.length === 1) {
+                consultTime = consultTimeOptions[0];
+            }
+
+            return {
+                minRating: rating && rating.value !== 'all' ? rating.value : '',
+                consultTime: consultTime,
+                minExperienceYears: experienceYears && experienceYears.value !== 'all' ? experienceYears.value : '',
+                maxPrice: price && price.value !== 'all' ? price.value : ''
+            };
         }
 
         function createTag(label) {
@@ -314,7 +362,16 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             const address = escapeHtml(consultant.address || '주소 정보 없음');
             const fieldLabel = getFieldLabel(consultant.field);
             const regionLabel = getRegionLabel(consultant.address);
+            const consultTimeLabel = getConsultTimeLabel(consultant.consultTime);
+            const experienceLabel = getExperienceLabel(consultant.experienceYears);
+            const priceLabel = getPriceLabel(consultant.price);
+            const ratingLabel = getRatingLabel(consultant.rating);
             const summaryTags = createTag(fieldLabel) + createTag(regionLabel);
+            const detailTags = summaryTags
+                + createTag('평점 ' + ratingLabel)
+                + createTag(getConsultTimeLabel(consultant.consultTime))
+                + createTag('경력 ' + experienceLabel)
+                + createTag('비용 ' + priceLabel);
 
             return ''
                 + '<div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">'
@@ -348,11 +405,11 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '<span class="text-[11px] text-slate-400">조회수 <strong class="text-blue-600 text-xs">0</strong></span>'
                 + '</div>'
                 + '<div class="flex flex-wrap gap-1.5 mt-1 group-hover:hidden">'
-                + summaryTags
+                + detailTags
                 + '</div>'
                 + '<div class="hidden md:group-hover:flex flex-col gap-3 mt-1">'
                 + '<div class="flex flex-wrap gap-1.5">'
-                + summaryTags
+                + detailTags
                 + '</div>'
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
@@ -362,7 +419,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '</div>'
                 + '<div class="flex md:hidden flex-col gap-3 mt-1">'
                 + '<div class="flex flex-wrap gap-1.5">'
-                + summaryTags
+                + detailTags
                 + '</div>'
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
@@ -420,9 +477,22 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
             const targetPage = appendMode ? currentPage + 1 : 0;
             const query = new URLSearchParams();
+            const selectedFilters = getSelectedFilters();
             fields.forEach(function (field) {
                 query.append('fields', field);
             });
+            if (selectedFilters.minRating) {
+                query.append('minRating', selectedFilters.minRating);
+            }
+            if (selectedFilters.consultTime) {
+                query.append('consultTime', selectedFilters.consultTime);
+            }
+            if (selectedFilters.minExperienceYears) {
+                query.append('minExperienceYears', selectedFilters.minExperienceYears);
+            }
+            if (selectedFilters.maxPrice) {
+                query.append('maxPrice', selectedFilters.maxPrice);
+            }
             query.append('page', String(targetPage));
             query.append('size', String(PAGE_SIZE));
 
@@ -543,22 +613,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         loadMoreButton.addEventListener('click', function () {
             loadConsultants(getCurrentFields(), true);
         });
-
-        methodRadios.forEach(function (radio) {
-            radio.addEventListener('change', function (e) {
-                if (e.target.value === 'face') {
-                    distanceFilter.classList.remove('hidden');
-                } else {
-                    distanceFilter.classList.add('hidden');
-                }
-            });
-        });
-
-        if (radiusRange) {
-            radiusRange.addEventListener('input', function (e) {
-                distanceValue.textContent = String(e.target.value) + 'km';
-            });
-        }
 
         window.openChatWithInput = function () {
             const input = document.getElementById('heroSearchInput').value;
