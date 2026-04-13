@@ -157,7 +157,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
                 <%-- 정렬 영역 --%>
                 <div class="flex justify-between items-center mt-2">
-                    <p class="text-slate-600 font-medium text-sm">총 <strong class="text-blue-600 font-bold" id="resultCount">3</strong>명의 전문가</p>
+                    <p class="text-slate-600 font-medium text-sm">총 <strong class="text-blue-600 font-bold" id="resultCount">0</strong>명의 전문가</p>
                     <select class="text-sm border border-slate-200 rounded-lg bg-transparent font-medium text-slate-600 focus:ring-2 focus:ring-blue-100 px-3 py-1.5 cursor-pointer outline-none">
                         <option>추천순</option>
                         <option>평점 높은 순</option>
@@ -168,196 +168,20 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
             <%-- 전문가 그리드 리스트 (사진 참고형 3단 레이아웃 + 호버 효과) --%>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full" id="consultantListContainer">
-                
-                <%-- [BACKEND/AI 연동] JSP forEach 문을 활용해 DB 또는 FastAPI의 추천 결과를 렌더링해야 합니다. --%>
-                
-                <%-- 카드 1 : 비오케이파트너스 --%>
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-lg font-bold text-slate-800">비오케이파트너스</h3>
-                        <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">서울</span>
+                <div id="emptyConsultantState" class="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-2xl border border-dashed border-slate-200 shadow-sm p-10 text-center">
+                    <div class="mx-auto mb-4 w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
+                        <i data-lucide="briefcase-business" class="w-7 h-7 text-slate-400"></i>
                     </div>
-                    <div class="flex items-center gap-1 text-slate-500 text-sm mb-1">
-                        <i data-lucide="phone" class="w-3.5 h-3.5 text-red-500"></i>
-                        <span>010-9122-2234</span>
-                    </div>
-
-                    <div class="w-full h-32 rounded-xl bg-slate-900 relative overflow-hidden mb-1 flex items-center p-4">
-                        <div class="absolute inset-0 bg-gradient-to-r from-gray-900 to-gray-700 opacity-90"></div>
-                        <div class="relative z-10">
-                            <p class="text-white font-bold text-sm leading-snug">어렵고 힘들어서 지친<br><span class="text-orange-400 text-lg">당신의 동행인</span></p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <div class="flex items-center gap-1.5">
-                            <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-600 fill-blue-600"></i>
-                            <span class="font-bold text-slate-800">김도현</span>
-                            <span class="text-xs text-slate-400">대표</span>
-                        </div>
-                        <div class="text-[11px] text-slate-500 flex gap-2">
-                            <span>자문요청수 <strong class="text-blue-600 text-xs">97</strong></span>
-                            <span>리뷰 <strong class="text-blue-600 text-xs">0</strong></span>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-full">자문문의 남기기 가능</span>
-                        <span class="text-[11px] text-slate-400">조회수 <strong class="text-blue-600 text-xs">80</strong></span>
-                    </div>
-
-                    <%-- Default State (호버 전) --%>
-                    <div class="flex flex-wrap gap-1.5 mt-1 group-hover:hidden">
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">특허</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">지원금</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 text-slate-400 rounded-full text-[11px]">... + 4</span>
-                    </div>
-
-                    <%-- Hover State (PC에서는 호버 시, 모바일에서는 항상 표시) --%>
-                    <div class="hidden md:group-hover:flex flex-col gap-3 mt-1 md:hidden">
-                        <div class="flex flex-wrap gap-1.5">
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                            </div>
-                        <div class="flex gap-2 mt-2">
-                            <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>
-                            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>
-                        </div>
-                    </div>
-
-                    <div class="flex md:hidden flex-col gap-3 mt-1">
-                        <div class="flex flex-wrap gap-1.5">
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">연구소</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">벤처인증</span>
-                        </div>
-                        <div class="flex gap-2 mt-2">
-                            <button class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>
-                            <button class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>
-                        </div>
-                    </div>
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">전문가 목록이 비어 있습니다</h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">상담 분야를 선택하거나 조건을 적용하면 같은 카드 형태로 전문가 목록이 표시됩니다.</p>
                 </div>
+            </div>
 
-                <%-- 카드 2 : 클라비스원 --%>
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-lg font-bold text-slate-800">클라비스원</h3>
-                        <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">경기</span>
-                    </div>
-                    <div class="flex items-center gap-1 text-slate-500 text-sm mb-1">
-                        <i data-lucide="phone" class="w-3.5 h-3.5 text-red-500"></i>
-                        <span>1544-1541</span>
-                    </div>
-
-                    <div class="w-full h-32 rounded-xl bg-slate-800 relative overflow-hidden mb-1 flex items-center p-4">
-                        <div class="absolute inset-0 bg-slate-700 opacity-80"></div>
-                        <div class="relative z-10 text-center w-full">
-                            <p class="text-white font-bold text-[13px] leading-snug">정책자금의 열쇠 복잡한 자금<br><span class="text-orange-400 text-base">단, 하나의 해답 클라비스원</span></p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <div class="flex items-center gap-1.5">
-                            <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-600 fill-blue-600"></i>
-                            <span class="font-bold text-slate-800">박선미</span>
-                            <span class="text-xs text-slate-400">대표</span>
-                        </div>
-                        <div class="text-[11px] text-slate-500 flex gap-2">
-                            <span>자문요청수 <strong class="text-blue-600 text-xs">125</strong></span>
-                            <span>리뷰 <strong class="text-blue-600 text-xs">0</strong></span>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-full">자문문의 남기기 가능</span>
-                        <span class="text-[11px] text-slate-400">조회수 <strong class="text-blue-600 text-xs">3,467</strong></span>
-                    </div>
-
-                    <div class="flex flex-wrap gap-1.5 mt-1 group-hover:hidden">
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">특허</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">지원금</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 text-slate-400 rounded-full text-[11px]">... + 5</span>
-                    </div>
-
-                    <div class="hidden group-hover:flex flex-col gap-3 mt-1">
-                        <div class="flex flex-wrap gap-1.5">
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">특허</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">지원금</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">정책자금</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">연구소</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">벤처인증</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">기업부설연구소</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">경정청구</span>
-                        </div>
-                        <div class="flex gap-2 mt-2">
-                            <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>
-                            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>
-                        </div>
-                    </div>
-                </div>
-
-                <%-- 카드 3 : 미래금융파트너스 --%>
-                <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">
-                    <div class="flex items-center gap-2">
-                        <h3 class="text-lg font-bold text-slate-800">미래금융파트너스</h3>
-                        <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">서울</span>
-                    </div>
-                    <div class="flex items-center gap-1 text-slate-500 text-sm mb-1">
-                        <i data-lucide="phone" class="w-3.5 h-3.5 text-red-500"></i>
-                        <span>010-4077-1724</span>
-                    </div>
-
-                    <div class="w-full h-32 rounded-xl bg-[#001E42] relative overflow-hidden mb-1 flex flex-col justify-center p-4">
-                        <div class="relative z-10 text-center">
-                            <p class="text-white font-bold text-[13px] leading-snug"><span class="bg-blue-600 px-1 rounded">부결된 자금도 되살리는</span><br>정책자금 심폐소생술 전문가</p>
-                            <p class="text-[10px] text-gray-300 mt-1">몰라서 못 받는 돈은 없어야 합니다.</p>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                        <div class="flex items-center gap-1.5">
-                            <i data-lucide="check-circle-2" class="w-4 h-4 text-blue-600 fill-blue-600"></i>
-                            <span class="font-bold text-slate-800">임상훈</span>
-                            <span class="text-xs text-slate-400">대표</span>
-                        </div>
-                        <div class="text-[11px] text-slate-500 flex gap-2">
-                            <span>자문요청수 <strong class="text-blue-600 text-xs">315</strong></span>
-                            <span>리뷰 <strong class="text-blue-600 text-xs">0</strong></span>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-between items-center">
-                        <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-full">자문문의 남기기 가능</span>
-                        <span class="text-[11px] text-slate-400">조회수 <strong class="text-blue-600 text-xs">8,086</strong></span>
-                    </div>
-
-                    <div class="flex flex-wrap gap-1.5 mt-1 group-hover:hidden">
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">세무</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">특허</span>
-                        <span class="px-3 py-1 bg-slate-50 border border-slate-200 text-slate-400 rounded-full text-[11px]">... + 7</span>
-                    </div>
-
-                    <div class="hidden group-hover:flex flex-col gap-3 mt-1">
-                        <div class="flex flex-wrap gap-1.5">
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">세무</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">ISO</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">특허</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">지원금</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">경영인증</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">기업대출</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">절세</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">노무</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">재무관리</span>
-                            <span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">신용등급</span>
-                        </div>
-                        <div class="flex gap-2 mt-2">
-                            <button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>
-                            <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>
-                        </div>
-                    </div>
+            <div id="loadMoreContainer" class="pt-6 hidden">
+                <div class="flex justify-center">
+                    <button id="loadMoreButton" type="button" class="bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-600 text-slate-700 px-6 py-3 rounded-2xl text-sm font-bold shadow-sm transition-all">
+                        더보기
+                    </button>
                 </div>
             </div>
         </div>
@@ -402,194 +226,430 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 </div>
 
 <script>
-    if(typeof lucide !== 'undefined') lucide.createIcons();
-
-    // 대분류별 소분류 매핑 데이터
-    const categoryMap = {
-        'IT': { name: 'IT / 기술', subs: [{id: 'ELEC', name: '전기전자통신'}, {id: 'SW', name: '소프트웨어/IT'}] },
-        'BIO': { name: '바이오 / 인증', subs: [{id: 'CHEM', name: '화학생명공학'}, {id: 'BIO_CERT', name: '바이오/의료기기'}] },
-        'MANU': { name: '제조 / R&D', subs: [{id: 'MECH', name: '기계금속건설'}, {id: 'PROCESS', name: '공정/품질'}] },
-        'BRAND': { name: '브랜딩 / 디자인', subs: [{id: 'DESIGN', name: '상표/디자인'}, {id: 'PATENT', name: '특허/IP'}] }
-    };
-
-    let selectedMain = null;
-    let selectedSubs = [];
-
-    function selectMainCategory(key) {
-        // 기존 버튼 스타일 초기화
-        document.querySelectorAll('.main-cat-btn').forEach(btn => {
-            btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
-        });
-
-        // 클릭된 버튼 스타일 적용
-        const selectedBtn = document.getElementById(`btn-\${key}`); 
-        if(selectedBtn) {
-            selectedBtn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
-        }
-
-        selectedMain = key;
-        
-        // 오른쪽 상단 소분류(세부 분야) 버튼들을 해당 대분류에 맞게 재생성
-        const container = document.getElementById('subCategoryContainer');
-        container.innerHTML = `<span class="text-sm font-bold text-slate-700 mr-2 border-r border-slate-300 pr-3">\${categoryMap[key].name} 세부 분야</span>` + 
-        `<button type="button" onclick="selectAllSubs(this)" class="px-4 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-sm font-medium text-white shadow-sm transition-all">전체</button>` +
-        categoryMap[key].subs.map(sub => `
-            <button type="button" onclick="toggleSubCategory('\${sub.id}', this)" 
-                    class="sub-cat-btn px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">
-                \${sub.name}
-            </button>
-        `).join('');
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
     }
 
-    // 소분류 개별 선택 토글 함수
-    function toggleSubCategory(subId, el) {
-        if (selectedSubs.includes(subId)) {
-            selectedSubs = selectedSubs.filter(id => id !== subId);
-            el.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
-            el.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
-        } else {
-            selectedSubs.push(subId);
-            el.classList.add('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
-            el.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
-        }
-    }
+    (function () {
+        const PAGE_SIZE = 12;
+        const categoryMap = {
+            IT: { name: 'IT / 기술', subs: [{ id: 'ELEC', name: '전기전자통신' }] },
+            BIO: { name: '바이오 / 인증', subs: [{ id: 'CHEM', name: '화학생명공학' }] },
+            MANU: { name: '제조 / R&D', subs: [{ id: 'MECH', name: '기계금속건설' }] },
+            BRAND: { name: '브랜딩 / 디자인', subs: [{ id: 'DESIGN', name: '상표/디자인' }] }
+        };
+        const fieldLabels = {
+            ELEC: '전기전자통신',
+            SW: '소프트웨어/IT',
+            CHEM: '화학생명공학',
+            MECH: '기계금속건설',
+            DESIGN: '상표/디자인'
+        };
 
-    // '전체' 버튼 클릭 시 선택 초기화용
-    function selectAllSubs(el) {
-        selectedSubs = [];
-        const container = document.getElementById('subCategoryContainer');
-        container.querySelectorAll('.sub-cat-btn').forEach(btn => {
-            btn.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
-            btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
-        });
-    }
+        const consultantListContainer = document.getElementById('consultantListContainer');
+        const resultCount = document.getElementById('resultCount');
+        const subCategoryContainer = document.getElementById('subCategoryContainer');
+        const consultingSearchForm = document.getElementById('consultingSearchForm');
+        const loadMoreContainer = document.getElementById('loadMoreContainer');
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        const methodRadios = document.querySelectorAll('input[name="method"]');
+        const distanceFilter = document.getElementById('distanceFilter');
+        const radiusRange = document.getElementById('radiusRange');
+        const distanceValue = document.getElementById('distanceValue');
 
-    // 초기화 폼 제출 시
-    document.getElementById('consultingSearchForm').addEventListener('reset', function() {
-        selectedMain = null;
-        selectedSubs = [];
-        
-        // 초기화 시 원래 있던 기본 소분류 버튼들로 복구
-        const container = document.getElementById('subCategoryContainer');
-        container.innerHTML = `
-            <span class="text-sm font-bold text-slate-700 mr-2 border-r border-slate-300 pr-3">세부 분야</span>
-            <button type="button" class="px-4 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-sm font-medium text-white shadow-sm">전체</button>
-            <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">세무/회계</button>
-            <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">인사/노무</button>
-            <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">법무/특허</button>
-            <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">지원금/정책자금</button>
-        `;
+        let selectedMain = null;
+        let selectedSubs = [];
+        let currentPage = 0;
+        let totalElements = 0;
+        let hasNext = false;
+        let loading = false;
 
-        document.querySelectorAll('.main-cat-btn').forEach(btn => {
-            btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
-        });
-    });
-
-    const methodRadios = document.querySelectorAll('input[name="method"]');
-    const distanceFilter = document.getElementById('distanceFilter');
-    methodRadios.forEach(radio => {
-        radio.addEventListener('change', (e) => {
-            if(e.target.value === 'face') {
-                distanceFilter.classList.remove('hidden');
-            } else {
-                distanceFilter.classList.add('hidden');
+        function refreshIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
             }
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function getFieldLabel(fieldCode) {
+            return fieldLabels[fieldCode] || fieldCode || '전문 분야';
+        }
+
+        function getRegionLabel(address) {
+            if (!address) {
+                return '전국';
+            }
+            const first = address.trim().split(/\s+/)[0];
+            return first || '전국';
+        }
+
+        function getCurrentFields() {
+            if (selectedSubs.length > 0) {
+                return selectedSubs.slice();
+            }
+            if (selectedMain && categoryMap[selectedMain]) {
+                return categoryMap[selectedMain].subs.map(function (sub) {
+                    return sub.id;
+                });
+            }
+            return [];
+        }
+
+        function createTag(label) {
+            return '<span class="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-[11px] text-slate-600">' + escapeHtml(label) + '</span>';
+        }
+
+        function createConsultantCard(consultant) {
+            const office = escapeHtml(consultant.office || '변리사 사무소');
+            const name = escapeHtml(consultant.name || '이름 미등록');
+            const phone = escapeHtml(consultant.phone || '연락처 정보 없음');
+            const address = escapeHtml(consultant.address || '주소 정보 없음');
+            const fieldLabel = getFieldLabel(consultant.field);
+            const regionLabel = getRegionLabel(consultant.address);
+            const summaryTags = createTag(fieldLabel) + createTag(regionLabel);
+
+            return ''
+                + '<div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">'
+                + '<div class="flex items-center gap-2">'
+                + '<h3 class="text-lg font-bold text-slate-800">' + office + '</h3>'
+                + '<span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">' + escapeHtml(regionLabel) + '</span>'
+                + '</div>'
+                + '<div class="flex items-center gap-1 text-slate-500 text-sm mb-1">'
+                + '<i data-lucide="phone" class="w-3.5 h-3.5 text-red-500"></i>'
+                + '<span>' + phone + '</span>'
+                + '</div>'
+                + '<div class="w-full h-32 rounded-xl bg-slate-900 relative overflow-hidden mb-1 flex items-center p-4">'
+                + '<div class="absolute inset-0 bg-gradient-to-r from-gray-900 to-gray-700 opacity-90"></div>'
+                + '<div class="relative z-10">'
+                + '<p class="text-white font-bold text-sm leading-snug">' + escapeHtml(fieldLabel) + '<br><span class="text-orange-400 text-lg">' + name + '</span></p>'
+                + '</div>'
+                + '</div>'
+                + '<div class="flex justify-between items-center border-b border-slate-100 pb-3">'
+                + '<div class="flex items-center gap-1.5">'
+                + '<i data-lucide="check-circle-2" class="w-4 h-4 text-blue-600 fill-blue-600"></i>'
+                + '<span class="font-bold text-slate-800">' + name + '</span>'
+                + '<span class="text-xs text-slate-400">대표</span>'
+                + '</div>'
+                + '<div class="text-[11px] text-slate-500 flex gap-2">'
+                + '<span>자문요청수 <strong class="text-blue-600 text-xs">0</strong></span>'
+                + '<span>리뷰 <strong class="text-blue-600 text-xs">0</strong></span>'
+                + '</div>'
+                + '</div>'
+                + '<div class="flex justify-between items-center">'
+                + '<span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-full">자문문의 남기기 가능</span>'
+                + '<span class="text-[11px] text-slate-400">조회수 <strong class="text-blue-600 text-xs">0</strong></span>'
+                + '</div>'
+                + '<div class="flex flex-wrap gap-1.5 mt-1 group-hover:hidden">'
+                + summaryTags
+                + '</div>'
+                + '<div class="hidden md:group-hover:flex flex-col gap-3 mt-1">'
+                + '<div class="flex flex-wrap gap-1.5">'
+                + summaryTags
+                + '</div>'
+                + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
+                + '<div class="flex gap-2 mt-2">'
+                + '<button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>'
+                + '<button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
+                + '</div>'
+                + '</div>'
+                + '<div class="flex md:hidden flex-col gap-3 mt-1">'
+                + '<div class="flex flex-wrap gap-1.5">'
+                + summaryTags
+                + '</div>'
+                + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
+                + '<div class="flex gap-2 mt-2">'
+                + '<button class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>'
+                + '<button class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
+                + '</div>'
+                + '</div>'
+                + '</div>';
+        }
+
+        function setLoadMoreVisible(visible) {
+            if (visible) {
+                loadMoreContainer.classList.remove('hidden');
+            } else {
+                loadMoreContainer.classList.add('hidden');
+            }
+        }
+
+        function renderEmptyState(message) {
+            consultantListContainer.innerHTML = ''
+                + '<div id="emptyConsultantState" class="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-2xl border border-dashed border-slate-200 shadow-sm p-10 text-center">'
+                + '<div class="mx-auto mb-4 w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">'
+                + '<i data-lucide="briefcase-business" class="w-7 h-7 text-slate-400"></i>'
+                + '</div>'
+                + '<h3 class="text-lg font-bold text-slate-800 mb-2">' + escapeHtml(message) + '</h3>'
+                + '<p class="text-sm text-slate-500 leading-relaxed">상담 분야를 선택하거나 조건을 적용하면 같은 카드 형태로 전문가 목록이 표시됩니다.</p>'
+                + '</div>';
+            resultCount.textContent = '0';
+            setLoadMoreVisible(false);
+            refreshIcons();
+        }
+
+        function renderConsultants(items, appendMode) {
+            if (!appendMode && (!items || items.length === 0)) {
+                renderEmptyState('조건에 맞는 전문가가 없습니다');
+                return;
+            }
+
+            const html = items.map(createConsultantCard).join('');
+            if (appendMode) {
+                consultantListContainer.insertAdjacentHTML('beforeend', html);
+            } else {
+                consultantListContainer.innerHTML = html;
+            }
+
+            resultCount.textContent = String(totalElements);
+            setLoadMoreVisible(hasNext);
+            refreshIcons();
+        }
+
+        async function loadConsultants(fields, appendMode) {
+            if (loading) {
+                return;
+            }
+
+            const targetPage = appendMode ? currentPage + 1 : 0;
+            const query = new URLSearchParams();
+            fields.forEach(function (field) {
+                query.append('fields', field);
+            });
+            query.append('page', String(targetPage));
+            query.append('size', String(PAGE_SIZE));
+
+            try {
+                loading = true;
+                loadMoreButton.disabled = true;
+                loadMoreButton.textContent = '불러오는 중...';
+
+                const response = await fetch('/api/consultants?' + query.toString());
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+
+                const payload = await response.json();
+                currentPage = Number(payload.page || 0);
+                totalElements = Number(payload.totalElements || 0);
+                hasNext = Boolean(payload.hasNext);
+                renderConsultants(payload.items || [], appendMode);
+            } catch (error) {
+                console.error('Failed to load consultants:', error);
+                renderEmptyState('전문가 목록을 불러오지 못했습니다');
+            } finally {
+                loading = false;
+                loadMoreButton.disabled = false;
+                loadMoreButton.textContent = '더보기';
+            }
+        }
+
+        function renderDefaultSubCategories() {
+            subCategoryContainer.innerHTML = ''
+                + '<span class="text-sm font-bold text-slate-700 mr-2 border-r border-slate-300 pr-3">세부 분야</span>'
+                + '<button type="button" class="px-4 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-sm font-medium text-white shadow-sm">전체</button>'
+                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">세무/회계</button>'
+                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">인사/노무</button>'
+                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">법무/특허</button>'
+                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">지원금/정책자금</button>';
+        }
+
+        function renderSubCategories(key) {
+            const category = categoryMap[key];
+            if (!category) {
+                renderDefaultSubCategories();
+                return;
+            }
+
+            let buttons = '';
+            category.subs.forEach(function (sub) {
+                buttons += '<button type="button" onclick="toggleSubCategory(\'' + sub.id + '\', this)" class="sub-cat-btn px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">' + escapeHtml(sub.name) + '</button>';
+            });
+
+            subCategoryContainer.innerHTML = ''
+                + '<span class="text-sm font-bold text-slate-700 mr-2 border-r border-slate-300 pr-3">' + escapeHtml(category.name) + ' 세부 분야</span>'
+                + '<button type="button" onclick="selectAllSubs()" class="px-4 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-sm font-medium text-white shadow-sm transition-all">전체</button>'
+                + buttons;
+        }
+
+        window.selectMainCategory = function (key) {
+            document.querySelectorAll('.main-cat-btn').forEach(function (btn) {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
+            });
+
+            const selectedBtn = document.getElementById('btn-' + key);
+            if (selectedBtn) {
+                selectedBtn.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
+            }
+
+            selectedMain = key;
+            selectedSubs = [];
+            currentPage = 0;
+            renderSubCategories(key);
+            loadConsultants(getCurrentFields(), false);
+        };
+
+        window.toggleSubCategory = function (subId, el) {
+            if (selectedSubs.indexOf(subId) >= 0) {
+                selectedSubs = selectedSubs.filter(function (id) {
+                    return id !== subId;
+                });
+                el.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
+                el.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+            } else {
+                selectedSubs.push(subId);
+                el.classList.add('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
+                el.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+            }
+        };
+
+        window.selectAllSubs = function () {
+            selectedSubs = [];
+            subCategoryContainer.querySelectorAll('.sub-cat-btn').forEach(function (btn) {
+                btn.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
+                btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+            });
+        };
+
+        window.searchConsultants = function () {
+            currentPage = 0;
+            loadConsultants(getCurrentFields(), false);
+        };
+
+        consultingSearchForm.addEventListener('reset', function () {
+            selectedMain = null;
+            selectedSubs = [];
+            currentPage = 0;
+            totalElements = 0;
+            hasNext = false;
+
+            document.querySelectorAll('.main-cat-btn').forEach(function (btn) {
+                btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
+            });
+
+            renderDefaultSubCategories();
+            setTimeout(function () {
+                loadConsultants([], false);
+            }, 0);
         });
-    });
 
-    const radiusRange = document.getElementById('radiusRange');
-    const distanceValue = document.getElementById('distanceValue');
-    radiusRange?.addEventListener('input', (e) => {
-        distanceValue.textContent = e.target.value + 'km';
-    });
+        loadMoreButton.addEventListener('click', function () {
+            loadConsultants(getCurrentFields(), true);
+        });
 
-    function searchConsultants() {
-        alert('선택한 조건 및 지역 정보를 바탕으로 서버에 전문가 데이터를 요청합니다.\n선택된 소분류: ' + (selectedSubs.length > 0 ? selectedSubs.join(', ') : '전체'));
-    }
+        methodRadios.forEach(function (radio) {
+            radio.addEventListener('change', function (e) {
+                if (e.target.value === 'face') {
+                    distanceFilter.classList.remove('hidden');
+                } else {
+                    distanceFilter.classList.add('hidden');
+                }
+            });
+        });
 
-    // AI 챗봇 스크립트 부분
-    function openChatWithInput() {
-        const input = document.getElementById('heroSearchInput').value;
-        if(input.trim() !== '') {
-            document.getElementById('chat-input').value = input;
-            toggleChat();
-            setTimeout(sendChatMessage, 300);
-        } else {
-            toggleChat();
+        if (radiusRange) {
+            radiusRange.addEventListener('input', function (e) {
+                distanceValue.textContent = String(e.target.value) + 'km';
+            });
         }
-    }
 
-    function toggleChat() {
-        const win = document.getElementById('chat-window');
-        if(win.classList.contains('hidden')) {
-            win.classList.remove('hidden');
-            setTimeout(() => {
-                win.classList.remove('translate-y-4', 'opacity-0');
-            }, 10);
-        } else {
-            win.classList.add('translate-y-4', 'opacity-0');
-            setTimeout(() => {
-                win.classList.add('hidden');
-            }, 300);
-        }
-    }
+        window.openChatWithInput = function () {
+            const input = document.getElementById('heroSearchInput').value;
+            if (input.trim() !== '') {
+                document.getElementById('chat-input').value = input;
+                toggleChat();
+                setTimeout(sendChatMessage, 300);
+            } else {
+                toggleChat();
+            }
+        };
 
-    function handleChatEnter(e) {
-        if(e.key === 'Enter') sendChatMessage();
-    }
+        window.toggleChat = function () {
+            const win = document.getElementById('chat-window');
+            if (win.classList.contains('hidden')) {
+                win.classList.remove('hidden');
+                setTimeout(function () {
+                    win.classList.remove('translate-y-4', 'opacity-0');
+                }, 10);
+            } else {
+                win.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(function () {
+                    win.classList.add('hidden');
+                }, 300);
+            }
+        };
 
-    async function sendChatMessage() {
-        const input = document.getElementById('chat-input');
-        const box = document.getElementById('chat-messages');
-        const text = input.value.trim();
-        if(!text) return;
-        
-        box.innerHTML += `
-            <div class="flex justify-end mb-4">
-                <div class="bg-purple-600 text-white p-3 rounded-2xl rounded-br-none shadow-sm text-sm max-w-[85%]">
-                    \${text}
-                </div>
-            </div>
-        `;
-        input.value = '';
-        box.scrollTop = box.scrollHeight;
+        window.handleChatEnter = function (e) {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        };
 
-        const loadingId = 'loading-' + Date.now();
-        box.innerHTML += `
-            <div id="\${loadingId}" class="flex gap-2 items-end mb-4">
-                <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-3 h-3 text-purple-600"></i></div>
-                <div class="bg-white px-4 py-3 rounded-2xl rounded-bl-none shadow-sm border border-slate-100 flex gap-1 items-center">
-                    <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"></div>
-                    <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                    <div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                </div>
-            </div>
-        `;
-        box.scrollTop = box.scrollHeight;
-        if(typeof lucide !== 'undefined') lucide.createIcons();
+        window.sendChatMessage = function () {
+            const input = document.getElementById('chat-input');
+            const box = document.getElementById('chat-messages');
+            const text = input.value.trim();
+            if (!text) {
+                return;
+            }
 
-        setTimeout(() => {
-            document.getElementById(loadingId).remove();
-            
-            const aiResponse = `
-                <div class="flex gap-2 items-end mb-4">
-                    <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-3 h-3 text-purple-600"></i></div>
-                    <div class="bg-white p-4 rounded-2xl rounded-bl-none shadow-sm border border-slate-100 text-sm text-slate-700 max-w-[85%]">
-                        말씀하신 내용을 바탕으로 <strong>상담 가이드</strong>를 요약했습니다.<br><br>
-                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 my-2 text-xs">
-                            <strong class="text-purple-600">요약 내용:</strong> 초기 스타트업 단계에서의 법인세 및 소득세 절세 방안 문의<br>
-                            <strong class="text-purple-600">추천 분야:</strong> 세무/회계
-                        </div>
-                        이 내용을 컨설턴트에게 바로 전달해 드릴까요? 화면에 가장 적합한 전문가를 매칭해 두었습니다!
-                        <button class="mt-3 w-full bg-purple-50 text-purple-600 border border-purple-200 py-2 rounded-lg font-bold text-xs hover:bg-purple-600 hover:text-white transition-colors">이 내용으로 상담 신청하기</button>
-                    </div>
-                </div>
-            `;
-            box.innerHTML += aiResponse;
+            box.innerHTML += ''
+                + '<div class="flex justify-end mb-4">'
+                + '<div class="bg-purple-600 text-white p-3 rounded-2xl rounded-br-none shadow-sm text-sm max-w-[85%]">'
+                + escapeHtml(text)
+                + '</div>'
+                + '</div>';
+            input.value = '';
             box.scrollTop = box.scrollHeight;
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        }, 1500);
-    }
+
+            const loadingId = 'loading-' + Date.now();
+            box.innerHTML += ''
+                + '<div id="' + loadingId + '" class="flex gap-2 items-end mb-4">'
+                + '<div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-3 h-3 text-purple-600"></i></div>'
+                + '<div class="bg-white px-4 py-3 rounded-2xl rounded-bl-none shadow-sm border border-slate-100 flex gap-1 items-center">'
+                + '<div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce"></div>'
+                + '<div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>'
+                + '<div class="w-1.5 h-1.5 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>'
+                + '</div>'
+                + '</div>';
+            box.scrollTop = box.scrollHeight;
+            refreshIcons();
+
+            setTimeout(function () {
+                const loadingNode = document.getElementById(loadingId);
+                if (loadingNode) {
+                    loadingNode.remove();
+                }
+
+                box.innerHTML += ''
+                    + '<div class="flex gap-2 items-end mb-4">'
+                    + '<div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0"><i data-lucide="bot" class="w-3 h-3 text-purple-600"></i></div>'
+                    + '<div class="bg-white p-4 rounded-2xl rounded-bl-none shadow-sm border border-slate-100 text-sm text-slate-700 max-w-[85%]">'
+                    + '말씀하신 내용을 바탕으로 <strong>상담 가이드</strong>를 요약했습니다.<br><br>'
+                    + '<div class="bg-slate-50 p-3 rounded-lg border border-slate-200 my-2 text-xs">'
+                    + '<strong class="text-purple-600">요약 내용:</strong> 초기 스타트업 단계에서의 법인세 및 소득세 절세 방안 문의<br>'
+                    + '<strong class="text-purple-600">추천 분야:</strong> 세무/회계'
+                    + '</div>'
+                    + '이 내용을 컨설턴트에게 바로 전달해 드릴까요? 화면에 가장 적합한 전문가를 매칭해 두었습니다!'
+                    + '<button class="mt-3 w-full bg-purple-50 text-purple-600 border border-purple-200 py-2 rounded-lg font-bold text-xs hover:bg-purple-600 hover:text-white transition-colors">이 내용으로 상담 신청하기</button>'
+                    + '</div>'
+                    + '</div>';
+                box.scrollTop = box.scrollHeight;
+                refreshIcons();
+            }, 1500);
+        };
+
+        renderDefaultSubCategories();
+        loadConsultants([], false);
+        refreshIcons();
+    })();
 </script>
 
 <%-- 푸터 파일 로드 --%>
