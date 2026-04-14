@@ -432,7 +432,7 @@
             <!-- 지원사업 -->
             <div class="card card-modern mb-4">
                 <div class="card-body">
-                    <div class="section-title">1. AI 추천 지원사업</div>
+                    <div class="section-title">1.추천 지원사업</div>
                     <div class="section-sub">고객님의 창업 단계와 지역 조건을 반영하여 활용 가능성이 높은 지원사업을 우선 추천합니다.</div>
 
                     <div class="result-row">

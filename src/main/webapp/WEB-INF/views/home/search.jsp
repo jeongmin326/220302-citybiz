@@ -134,7 +134,7 @@
                         <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
                             <i data-lucide="sparkles" class="w-4 h-4 text-blue-600"></i>
                         </div>
-                        <h2 class="text-2xl font-bold text-slate-900 uppercase tracking-tight">1. AI 추천 지원사업</h2>
+                        <h2 class="text-2xl font-bold text-slate-900 uppercase tracking-tight">1. 지원사업</h2>
                     </div>
                     <p class="text-slate-500">창업 단계와 지역 조건을 반영하여 활용 가능성이 높은 지원사업입니다.</p>
                 </div>
