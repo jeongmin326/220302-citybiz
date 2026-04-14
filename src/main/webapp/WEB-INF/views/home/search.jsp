@@ -248,30 +248,9 @@
                 </div>
             </div>
 
-            <div class="bg-slate-900 p-8 rounded-[2.5rem] shadow-xl text-white">
-                <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-400"></i>
-                    6. 서비스 요약
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center py-3 border-b border-white/10">
-                        <span class="text-white/60 text-sm">공간 예약 건수</span>
-                        <span class="font-bold text-blue-400">27건</span>
-                    </div>
-                    <div class="flex justify-between items-center py-3 border-b border-white/10">
-                        <span class="text-white/60 text-sm">컨설팅 예약 건수</span>
-                        <span class="font-bold text-blue-400">14건</span>
-                    </div>
-                    <div class="flex justify-between items-center py-3">
-                        <span class="text-white/60 text-sm">전문가 연결 진행</span>
-                        <span class="font-bold text-blue-400">9건</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="bg-blue-600 p-8 rounded-[2.5rem] shadow-xl shadow-blue-200 text-white relative overflow-hidden group">
                 <i data-lucide="cpu" class="absolute -right-4 -bottom-4 w-32 h-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform"></i>
-                <h3 class="text-xl font-bold mb-4 relative z-10">7. AI 추천 근거</h3>
+                <h3 class="text-xl font-bold mb-4 relative z-10">6. AI 추천 근거</h3>
                 <ul class="space-y-3 relative z-10">
                     <li class="flex items-start gap-2 text-sm text-blue-100">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-300 mt-1.5 shrink-0"></span>
@@ -292,7 +271,7 @@
 
     <div class="mt-20 pt-20 border-t border-slate-200">
         <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold text-slate-900 mb-4">8. 고객님에게 제공하는 가치</h2>
+            <h2 class="text-3xl font-bold text-slate-900 mb-4">7. 고객님에게 제공하는 가치</h2>
             <p class="text-slate-500">더 나은 비즈니스 환경을 위한 플랫폼의 약속입니다.</p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
