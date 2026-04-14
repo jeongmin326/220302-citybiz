@@ -50,32 +50,35 @@
                 <button type="reset" form="policySearchForm" class="text-xs font-medium text-slate-400 hover:text-rose-500 underline">초기화</button>
             </div>
 
-            <%-- [Backend/DB] 필터 조건에 맞춰 MyBatis 또는 JPA 동적 쿼리로 정책 데이터 검색 --%>
+            <%-- [Backend/DB] 수정됨: policy_funds 스키마에 맞춘 동적 쿼리용 필터 폼 --%>
             <form id="policySearchForm" class="space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3">사업 분야</label>
-                    <select class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300">
-                        <option value="">전체 분야</option>
-                        <option value="IT">IT / 소프트웨어</option>
-                        <option value="MANU">제조업</option>
-                        <option value="SERVICE">서비스업</option>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">자금 구분</label>
+                    <select name="category" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300">
+                        <option value="">전체 구분</option>
+                        <option value="융자">융자</option>
+                        <option value="보증">보증</option>
+                        <option value="보험">보험</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3">기업 업력</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">운영 기관</label>
+                    <input type="text" name="institution" placeholder="예: 기술보증기금, 중진공" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">접수 상태</label>
                     <div class="flex flex-col gap-2">
-                        <label class="flex items-center gap-2 text-sm text-slate-600"><input type="radio" name="history" value="pre" class="accent-indigo-600"> 예비 창업자</label>
-                        <label class="flex items-center gap-2 text-sm text-slate-600"><input type="radio" name="history" value="under3" class="accent-indigo-600"> 창업 3년 미만</label>
-                        <label class="flex items-center gap-2 text-sm text-slate-600"><input type="radio" name="history" value="over3" class="accent-indigo-600"> 창업 3년 이상 ~ 7년 미만</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-600"><input type="radio" name="application_available_yn" value="Y" class="accent-indigo-600" checked> 접수중 (Y)</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-600"><input type="radio" name="application_available_yn" value="N" class="accent-indigo-600"> 마감 (N)</label>
+                        <label class="flex items-center gap-2 text-sm text-slate-600"><input type="radio" name="application_available_yn" value="" class="accent-indigo-600"> 상태 무관</label>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3">대표자 나이</label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" class="accent-indigo-600"> 청년 (만 39세 이하)</label>
-                    </div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3">키워드 검색</label>
+                    <input type="text" name="keyword" placeholder="해시태그, 자금명 검색" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300">
                 </div>
 
                 <button type="button" onclick="searchPolicies()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-xl hover:bg-slate-800 transition-all duration-300 mt-2 shadow-md hover:-translate-y-0.5">
@@ -99,17 +102,17 @@
                 <a href="#" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col h-full">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2 flex-wrap">
-                            <span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs font-bold border border-indigo-100">자금지원</span>
+                            <span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs font-bold border border-indigo-100">융자</span>
                             <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">청년전용</span>
                         </div>
-                        <span class="px-3 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold border border-rose-100">D-12</span>
+                        <span class="px-3 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold border border-rose-100">접수중</span>
                     </div>
-                    <h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">2026년 청년전용창업자금 (중소벤처기업진흥공단)</h4>
+                    <h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">2026년 청년전용창업자금</h4>
                     <p class="text-sm text-slate-500 mb-6 line-clamp-2 flex-grow">우수한 아이디어를 보유한 청년 창업자를 대상으로 시설자금 및 운전자금을 지원합니다.</p>
                     <div class="flex items-end justify-between border-t border-slate-100 pt-4">
                         <div>
-                            <p class="text-xs text-slate-400 mb-1">최대 지원 한도</p>
-                            <p class="text-xl font-extrabold text-slate-900">1억 <span class="text-sm font-normal text-slate-500">원</span></p>
+                            <p class="text-xs text-slate-400 mb-1">운영 기관</p>
+                            <p class="text-sm font-extrabold text-slate-900">중소벤처기업진흥공단</p>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                             <i data-lucide="arrow-right" class="w-5 h-5"></i>
@@ -120,17 +123,17 @@
                 <a href="#" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col h-full">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex gap-2 flex-wrap">
-                            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-md text-xs font-bold border border-emerald-100">R&D</span>
+                            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-md text-xs font-bold border border-emerald-100">보증</span>
                             <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">초기기업</span>
                         </div>
                         <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold">상시모집</span>
                     </div>
-                    <h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">디딤돌 R&D 지원사업 (기술보증기금)</h4>
+                    <h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">디딤돌 R&D 지원사업</h4>
                     <p class="text-sm text-slate-500 mb-6 line-clamp-2 flex-grow">기술력을 갖춘 초기 스타트업의 연구개발비를 지원하여 기술 고도화를 돕습니다.</p>
                     <div class="flex items-end justify-between border-t border-slate-100 pt-4">
                         <div>
-                            <p class="text-xs text-slate-400 mb-1">최대 지원 한도</p>
-                            <p class="text-xl font-extrabold text-slate-900">1.5억 <span class="text-sm font-normal text-slate-500">원</span></p>
+                            <p class="text-xs text-slate-400 mb-1">운영 기관</p>
+                            <p class="text-sm font-extrabold text-slate-900">기술보증기금</p>
                         </div>
                         <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors text-slate-400">
                             <i data-lucide="arrow-right" class="w-5 h-5"></i>
@@ -163,15 +166,34 @@
 <script>
     // [AI/ML] AI 자가진단 모달 열기 및 FastAPI 연동용 함수
     function openAiDiagnosisModal() {
-        alert('AI 자가진단 모달이 열립니다. \n(프론트에서 모달을 띄우고, 입력값을 FastAPI로 보내 합격 확률을 계산합니다.)');
+        alert('AI 자가진단 모달이 열립니다.\n(프론트에서 모달을 띄우고, 입력값을 FastAPI로 보내 합격 확률을 계산합니다.)');
         // 추후 로직 추가: 모달 오픈 -> 입력 폼 -> axios.post('http://ai-server/predict') -> 결과 화면 렌더링
     }
 
     // [Backend] Spring Boot API 통신하여 정책 리스트 필터링
     function searchPolicies() {
-        alert('선택한 조건에 맞춰 Spring Boot 서버에 정책 데이터를 재요청합니다.');
-        // const formData = new FormData(document.getElementById('policySearchForm'));
-        // axios.get('/api/policies', { params: ... })
+        const form = document.getElementById('policySearchForm');
+        const formData = new FormData(form);
+        const searchParams = Object.fromEntries(formData.entries());
+
+        console.log('API로 전송될 검색 파라미터:', searchParams);
+        
+        /* * [백엔드 연동 로직 구현부]
+         * Spring Boot의 @RestController 엔드포인트(예: /api/policies)로 GET 요청을 보냅니다.
+         * MyBatis나 JPA(QueryDSL 등)를 사용하여 전달받은 파라미터(category, institution, application_available_yn, keyword)
+         * 에 따라 동적 쿼리를 실행해 결과를 반환받아야 합니다.
+         */
+         
+        // axios.get('/api/policies', { params: searchParams })
+        //     .then(response => {
+        //         // 1. response.data의 배열을 순회하며 HTML 문자열 생성
+        //         // 2. document.getElementById('policyListContainer').innerHTML = 생성된HTML;
+        //         // 3. document.getElementById('policyCount').innerText = response.data.length;
+        //     })
+        //     .catch(error => {
+        //         console.error('검색 중 오류 발생:', error);
+        //         alert('데이터를 불러오는데 실패했습니다.');
+        //     });
     }
 </script>
 
