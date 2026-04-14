@@ -119,6 +119,14 @@
                     </div> -->
                     <%-- 추가 카드는 비워두거나 JS에서 렌더링 --%>
                 </div>
+
+                <div id="loadMoreContainer" class="pt-2 hidden">
+                    <div class="flex justify-center">
+                        <button id="loadMoreButton" type="button" class="bg-white border border-slate-200 hover:border-blue-300 hover:text-blue-600 text-slate-700 px-6 py-3 rounded-2xl text-sm font-bold shadow-sm transition-all">
+                            더보기
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -154,14 +162,72 @@
         priceRange.value = val;
     });
 
+    const PAGE_SIZE = 12;
+    let currentPage = 0;
+    let hasNextPage = false;
+    let totalElements = 0;
+    let isLoading = false;
+
+    function setLoadMoreVisible(visible) {
+        const loadMoreContainer = document.getElementById('loadMoreContainer');
+        if (!loadMoreContainer) return;
+
+        if (visible) {
+            loadMoreContainer.classList.remove('hidden');
+        } else {
+            loadMoreContainer.classList.add('hidden');
+        }
+    }
+
+    function renderEmptyState() {
+        const container = document.getElementById('spaceCardContainer');
+        container.innerHTML =
+            '<div class="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm p-10 text-center">' +
+                '<div class="mx-auto mb-4 w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">' +
+                    '<i data-lucide="building-2" class="w-7 h-7 text-slate-400"></i>' +
+                '</div>' +
+                '<h3 class="text-lg font-bold text-slate-800 mb-2">공간 목록이 비어 있습니다</h3>' +
+                '<p class="text-sm text-slate-500 leading-relaxed">조건에 맞는 공간이 없거나 아직 등록된 공간이 없습니다.</p>' +
+            '</div>';
+        document.getElementById('resultCount').textContent = '0';
+        setLoadMoreVisible(false);
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    }
+
     // db 공간가져오기
-    async function loadSpaces() {
+    async function loadSpaces(appendMode) {
+        if (isLoading) {
+            return;
+        }
+
+        const pageToLoad = appendMode ? currentPage + 1 : 0;
+        const loadMoreButton = document.getElementById('loadMoreButton');
+
         try {
-            const response = await fetch('/api/spaces');
-            const spaces = await response.json();
+            isLoading = true;
+            if (loadMoreButton) {
+                loadMoreButton.disabled = true;
+                loadMoreButton.textContent = '불러오는 중...';
+            }
+
+            const response = await fetch('/api/spaces?page=' + pageToLoad + '&size=' + PAGE_SIZE);
+            const payload = await response.json();
+            const spaces = payload.items || [];
+            currentPage = Number(payload.page || 0);
+            hasNextPage = Boolean(payload.hasNext);
+            totalElements = Number(payload.totalElements || 0);
 
             const container = document.getElementById('spaceCardContainer');
-            container.innerHTML = '';
+            if (!appendMode) {
+                container.innerHTML = '';
+            }
+
+            if (!appendMode && spaces.length === 0) {
+                renderEmptyState();
+                return;
+            }
 
             spaces.forEach(space => {
                 const card =
@@ -187,13 +253,15 @@
                         '</div>' +
                     '</div>';
 
-                container.innerHTML += card;
+                container.insertAdjacentHTML('beforeend', card);
             });
 
             const resultCount = document.getElementById('resultCount');
             if (resultCount) {
-                resultCount.textContent = spaces.length;
+                resultCount.textContent = totalElements;
             }
+
+            setLoadMoreVisible(hasNextPage);
 
             if (window.lucide) {
                 lucide.createIcons();
@@ -201,6 +269,15 @@
 
         } catch (error) {
             console.error('공간 목록 로딩 오류:', error);
+            if (!appendMode) {
+                renderEmptyState();
+            }
+        } finally {
+            isLoading = false;
+            if (loadMoreButton) {
+                loadMoreButton.disabled = false;
+                loadMoreButton.textContent = '더보기';
+            }
         }
     }
 
@@ -216,7 +293,11 @@
         }
     }
 
-    loadSpaces();
+    document.getElementById('loadMoreButton')?.addEventListener('click', function() {
+        loadSpaces(true);
+    });
+
+    loadSpaces(false);
 
     
 </script>
