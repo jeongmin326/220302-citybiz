@@ -65,4 +65,11 @@ public class HomeController {
     public String expertManagementPage() {
         return "mypage/expertManagement"; 
     }
+
+    @GetMapping("/search")
+    public String searchPage() {
+        // 이 리턴값 "search"는 prefix(/WEB-INF/views/)와 suffix(.jsp)가 붙어
+        // /WEB-INF/views/search.jsp 파일을 찾아가게 합니다.
+        return "home/search"; 
+    }
 }
