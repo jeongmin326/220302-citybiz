@@ -30,7 +30,6 @@
 <%
     // [기능/논리 유지] 기존 로직 절대 수정하지 않음
     request.setCharacterEncoding("UTF-8");
-
     String keyword = request.getParameter("keyword");
     if(keyword == null || keyword.trim().equals("")){
         keyword = "창업 공간 / 지원사업 / 컨설팅";
@@ -69,7 +68,7 @@
                 분산된 창업공간, 지원사업, 지원기관, 컨설팅 네트워크 정보를 통합하여 고객님께 가장 적합한 비즈니스 자원을 한눈에 보여드립니다.
             </p>
 
-            <div class="flex flex-wrap gap-3">
+            <div class="flex flex-wrap gap-3 items-center">
                 <div class="bg-white/10 backdrop-blur-md border border-white/20 px-5 py-3 rounded-2xl flex items-center gap-3">
                     <span class="text-white/50 text-xs font-bold uppercase tracking-widest">검색어</span>
                     <span class="font-semibold text-blue-100"><%= keyword %></span>
@@ -82,6 +81,12 @@
                     <span class="text-white/50 text-xs font-bold uppercase tracking-widest">지역</span>
                     <span class="font-semibold text-blue-100"><%= region %></span>
                 </div>
+                
+                <%-- 다시 검색하기 버튼 --%>
+                <a href="/main" class="ml-auto bg-white text-slate-900 hover:bg-blue-50 px-6 py-3 rounded-2xl flex items-center gap-2 transition-all duration-300 font-bold text-sm shadow-lg">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4 text-blue-600"></i>
+                    다시 검색하기
+                </a>
             </div>
         </div>
     </div>
@@ -314,8 +319,6 @@
             </div>
         </div>
     </div>
-
-    
 
 </div>
 

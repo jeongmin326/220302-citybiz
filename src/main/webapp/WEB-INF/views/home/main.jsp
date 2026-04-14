@@ -45,7 +45,6 @@
                                     </div>
                                     <span class="text-slate-700">
                                         <strong class="text-slate-900">${sessionScope.loginName}</strong> 님
-                                        <%-- 백엔드 변수명 loginRole로 수정 --%>
                                         <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded ml-1 text-slate-500">${sessionScope.loginRole}</span>
                                     </span>
                                 </div>
@@ -77,7 +76,7 @@
         <%-- 로그인 유저의 역할(Role)별 맞춤형 대시보드 배너 --%>
         <c:if test="${not empty sessionScope.loginUser}">
             <div class="max-w-6xl w-full mb-16 z-10 animate-in fade-in slide-in-from-top-4 duration-700">
-                <div class="bg-white/60 backdrop-blur-sm border border-white/50 rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row justify-between items-center gap-8">
+                 <div class="bg-white/60 backdrop-blur-sm border border-white/50 rounded-[2.5rem] p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row justify-between items-center gap-8">
                     <div class="flex items-center gap-6">
                         <div class="w-16 h-16 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-white shadow-xl">
                             <i data-lucide="sparkles" class="w-8 h-8"></i>
@@ -93,7 +92,6 @@
                             </p>
                         </div>
                     </div>
-                    
                     <div class="flex gap-3 w-full md:w-auto">
                         <c:choose>
                             <c:when test="${sessionScope.loginRole == 'PROVIDER'}">
@@ -113,7 +111,7 @@
             </div>
         </c:if>
 
-        <div class="text-center mb-20 relative z-10">
+        <div class="text-center mb-20 relative z-10 w-full">
             <span class="inline-block py-1 px-3 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-sm font-semibold mb-6 tracking-wide">
                 도시 비즈니스 인프라 통합 플랫폼
             </span>
@@ -121,9 +119,52 @@
                 비즈니스의 성공,<br>
                 <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">올바른 자원</span>에서 시작됩니다.
             </h1>
-            <p class="text-xl text-slate-500 max-w-2xl mx-auto font-light">
+            <p class="text-xl text-slate-500 max-w-2xl mx-auto font-light mb-10">
                 흩어져 있던 창업 공간, 정책 지원금, 전문가 네트워크를 한 곳에서.<br>당신에게 가장 필요한 비즈니스 자원을 지금 만나보세요.
             </p>
+
+            <%-- 통합 검색창 시작 --%>
+            <div class="max-w-4xl mx-auto relative z-20">
+                <form action="/search" method="GET" class="bg-white p-2 rounded-3xl md:rounded-full shadow-xl border border-slate-200 flex flex-col md:flex-row items-center gap-2">
+                    
+                    <%-- 1. 검색어 입력 (keyword) - 잘림 현상 수정을 위해 flex-[1.5] 및 md:min-w-[280px] 적용 --%>
+                    <div class="flex-[1.5] md:min-w-[280px] flex items-center px-4 py-3 w-full border-b md:border-b-0 md:border-r border-slate-100">
+                        <i data-lucide="search" class="w-5 h-5 text-blue-500 mr-3 shrink-0"></i>
+                        <input type="text" name="keyword" placeholder="어떤 비즈니스 자원을 찾으시나요?" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 placeholder-slate-400 outline-none text-base">
+                    </div>
+                    
+                    <%-- 2. 사용자 유형 선택 (userType) --%>
+                    <div class="flex-1 flex items-center px-4 py-3 w-full border-b md:border-b-0 md:border-r border-slate-100">
+                        <i data-lucide="briefcase" class="w-5 h-5 text-indigo-400 mr-3 shrink-0"></i>
+                        <select name="userType" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 outline-none cursor-pointer appearance-none text-base">
+                            <option value="" disabled selected>사용자 유형</option>
+                            <option value="예비창업자">예비창업자</option>
+                            <option value="초기창업기업">초기창업기업</option>
+                            <option value="중소기업">중소기업</option>
+                        </select>
+                    </div>
+                    
+                    <%-- 3. 지역 선택 (region) --%>
+                    <div class="flex-1 flex items-center px-4 py-3 w-full">
+                        <i data-lucide="map-pin" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i>
+                        <select name="region" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 outline-none cursor-pointer appearance-none text-base">
+                            <option value="" disabled selected>지역 선택</option>
+                            <option value="경기도 성남시">경기도 성남시</option>
+                            <option value="서울특별시 강남구">서울특별시 강남구</option>
+                            <option value="인천광역시 연수구">인천광역시 연수구</option>
+                        </select>
+                    </div>
+                    
+                    <%-- 검색 버튼 --%>
+                    <button type="submit" class="w-full md:w-auto bg-slate-900 hover:bg-blue-600 text-white px-8 py-4 rounded-2xl md:rounded-full font-bold transition-all shadow-md shrink-0 flex items-center justify-center gap-2 group">
+                        <span>검색하기</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                    
+                </form>
+            </div>
+            <%-- 통합 검색창 끝 --%>
+
         </div>
 
         <div class="max-w-6xl w-full grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
@@ -147,7 +188,7 @@
             <a href="/policy" class="group bg-white p-10 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
                 <i data-lucide="banknote" class="absolute -bottom-6 -right-6 w-40 h-40 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
                 <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-8 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 z-10 shadow-sm">
-                     <i data-lucide="pie-chart" class="w-8 h-8"></i>
+                    <i data-lucide="pie-chart" class="w-8 h-8"></i>
                 </div>
                 <h2 class="text-2xl font-bold mb-4 text-slate-900 z-10">정책 지원</h2>
                 <p class="text-slate-500 leading-relaxed z-10 flex-grow">
@@ -162,7 +203,7 @@
             <a href="/consulting" class="group bg-white p-10 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] hover:-translate-y-2 transition-all duration-300 relative overflow-hidden flex flex-col h-full">
                 <i data-lucide="users" class="absolute -bottom-6 -right-6 w-40 h-40 text-slate-50 opacity-50 group-hover:scale-110 transition-transform duration-500"></i>
                 <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-8 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 z-10 shadow-sm">
-                   <i data-lucide="network" class="w-8 h-8"></i>
+                    <i data-lucide="network" class="w-8 h-8"></i>
                 </div>
                 <h2 class="text-2xl font-bold mb-4 text-slate-900 z-10">컨설팅 네트워크</h2>
                 <p class="text-slate-500 leading-relaxed z-10 flex-grow">
