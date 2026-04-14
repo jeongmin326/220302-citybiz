@@ -44,6 +44,7 @@
                     <a href="/space" class="nav-link text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">공간 대여</a>
                     <a href="/policy" class="nav-link text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">정책 지원</a>
                     <a href="/consulting" class="nav-link text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">컨설팅 네트워크</a>
+                    <a href="/about" class="nav-link text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">사이트 소개</a>
                 </nav>
 
                 <div class="flex items-center gap-5">

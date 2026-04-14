@@ -72,4 +72,9 @@ public class HomeController {
         // /WEB-INF/views/search.jsp 파일을 찾아가게 합니다.
         return "home/search"; 
     }
+
+    @GetMapping("/about")
+    public String aboutPage() {
+        return "home/about";
+    }
 }
