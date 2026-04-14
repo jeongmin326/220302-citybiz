@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
+
+<jsp:include page="/WEB-INF/views/common/header.jsp" />
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -312,12 +315,7 @@
         </div>
     </div>
 
-    <footer class="mt-24 pb-12 text-center">
-        <div class="bg-slate-100 inline-block px-6 py-2 rounded-full mb-4">
-            <p class="text-slate-500 text-xs font-medium">본 페이지는 AI 기반 데이터로 구성된 결과 예시입니다.</p>
-        </div>
-        <p class="text-slate-400 text-[11px] font-light">© 2024 City Business Resource Platform. All rights reserved.</p>
-    </footer>
+    
 
 </div>
 
@@ -325,6 +323,8 @@
     // 아이콘 로드
     lucide.createIcons();
 </script>
+
+<jsp:include page="/WEB-INF/views/common/footer.jsp" />
 
 </body>
 </html>
