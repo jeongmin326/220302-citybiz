@@ -89,7 +89,7 @@
                 <i data-lucide="users" class="w-6 h-6 text-purple-600 group-hover:text-white"></i>
             </div>
             <div class="text-slate-400 text-sm font-semibold mb-1">컨설팅 기업</div>
-            <div class="text-3xl font-bold text-slate-900">15개</div>
+            <div class="text-3xl font-bold text-slate-900">${consultingCount}명</div>
         </div>
 
         <div class="group bg-white p-8 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -215,24 +215,28 @@
                     <h2 class="text-2xl font-bold text-slate-900 tracking-tight">3. 추천 컨설팅 기업 / 전문가</h2>
                 </div>
                 <div class="p-8 sm:p-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-purple-200 transition-all group">
-                        <div class="text-purple-600 text-[10px] font-black tracking-widest uppercase mb-2">TAX & LAW</div>
-                        <h4 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">세무 전략 파트너스</h4>
-                        <p class="text-slate-500 text-sm mb-6 leading-relaxed">스타트업 세무 신고, 정부지원금 정산 전문</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-400 underline decoration-slate-200 underline-offset-4">매출액: 12억 원</span>
-                            <i data-lucide="arrow-right-circle" class="w-6 h-6 text-slate-300 group-hover:text-purple-500 transition-all"></i>
-                        </div>
-                    </div>
-                    <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-purple-200 transition-all group">
-                        <div class="text-purple-600 text-[10px] font-black tracking-widest uppercase mb-2">BUSINESS STRATEGY</div>
-                        <h4 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">AI 성장전략 연구소</h4>
-                        <p class="text-slate-500 text-sm mb-6 leading-relaxed">시장 분석, BM 설계, 데이터 전략 컨설팅</p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-slate-400 underline decoration-slate-200 underline-offset-4">매출액: 25억 원</span>
-                            <i data-lucide="arrow-right-circle" class="w-6 h-6 text-slate-300 group-hover:text-purple-500 transition-all"></i>
-                        </div>
-                    </div>
+                    <c:choose>
+                        <c:when test="${empty consultingResults}">
+                            <div class="col-span-2 text-center py-8">
+                                <p class="text-slate-400 text-sm">선택한 지역에 등록된 전문가가 없습니다.</p>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <c:forEach var="c" items="${consultingResults}">
+                                <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-purple-200 transition-all group">
+                                    <div class="text-purple-600 text-[10px] font-black tracking-widest uppercase mb-2">${c.expertType}</div>
+                                    <h4 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors truncate">${c.office}</h4>
+                                    <p class="text-slate-500 text-sm mb-6 leading-relaxed">${c.field} 전문</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold text-slate-400 underline decoration-slate-200 underline-offset-4">
+                                            평점 ${c.rating}점 / 경력 ${c.experienceYears}년
+                                        </span>
+                                        <i data-lucide="arrow-right-circle" class="w-6 h-6 text-slate-300 group-hover:text-purple-500 transition-all"></i>
+                                    </div>
+                                </div>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </section>
         </div>

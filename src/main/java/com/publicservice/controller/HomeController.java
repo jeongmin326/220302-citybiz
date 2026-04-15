@@ -1,9 +1,16 @@
 package com.publicservice.controller;
 
+import com.publicservice.dto.ExpertDto;
 import com.publicservice.entity.PolicyFund;
 import com.publicservice.entity.Space;
+import com.publicservice.repository.AccountantRepository;
+import com.publicservice.repository.LaborAttorneyRepository;
+import com.publicservice.repository.PatentAttorneyRepository;
 import com.publicservice.repository.PolicyFundRepository;
 import com.publicservice.repository.SpaceRepository;
+import com.publicservice.repository.TaxAccountantRepository;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,11 +22,23 @@ public class HomeController {
 
     private final PolicyFundRepository policyFundRepository;
     private final SpaceRepository spaceRepository;
+    private final PatentAttorneyRepository patentAttorneyRepository;
+    private final TaxAccountantRepository taxAccountantRepository;
+    private final AccountantRepository accountantRepository;
+    private final LaborAttorneyRepository laborAttorneyRepository;
 
     public HomeController(PolicyFundRepository policyFundRepository,
-                          SpaceRepository spaceRepository) {
+                          SpaceRepository spaceRepository,
+                          PatentAttorneyRepository patentAttorneyRepository,
+                          TaxAccountantRepository taxAccountantRepository,
+                          AccountantRepository accountantRepository,
+                          LaborAttorneyRepository laborAttorneyRepository) {
         this.policyFundRepository = policyFundRepository;
         this.spaceRepository = spaceRepository;
+        this.patentAttorneyRepository = patentAttorneyRepository;
+        this.taxAccountantRepository = taxAccountantRepository;
+        this.accountantRepository = accountantRepository;
+        this.laborAttorneyRepository = laborAttorneyRepository;
     }
     // 03/29 07:20 /main이 없어져서 다시 추가했어용
     @GetMapping("/main")
@@ -96,15 +115,49 @@ public class HomeController {
             model.addAttribute("policyCount", 0);
         }
 
-        // 공간 검색 (region = "서울특별시 강남구" 형태 → district = "강남구" 추출)
+        // 공간 + 컨설팅 검색 (region = "서울특별시 강남구" 형태 → district = "강남구" 추출)
         if (region != null && !region.isBlank()) {
             String district = region.contains(" ") ? region.substring(region.lastIndexOf(" ") + 1) : region;
+
             List<Space> spaceResults = spaceRepository.findByDistrict(district);
             model.addAttribute("spaceResults", spaceResults);
             model.addAttribute("spaceCount", spaceResults.size());
+
+            long consultingCount = taxAccountantRepository.countByDistrict(district)
+                    + accountantRepository.countByDistrict(district)
+                    + laborAttorneyRepository.countByDistrict(district)
+                    + patentAttorneyRepository.countByAddressContaining(district);
+            model.addAttribute("consultingCount", consultingCount);
+
+            // 컨설팅 추천 2개: 타입별로 랜덤 1명씩 후보 모아서 2개 선택
+            List<ExpertDto> consultingCandidates = new ArrayList<>();
+            List<com.publicservice.entity.TaxAccountant> taxList = taxAccountantRepository.findByDistrict(district);
+            if (!taxList.isEmpty()) {
+                Collections.shuffle(taxList);
+                consultingCandidates.add(ExpertDto.from(taxList.get(0)));
+            }
+            List<com.publicservice.entity.Accountant> accountList = accountantRepository.findByDistrict(district);
+            if (!accountList.isEmpty()) {
+                Collections.shuffle(accountList);
+                consultingCandidates.add(ExpertDto.from(accountList.get(0)));
+            }
+            List<com.publicservice.entity.LaborAttorney> laborList = laborAttorneyRepository.findByDistrict(district);
+            if (!laborList.isEmpty()) {
+                Collections.shuffle(laborList);
+                consultingCandidates.add(ExpertDto.from(laborList.get(0)));
+            }
+            List<com.publicservice.entity.PatentAttorney> patentList = patentAttorneyRepository.findByAddressContaining(district);
+            if (!patentList.isEmpty()) {
+                Collections.shuffle(patentList);
+                consultingCandidates.add(ExpertDto.from(patentList.get(0)));
+            }
+            Collections.shuffle(consultingCandidates);
+            model.addAttribute("consultingResults",
+                    consultingCandidates.size() > 2 ? consultingCandidates.subList(0, 2) : consultingCandidates);
         } else {
             model.addAttribute("spaceResults", List.of());
             model.addAttribute("spaceCount", 0);
+            model.addAttribute("consultingCount", 0);
         }
 
         return "home/search";
