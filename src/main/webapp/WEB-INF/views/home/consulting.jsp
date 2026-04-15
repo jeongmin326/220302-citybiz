@@ -226,23 +226,19 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
     (function () {
         const PAGE_SIZE = 12;
+        // ALL/PATENT: patent_attorneys 조회. 나머지는 DB 추가 후 연결 예정
         const categoryMap = {
-            IT: { name: 'IT / 기술', subs: [{ id: 'ELEC', name: '전기전자통신' }] },
-            BIO: { name: '바이오 / 인증', subs: [{ id: 'CHEM', name: '화학생명공학' }] },
-            MANU: { name: '제조 / R&D', subs: [{ id: 'MECH', name: '기계금속건설' }] },
-            BRAND: { name: '브랜딩 / 디자인', subs: [{ id: 'DESIGN', name: '상표/디자인' }] }
+            ALL:     { ready: true  },
+            PATENT:  { ready: true  },
+            LAWYER:  { ready: false },
+            TAX:     { ready: false },
+            ACCOUNT: { ready: false },
+            LABOR:   { ready: false }
         };
-        const fieldLabels = {
-            ELEC: '전기전자통신',
-            SW: '소프트웨어/IT',
-            CHEM: '화학생명공학',
-            MECH: '기계금속건설',
-            DESIGN: '상표/디자인'
-        };
+        const fieldLabels = {};
 
         const consultantListContainer = document.getElementById('consultantListContainer');
         const resultCount = document.getElementById('resultCount');
-        const subCategoryContainer = document.getElementById('subCategoryContainer');
         const consultingSearchForm = document.getElementById('consultingSearchForm');
         const loadMoreContainer = document.getElementById('loadMoreContainer');
         const loadMoreButton = document.getElementById('loadMoreButton');
@@ -310,14 +306,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         }
 
         function getCurrentFields() {
-            if (selectedSubs.length > 0) {
-                return selectedSubs.slice();
-            }
-            if (selectedMain && categoryMap[selectedMain]) {
-                return categoryMap[selectedMain].subs.map(function (sub) {
-                    return sub.id;
-                });
-            }
             return [];
         }
 
@@ -515,34 +503,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             }
         }
 
-        function renderDefaultSubCategories() {
-            subCategoryContainer.innerHTML = ''
-                + '<span class="text-sm font-bold text-slate-700 mr-2 border-r border-slate-300 pr-3">세부 분야</span>'
-                + '<button type="button" class="px-4 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-sm font-medium text-white shadow-sm">전체</button>'
-                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">세무/회계</button>'
-                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">인사/노무</button>'
-                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">법무/특허</button>'
-                + '<button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">지원금/정책자금</button>';
-        }
-
-        function renderSubCategories(key) {
-            const category = categoryMap[key];
-            if (!category) {
-                renderDefaultSubCategories();
-                return;
-            }
-
-            let buttons = '';
-            category.subs.forEach(function (sub) {
-                buttons += '<button type="button" onclick="toggleSubCategory(\'' + sub.id + '\', this)" class="sub-cat-btn px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">' + escapeHtml(sub.name) + '</button>';
-            });
-
-            subCategoryContainer.innerHTML = ''
-                + '<span class="text-sm font-bold text-slate-700 mr-2 border-r border-slate-300 pr-3">' + escapeHtml(category.name) + ' 세부 분야</span>'
-                + '<button type="button" onclick="selectAllSubs()" class="px-4 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-sm font-medium text-white shadow-sm transition-all">전체</button>'
-                + buttons;
-        }
-
         window.selectMainCategory = function (key) {
             document.querySelectorAll('.main-cat-btn').forEach(function (btn) {
                 btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
@@ -556,30 +516,13 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             selectedMain = key;
             selectedSubs = [];
             currentPage = 0;
-            renderSubCategories(key);
-            loadConsultants(getCurrentFields(), false);
-        };
 
-        window.toggleSubCategory = function (subId, el) {
-            if (selectedSubs.indexOf(subId) >= 0) {
-                selectedSubs = selectedSubs.filter(function (id) {
-                    return id !== subId;
-                });
-                el.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
-                el.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
-            } else {
-                selectedSubs.push(subId);
-                el.classList.add('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
-                el.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+            const cat = categoryMap[key];
+            if (!cat || !cat.ready) {
+                renderEmptyState('해당 전문가 DB는 준비 중입니다');
+                return;
             }
-        };
-
-        window.selectAllSubs = function () {
-            selectedSubs = [];
-            subCategoryContainer.querySelectorAll('.sub-cat-btn').forEach(function (btn) {
-                btn.classList.remove('bg-blue-50', 'text-blue-600', 'border-blue-400', 'font-bold');
-                btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
-            });
+            loadConsultants(getCurrentFields(), false);
         };
 
         window.searchConsultants = function () {
@@ -598,7 +541,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
             });
 
-            renderDefaultSubCategories();
             setTimeout(function () {
                 loadConsultants([], false);
             }, 0);
@@ -694,8 +636,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             }, 1500);
         };
 
-        renderDefaultSubCategories();
-        loadConsultants([], false);
+        selectMainCategory('ALL');
         refreshIcons();
     })();
 </script>
