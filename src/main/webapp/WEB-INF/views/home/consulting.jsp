@@ -43,19 +43,25 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
          
                 <%-- 대분류 필터 (왼쪽 사이드바) --%>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">상담 분야 (대분류)</label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">전문가</label>
                     <div class="grid grid-cols-1 gap-2.5">
-                        <button type="button" onclick="selectMainCategory('IT')" id="btn-IT" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
-                            <span>IT / 기술 컨설팅</span>
+                        <button type="button" onclick="selectMainCategory('ALL')" id="btn-ALL" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
+                            <span>전체보기</span>
                         </button>
-                        <button type="button" onclick="selectMainCategory('BIO')" id="btn-BIO" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
-                            <span>바이오 / 인증 컨설팅</span>
+                        <button type="button" onclick="selectMainCategory('LAWYER')" id="btn-LAWYER" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
+                            <span>변호사</span>
                         </button>
-                        <button type="button" onclick="selectMainCategory('MANU')" id="btn-MANU" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
-                            <span>제조 / R&D 지원</span>
+                        <button type="button" onclick="selectMainCategory('PATENT')" id="btn-PATENT" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
+                            <span>변리사</span>
                         </button>
-                        <button type="button" onclick="selectMainCategory('BRAND')" id="btn-BRAND" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
-                            <span>브랜딩 / 디자인 / 특허</span>
+                        <button type="button" onclick="selectMainCategory('TAX')" id="btn-TAX" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
+                            <span>세무사</span>
+                        </button>
+                        <button type="button" onclick="selectMainCategory('ACCOUNT')" id="btn-ACCOUNT" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
+                            <span>회계사</span>
+                        </button>
+                        <button type="button" onclick="selectMainCategory('LABOR')" id="btn-LABOR" class="main-cat-btn flex items-center justify-center px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-600 font-semibold transition-all hover:border-blue-400 hover:bg-white shadow-sm w-full">
+                            <span>노무사</span>
                         </button>
                     </div>
                 </div>
@@ -143,18 +149,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             <%-- 상단 필터 및 정렬 영역 (소분류 버튼 + 추천순 정렬 통합) --%>
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-6 p-5 transition-all duration-300">
                 
-                <%-- 소분류 선택 영역 --%>
-                <div class="flex flex-wrap items-center gap-2 mb-4" id="subCategoryContainer">
-                    <span class="text-sm font-bold text-slate-700 mr-2 border-r border-slate-300 pr-3">세부 분야</span>
-                    <button type="button" class="px-4 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-sm font-medium text-white shadow-sm">전체</button>
-                    <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">세무/회계</button>
-                    <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">인사/노무</button>
-                    <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">법무/특허</button>
-                    <button type="button" class="px-4 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-medium text-slate-600 hover:border-blue-400 hover:text-blue-600 transition-all shadow-sm">지원금/정책자금</button>
-                </div>
-                
-                <div class="w-full h-px bg-slate-100 my-2"></div>
-
                 <%-- 정렬 영역 --%>
                 <div class="flex justify-between items-center mt-2">
                     <p class="text-slate-600 font-medium text-sm">총 <strong class="text-blue-600 font-bold" id="resultCount">0</strong>명의 전문가</p>
