@@ -144,14 +144,36 @@
                         </select>
                     </div>
                     
-                    <%-- 3. 지역 선택 (region) --%>
+                    <%-- 3. 지역 선택 (region) - 서울 25개 구 --%>
                     <div class="flex-1 flex items-center px-4 py-3 w-full">
                         <i data-lucide="map-pin" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i>
                         <select name="region" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 outline-none cursor-pointer appearance-none text-base">
                             <option value="" disabled selected>지역 선택</option>
-                            <option value="경기도 성남시">경기도 성남시</option>
-                            <option value="서울특별시 강남구">서울특별시 강남구</option>
-                            <option value="인천광역시 연수구">인천광역시 연수구</option>
+                            <option value="서울특별시 강남구">서울 강남구</option>
+                            <option value="서울특별시 강동구">서울 강동구</option>
+                            <option value="서울특별시 강북구">서울 강북구</option>
+                            <option value="서울특별시 강서구">서울 강서구</option>
+                            <option value="서울특별시 관악구">서울 관악구</option>
+                            <option value="서울특별시 광진구">서울 광진구</option>
+                            <option value="서울특별시 구로구">서울 구로구</option>
+                            <option value="서울특별시 금천구">서울 금천구</option>
+                            <option value="서울특별시 노원구">서울 노원구</option>
+                            <option value="서울특별시 도봉구">서울 도봉구</option>
+                            <option value="서울특별시 동대문구">서울 동대문구</option>
+                            <option value="서울특별시 동작구">서울 동작구</option>
+                            <option value="서울특별시 마포구">서울 마포구</option>
+                            <option value="서울특별시 서대문구">서울 서대문구</option>
+                            <option value="서울특별시 서초구">서울 서초구</option>
+                            <option value="서울특별시 성동구">서울 성동구</option>
+                            <option value="서울특별시 성북구">서울 성북구</option>
+                            <option value="서울특별시 송파구">서울 송파구</option>
+                            <option value="서울특별시 양천구">서울 양천구</option>
+                            <option value="서울특별시 영등포구">서울 영등포구</option>
+                            <option value="서울특별시 용산구">서울 용산구</option>
+                            <option value="서울특별시 은평구">서울 은평구</option>
+                            <option value="서울특별시 종로구">서울 종로구</option>
+                            <option value="서울특별시 중구">서울 중구</option>
+                            <option value="서울특별시 중랑구">서울 중랑구</option>
                         </select>
                     </div>
                     

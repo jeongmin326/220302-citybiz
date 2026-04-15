@@ -1,31 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html lang="ko">
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <jsp:include page="/WEB-INF/views/common/header.jsp" />
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>도시 비즈니스 자원 통합 검색 플랫폼 - 결과 페이지</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
-        body { 
-            font-family: 'Pretendard', sans-serif; 
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-    </style>
-</head>
-<body class="bg-[#F8FAFC] flex flex-col min-h-screen text-slate-800 selection:bg-blue-100 selection:text-blue-900">
 
 <%
     // [기능/논리 유지] 기존 로직 절대 수정하지 않음
@@ -97,7 +73,7 @@
                 <i data-lucide="map-pin" class="w-6 h-6 text-blue-600 group-hover:text-white"></i>
             </div>
             <div class="text-slate-400 text-sm font-semibold mb-1">추천 공간</div>
-            <div class="text-3xl font-bold text-slate-900">12개</div>
+            <div class="text-3xl font-bold text-slate-900">${spaceCount}개</div>
         </div>
         
         <div class="group bg-white p-8 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -105,7 +81,7 @@
                 <i data-lucide="briefcase" class="w-6 h-6 text-emerald-600 group-hover:text-white"></i>
             </div>
             <div class="text-slate-400 text-sm font-semibold mb-1">지원사업</div>
-            <div class="text-3xl font-bold text-slate-900">8건</div>
+            <div class="text-3xl font-bold text-slate-900">${policyCount}건</div>
         </div>
 
         <div class="group bg-white p-8 rounded-[2rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -139,28 +115,34 @@
                     <p class="text-slate-500">창업 단계와 지역 조건을 반영하여 활용 가능성이 높은 지원사업입니다.</p>
                 </div>
                 <div class="p-8 sm:p-10 space-y-4">
-                    <div class="group border border-slate-100 rounded-2xl p-6 hover:bg-slate-50 hover:border-blue-200 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div class="flex-grow">
-                            <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">초기창업패키지 지원사업</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed mb-4">예비창업자 및 초기창업기업 대상 사업화 자금, 멘토링, 교육 지원</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">기관: 창업진흥원</span>
-                                <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold">유형: 사업화 자금</span>
+                    <c:choose>
+                        <c:when test="${empty policyResults}">
+                            <div class="text-center py-8">
+                                <p class="text-slate-400 text-sm">검색 조건에 맞는 지원사업이 없습니다.</p>
                             </div>
-                        </div>
-                        <button class="shrink-0 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">상세보기</button>
-                    </div>
-                    <div class="group border border-slate-100 rounded-2xl p-6 hover:bg-slate-50 hover:border-blue-200 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div class="flex-grow">
-                            <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">중소기업 정책자금 지원</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed mb-4">창업기업 운영자금 및 시설자금 지원 프로그램</p>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">기관: 중소벤처기업진흥공단</span>
-                                <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold">유형: 정책자금</span>
-                            </div>
-                        </div>
-                        <button class="shrink-0 border border-slate-200 text-slate-600 px-6 py-3 rounded-xl text-sm font-bold hover:bg-slate-50 transition-all">신청안내</button>
-                    </div>
+                        </c:when>
+                        <c:otherwise>
+                            <c:forEach var="p" items="${policyResults}" begin="0" end="1">
+                                <div class="group border border-slate-100 rounded-2xl p-6 hover:bg-slate-50 hover:border-blue-200 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                    <div class="flex-grow">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="bg-indigo-50 text-indigo-600 border border-indigo-100 px-2.5 py-0.5 rounded-md text-xs font-bold">${p.category}</span>
+                                            <c:if test="${p.applicationAvailableYn == 'Y'}">
+                                                <span class="bg-rose-50 text-rose-600 border border-rose-100 px-2.5 py-0.5 rounded-full text-xs font-bold">접수중</span>
+                                            </c:if>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">${p.fundName}</h3>
+                                        <p class="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-2">${p.businessDescription}</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">기관: ${p.institution}</span>
+                                            <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold">유형: ${p.category}</span>
+                                        </div>
+                                    </div>
+                                    <a href="/policy" class="shrink-0 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">상세보기</a>
+                                </div>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </section>
 
@@ -174,35 +156,57 @@
                     </div>
                 </div>
                 <div class="p-8 sm:p-10">
-                    <div class="overflow-x-auto rounded-2xl border border-slate-100">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50/50 text-slate-500 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
-                                    <th class="p-5">공간명</th>
-                                    <th class="p-5">위치</th>
-                                    <th class="p-5">수용인원</th>
-                                    <th class="p-5">상태</th>
-                                    <th class="p-5 text-center">예약</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-50">
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-5 font-bold text-slate-900">성남 스타트업 라운지 A</td>
-                                    <td class="p-5 text-slate-500 text-sm">성남시 분당구</td>
-                                    <td class="p-5 text-slate-500 text-sm">10명</td>
-                                    <td class="p-5"><span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md text-[11px] font-black tracking-tight">AVAILABLE</span></td>
-                                    <td class="p-5 text-center"><button class="text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-lg text-sm font-bold transition-all">예약하기</button></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-5 font-bold text-slate-900">판교 공유오피스 B</td>
-                                    <td class="p-5 text-slate-500 text-sm">성남시 분당구</td>
-                                    <td class="p-5 text-slate-500 text-sm">20명</td>
-                                    <td class="p-5"><span class="bg-amber-50 text-amber-600 px-2 py-1 rounded-md text-[11px] font-black tracking-tight">WAITING</span></td>
-                                    <td class="p-5 text-center"><button class="text-slate-400 px-3 py-1 text-sm font-bold" disabled>대기중</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <c:choose>
+                        <c:when test="${empty spaceResults}">
+                            <div class="text-center py-8">
+                                <p class="text-slate-400 text-sm">선택한 지역에 등록된 공간이 없습니다.</p>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="overflow-x-auto rounded-2xl border border-slate-100">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-50/50 text-slate-500 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
+                                            <th class="p-5">공간명</th>
+                                            <th class="p-5">위치</th>
+                                            <th class="p-5">수용인원</th>
+                                            <th class="p-5">상태</th>
+                                            <th class="p-5 text-center">예약</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-50">
+                                        <c:forEach var="s" items="${spaceResults}" begin="0" end="1">
+                                            <tr class="hover:bg-slate-50 transition-colors">
+                                                <td class="p-5 font-bold text-slate-900">${s.name}</td>
+                                                <td class="p-5 text-slate-500 text-sm">${s.district}</td>
+                                                <td class="p-5 text-slate-500 text-sm">${s.capacity}명</td>
+                                                <td class="p-5">
+                                                    <c:choose>
+                                                        <c:when test="${s.availableYn == 'Y'}">
+                                                            <span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md text-[11px] font-black tracking-tight">AVAILABLE</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="bg-amber-50 text-amber-600 px-2 py-1 rounded-md text-[11px] font-black tracking-tight">WAITING</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                                <td class="p-5 text-center">
+                                                    <c:choose>
+                                                        <c:when test="${s.availableYn == 'Y'}">
+                                                            <a href="/space" class="text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-lg text-sm font-bold transition-all">예약하기</a>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-slate-400 px-3 py-1 text-sm font-bold">대기중</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </section>
 
@@ -271,11 +275,7 @@
 </div>
 
 <script>
-    // 아이콘 로드
     lucide.createIcons();
 </script>
 
 <jsp:include page="/WEB-INF/views/common/footer.jsp" />
-
-</body>
-</html>
