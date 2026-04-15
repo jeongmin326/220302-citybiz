@@ -5,11 +5,11 @@
 <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
 <main class="flex-grow max-w-[1400px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 flex flex-col gap-10 relative overflow-hidden">
-    
+
     <div class="absolute top-[-5%] right-[-5%] w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl pointer-events-none"></div>
 
     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
-        
+
         <%-- [AI/ML] 사용자 입력 폼 데이터를 받아 FastAPI에서 합격 확률 및 추천 정책 목록을 반환 --%>
         <button onclick="openAiDiagnosisModal()" class="lg:col-span-2 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-3xl p-8 text-left relative overflow-hidden group shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-center">
             <div class="relative z-10">
@@ -43,7 +43,7 @@
     </section>
 
     <div class="flex flex-col md:flex-row gap-10 items-start relative z-10">
-        
+
         <aside class="w-full md:w-[320px] flex-shrink-0 bg-white rounded-3xl border border-slate-100 p-8 sticky top-28 max-h-[calc(100vh-10rem)] overflow-y-auto shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
             <div class="flex justify-between items-center mb-8 pb-4 border-b border-slate-100">
                 <h3 class="font-extrabold text-lg flex items-center gap-2.5 text-slate-900"><i data-lucide="filter" class="w-5 h-5 text-indigo-500"></i> 맞춤 필터</h3>
@@ -64,7 +64,7 @@
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-3">운영 기관</label>
-                    <input type="text" name="institution" placeholder="예: 기술보증기금, 중진공" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300">
+                    <input type="text" name="institution" placeholder="예: 기술보증기금" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-100 focus:border-indigo-300">
                 </div>
 
                 <div>
@@ -88,7 +88,7 @@
         </aside>
 
         <div class="flex-grow flex flex-col gap-8 w-full">
-            
+
             <div class="flex justify-between items-center px-4 py-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
                 <%-- [Backend] 검색 결과 카운트 --%>
                 <p class="text-slate-600">총 <strong class="text-indigo-600 font-bold" id="policyCount">42</strong>건의 지원사업이 있습니다.</p>
@@ -98,48 +98,14 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="policyListContainer">
-                
-                <a href="#" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col h-full">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex gap-2 flex-wrap">
-                            <span class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded-md text-xs font-bold border border-indigo-100">융자</span>
-                            <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">청년전용</span>
-                        </div>
-                        <span class="px-3 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold border border-rose-100">접수중</span>
-                    </div>
-                    <h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">2026년 청년전용창업자금</h4>
-                    <p class="text-sm text-slate-500 mb-6 line-clamp-2 flex-grow">우수한 아이디어를 보유한 청년 창업자를 대상으로 시설자금 및 운전자금을 지원합니다.</p>
-                    <div class="flex items-end justify-between border-t border-slate-100 pt-4">
-                        <div>
-                            <p class="text-xs text-slate-400 mb-1">운영 기관</p>
-                            <p class="text-sm font-extrabold text-slate-900">중소벤처기업진흥공단</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                        </div>
-                    </div>
-                </a>
+            </div>
 
-                <a href="#" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col h-full">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex gap-2 flex-wrap">
-                            <span class="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-md text-xs font-bold border border-emerald-100">보증</span>
-                            <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">초기기업</span>
-                        </div>
-                        <span class="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold">상시모집</span>
-                    </div>
-                    <h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">디딤돌 R&D 지원사업</h4>
-                    <p class="text-sm text-slate-500 mb-6 line-clamp-2 flex-grow">기술력을 갖춘 초기 스타트업의 연구개발비를 지원하여 기술 고도화를 돕습니다.</p>
-                    <div class="flex items-end justify-between border-t border-slate-100 pt-4">
-                        <div>
-                            <p class="text-xs text-slate-400 mb-1">운영 기관</p>
-                            <p class="text-sm font-extrabold text-slate-900">기술보증기금</p>
-                        </div>
-                        <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors text-slate-400">
-                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                        </div>
-                    </div>
-                </a>
+            <div id="loadMoreContainer" class="pt-4 hidden">
+                <div class="flex justify-center">
+                    <button id="loadMoreButton" type="button" class="bg-white border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 text-slate-700 px-6 py-3 rounded-2xl text-sm font-bold shadow-sm transition-all">
+                        더보기
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
@@ -164,37 +130,147 @@
 </main>
 
 <script>
-    // [AI/ML] AI 자가진단 모달 열기 및 FastAPI 연동용 함수
     function openAiDiagnosisModal() {
         alert('AI 자가진단 모달이 열립니다.\n(프론트에서 모달을 띄우고, 입력값을 FastAPI로 보내 합격 확률을 계산합니다.)');
-        // 추후 로직 추가: 모달 오픈 -> 입력 폼 -> axios.post('http://ai-server/predict') -> 결과 화면 렌더링
     }
 
-    // [Backend] Spring Boot API 통신하여 정책 리스트 필터링
-    function searchPolicies() {
-        const form = document.getElementById('policySearchForm');
-        const formData = new FormData(form);
-        const searchParams = Object.fromEntries(formData.entries());
+    var PAGE_SIZE = 12;
+    var currentPage = 0;
+    var hasNextPage = false;
+    var isLoading = false;
 
-        console.log('API로 전송될 검색 파라미터:', searchParams);
-        
-        /* * [백엔드 연동 로직 구현부]
-         * Spring Boot의 @RestController 엔드포인트(예: /api/policies)로 GET 요청을 보냅니다.
-         * MyBatis나 JPA(QueryDSL 등)를 사용하여 전달받은 파라미터(category, institution, application_available_yn, keyword)
-         * 에 따라 동적 쿼리를 실행해 결과를 반환받아야 합니다.
-         */
-         
-        // axios.get('/api/policies', { params: searchParams })
-        //     .then(response => {
-        //         // 1. response.data의 배열을 순회하며 HTML 문자열 생성
-        //         // 2. document.getElementById('policyListContainer').innerHTML = 생성된HTML;
-        //         // 3. document.getElementById('policyCount').innerText = response.data.length;
-        //     })
-        //     .catch(error => {
-        //         console.error('검색 중 오류 발생:', error);
-        //         alert('데이터를 불러오는데 실패했습니다.');
-        //     });
+    function escapeHtml(val) {
+        return String(val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+
+    function truncate(str, max) {
+        if (!str) return '';
+        return str.length > max ? str.substring(0, max) + '...' : str;
+    }
+
+    function getCategoryStyle(cat) {
+        switch (cat) {
+            case '융자': return 'bg-indigo-50 text-indigo-600 border-indigo-100';
+            case '보증': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+            case '보험': return 'bg-amber-50 text-amber-600 border-amber-100';
+            default:     return 'bg-slate-100 text-slate-600 border-slate-200';
+        }
+    }
+
+    function getStatusBadge(yn) {
+        if (yn === 'Y') return '<span class="px-3 py-1 bg-rose-50 text-rose-600 rounded-full text-xs font-bold border border-rose-100">접수중</span>';
+        return '<span class="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-bold">마감</span>';
+    }
+
+    function getSelectedFilters() {
+        var ynRadio = document.querySelector('input[name="application_available_yn"]:checked');
+        return {
+            category: document.querySelector('select[name="category"]').value,
+            institution: document.querySelector('input[name="institution"]').value,
+            applicationAvailableYn: ynRadio ? ynRadio.value : '',
+            keyword: document.querySelector('input[name="keyword"]').value
+        };
+    }
+
+    function searchPolicies() { loadPolicies(false); }
+
+    function parseHashtags(str, max) {
+        if (!str) return '';
+        var tags = str.split('#').filter(Boolean).slice(0, max);
+        return tags.map(function(t) {
+            return '<span class="text-xs text-indigo-500 font-medium">#' + escapeHtml(t.trim()) + '</span>';
+        }).join(' ');
+    }
+
+    function createPolicyCard(p) {
+        var catStyle = getCategoryStyle(p.category);
+        var hashtags = parseHashtags(p.hashtags, 3);
+        return '' +
+            '<a href="#" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col h-full">' +
+                '<div class="flex justify-between items-start mb-4">' +
+                    '<span class="px-2.5 py-1 rounded-md text-xs font-bold border ' + catStyle + '">' + escapeHtml(p.category) + '</span>' +
+                    getStatusBadge(p.applicationAvailableYn) +
+                '</div>' +
+                '<h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">' + escapeHtml(p.fundName) + '</h4>' +
+                '<p class="text-sm text-slate-500 mb-4 line-clamp-2 flex-grow">' + escapeHtml(p.businessDescription) + '</p>' +
+                '<div class="flex flex-wrap gap-1.5 mb-4">' + hashtags + '</div>' +
+                '<div class="flex items-end justify-between border-t border-slate-100 pt-4">' +
+                    '<div>' +
+                        '<p class="text-xs text-slate-400 mb-1">운영 기관</p>' +
+                        '<p class="text-sm font-extrabold text-slate-900">' + escapeHtml(p.institution) + '</p>' +
+                    '</div>' +
+                    '<div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">' +
+                        '<i data-lucide="arrow-right" class="w-5 h-5"></i>' +
+                    '</div>' +
+                '</div>' +
+            '</a>';
+    }
+
+    async function loadPolicies(appendMode) {
+        if (isLoading) return;
+        var pageToLoad = appendMode ? currentPage + 1 : 0;
+        var btn = document.getElementById('loadMoreButton');
+
+        try {
+            isLoading = true;
+            if (btn) { btn.disabled = true; btn.textContent = '불러오는 중...'; }
+
+            var f = getSelectedFilters();
+            var q = new URLSearchParams();
+            if (f.category) q.append('category', f.category);
+            if (f.institution) q.append('institution', f.institution);
+            if (f.applicationAvailableYn) q.append('applicationAvailableYn', f.applicationAvailableYn);
+            if (f.keyword) q.append('keyword', f.keyword);
+            q.append('page', String(pageToLoad));
+            q.append('size', String(PAGE_SIZE));
+
+            var res = await fetch('/api/policies?' + q.toString());
+            var data = await res.json();
+            var items = data.items || [];
+            currentPage = Number(data.page || 0);
+            hasNextPage = Boolean(data.hasNext);
+
+            var container = document.getElementById('policyListContainer');
+            if (!appendMode) container.innerHTML = '';
+
+            if (!appendMode && items.length === 0) {
+                container.innerHTML =
+                    '<div class="col-span-1 md:col-span-2 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm p-10 text-center">' +
+                        '<h3 class="text-lg font-bold text-slate-800 mb-2">정책 목록이 비어 있습니다</h3>' +
+                        '<p class="text-sm text-slate-500">조건에 맞는 정책이 없거나 아직 등록된 정책이 없습니다.</p>' +
+                    '</div>';
+                document.getElementById('policyCount').textContent = '0';
+                document.getElementById('loadMoreContainer').classList.add('hidden');
+                return;
+            }
+
+            items.forEach(function(p) { container.insertAdjacentHTML('beforeend', createPolicyCard(p)); });
+            document.getElementById('policyCount').textContent = data.totalElements || 0;
+
+            var loadMoreEl = document.getElementById('loadMoreContainer');
+            hasNextPage ? loadMoreEl.classList.remove('hidden') : loadMoreEl.classList.add('hidden');
+
+            if (window.lucide) lucide.createIcons();
+        } catch (err) {
+            console.error('정책 목록 로딩 오류:', err);
+        } finally {
+            isLoading = false;
+            if (btn) { btn.disabled = false; btn.textContent = '더보기'; }
+        }
+    }
+
+    document.querySelector('button[type="reset"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector('select[name="category"]').value = '';
+        document.querySelector('input[name="institution"]').value = '';
+        document.querySelector('input[name="application_available_yn"][value="Y"]').checked = true;
+        document.querySelector('input[name="keyword"]').value = '';
+        loadPolicies(false);
+    });
+
+    document.getElementById('loadMoreButton').addEventListener('click', function() { loadPolicies(true); });
+
+    loadPolicies(false);
 </script>
 
 <%-- 푸터 파일 로드 --%>
