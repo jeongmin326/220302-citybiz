@@ -226,14 +226,13 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
     (function () {
         const PAGE_SIZE = 12;
-        // ALL/PATENT: patent_attorneys 조회. 나머지는 DB 추가 후 연결 예정
         const categoryMap = {
             ALL:     { ready: true  },
             PATENT:  { ready: true  },
             LAWYER:  { ready: false },
-            TAX:     { ready: false },
-            ACCOUNT: { ready: false },
-            LABOR:   { ready: false }
+            TAX:     { ready: true  },
+            ACCOUNT: { ready: true  },
+            LABOR:   { ready: true  }
         };
         const fieldLabels = {};
 
@@ -338,10 +337,11 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         }
 
         function createConsultantCard(consultant) {
-            const office = escapeHtml(consultant.office || '변리사 사무소');
+            const office = escapeHtml(consultant.office || '사무소');
             const name = escapeHtml(consultant.name || '이름 미등록');
             const phone = escapeHtml(consultant.phone || '연락처 정보 없음');
             const address = escapeHtml(consultant.address || '주소 정보 없음');
+            const expertType = escapeHtml(consultant.expertType || '전문가');
             const fieldLabel = getFieldLabel(consultant.field);
             const regionLabel = getRegionLabel(consultant.address);
             const consultTimeLabel = getConsultTimeLabel(consultant.consultTime);
@@ -357,9 +357,10 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
             return ''
                 + '<div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">'
-                + '<div class="flex items-center gap-2">'
-                + '<h3 class="text-lg font-bold text-slate-800">' + office + '</h3>'
-                + '<span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">' + escapeHtml(regionLabel) + '</span>'
+                + '<div class="flex items-center gap-2 min-w-0">'
+                + '<h3 class="text-lg font-bold text-slate-800 truncate min-w-0 flex-1">' + office + '</h3>'
+                + '<span class="shrink-0 bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded-full">' + expertType + '</span>'
+                + '<span class="shrink-0 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full">' + escapeHtml(regionLabel) + '</span>'
                 + '</div>'
                 + '<div class="flex items-center gap-1 text-slate-500 text-sm mb-1">'
                 + '<i data-lucide="phone" class="w-3.5 h-3.5 text-red-500"></i>'
@@ -452,7 +453,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             refreshIcons();
         }
 
-        async function loadConsultants(fields, appendMode) {
+        async function loadConsultants(type, appendMode) {
             if (loading) {
                 return;
             }
@@ -460,9 +461,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             const targetPage = appendMode ? currentPage + 1 : 0;
             const query = new URLSearchParams();
             const selectedFilters = getSelectedFilters();
-            fields.forEach(function (field) {
-                query.append('fields', field);
-            });
+            query.append('type', type || 'ALL');
             if (selectedFilters.minRating) {
                 query.append('minRating', selectedFilters.minRating);
             }
@@ -522,12 +521,12 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 renderEmptyState('해당 전문가 DB는 준비 중입니다');
                 return;
             }
-            loadConsultants(getCurrentFields(), false);
+            loadConsultants(key, false);
         };
 
         window.searchConsultants = function () {
             currentPage = 0;
-            loadConsultants(getCurrentFields(), false);
+            loadConsultants(selectedMain || 'ALL', false);
         };
 
         consultingSearchForm.addEventListener('reset', function () {
@@ -542,12 +541,12 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             });
 
             setTimeout(function () {
-                loadConsultants([], false);
+                loadConsultants('ALL', false);
             }, 0);
         });
 
         loadMoreButton.addEventListener('click', function () {
-            loadConsultants(getCurrentFields(), true);
+            loadConsultants(selectedMain || 'ALL', true);
         });
 
         window.openChatWithInput = function () {

@@ -1,13 +1,21 @@
 package com.publicservice.controller;
 
+import com.publicservice.dto.ExpertDto;
+import com.publicservice.entity.Accountant;
+import com.publicservice.entity.LaborAttorney;
 import com.publicservice.entity.PatentAttorney;
+import com.publicservice.entity.TaxAccountant;
+import com.publicservice.repository.AccountantRepository;
+import com.publicservice.repository.LaborAttorneyRepository;
 import com.publicservice.repository.PatentAttorneyRepository;
+import com.publicservice.repository.TaxAccountantRepository;
 import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,60 +31,138 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConsultantController {
 
     private final PatentAttorneyRepository patentAttorneyRepository;
+    private final TaxAccountantRepository taxAccountantRepository;
+    private final AccountantRepository accountantRepository;
+    private final LaborAttorneyRepository laborAttorneyRepository;
 
-    public ConsultantController(PatentAttorneyRepository patentAttorneyRepository) {
+    public ConsultantController(PatentAttorneyRepository patentAttorneyRepository,
+                                TaxAccountantRepository taxAccountantRepository,
+                                AccountantRepository accountantRepository,
+                                LaborAttorneyRepository laborAttorneyRepository) {
         this.patentAttorneyRepository = patentAttorneyRepository;
+        this.taxAccountantRepository = taxAccountantRepository;
+        this.accountantRepository = accountantRepository;
+        this.laborAttorneyRepository = laborAttorneyRepository;
     }
 
     @GetMapping
     public Map<String, Object> getConsultants(
-            @RequestParam(name = "fields", required = false) List<String> fields,
+            @RequestParam(name = "type", required = false, defaultValue = "ALL") String type,
             @RequestParam(name = "minRating", required = false) BigDecimal minRating,
             @RequestParam(name = "consultTime", required = false) String consultTime,
             @RequestParam(name = "minExperienceYears", required = false) Integer minExperienceYears,
             @RequestParam(name = "maxPrice", required = false) Integer maxPrice,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "12") int size) {
-        Pageable pageable = PageRequest.of(
-                Math.max(page, 0),
-                Math.max(size, 1),
-                Sort.by(Sort.Direction.ASC, "name"));
 
-        Specification<PatentAttorney> specification = (root, query, criteriaBuilder) -> {
-            List<Predicate> predicates = new ArrayList<>();
+        List<ExpertDto> items;
+        long totalElements;
+        boolean hasNext;
 
-            if (fields != null && !fields.isEmpty()) {
-                predicates.add(root.get("field").in(fields));
+        String upperType = type.toUpperCase();
+
+        if ("ALL".equals(upperType)) {
+            List<ExpertDto> all = new ArrayList<>();
+            all.addAll(fetchPatent(minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchTax(minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchAccount(minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchLabor(minRating, consultTime, minExperienceYears, maxPrice));
+
+            totalElements = all.size();
+            int start = page * size;
+            int end = (int) Math.min((long) start + size, totalElements);
+            items = start < totalElements ? all.subList(start, end) : new ArrayList<>();
+            hasNext = end < totalElements;
+
+        } else {
+            Pageable pageable = PageRequest.of(Math.max(page, 0), Math.max(size, 1), Sort.by(Sort.Direction.ASC, "name"));
+
+            switch (upperType) {
+                case "PATENT" -> {
+                    Page<PatentAttorney> result = patentAttorneyRepository.findAll(buildPatentSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    totalElements = result.getTotalElements();
+                    hasNext = result.hasNext();
+                }
+                case "TAX" -> {
+                    Page<TaxAccountant> result = taxAccountantRepository.findAll(buildSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    totalElements = result.getTotalElements();
+                    hasNext = result.hasNext();
+                }
+                case "ACCOUNT" -> {
+                    Page<Accountant> result = accountantRepository.findAll(buildSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    totalElements = result.getTotalElements();
+                    hasNext = result.hasNext();
+                }
+                case "LABOR" -> {
+                    Page<LaborAttorney> result = laborAttorneyRepository.findAll(buildSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    totalElements = result.getTotalElements();
+                    hasNext = result.hasNext();
+                }
+                default -> {
+                    items = new ArrayList<>();
+                    totalElements = 0;
+                    hasNext = false;
+                }
             }
-
-            if (minRating != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("rating"), minRating));
-            }
-
-            if (consultTime != null && !consultTime.isBlank()) {
-                predicates.add(criteriaBuilder.equal(root.get("consultTime"), consultTime));
-            }
-
-            if (minExperienceYears != null) {
-                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("experienceYears"), minExperienceYears));
-            }
-
-            if (maxPrice != null) {
-                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("price"), maxPrice));
-            }
-
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-
-        Page<PatentAttorney> result = patentAttorneyRepository.findAll(specification, pageable);
+        }
 
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("items", result.getContent());
-        response.put("page", result.getNumber());
-        response.put("size", result.getSize());
-        response.put("totalElements", result.getTotalElements());
-        response.put("totalPages", result.getTotalPages());
-        response.put("hasNext", result.hasNext());
+        response.put("items", items);
+        response.put("page", page);
+        response.put("size", size);
+        response.put("totalElements", totalElements);
+        response.put("totalPages", totalElements == 0 ? 0 : (int) Math.ceil((double) totalElements / size));
+        response.put("hasNext", hasNext);
         return response;
+    }
+
+    // patent_attorneys 전용 (필드명이 다름: address)
+    private Specification<PatentAttorney> buildPatentSpec(BigDecimal minRating, String consultTime,
+                                                           Integer minExperienceYears, Integer maxPrice) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (minRating != null) predicates.add(cb.greaterThanOrEqualTo(root.get("rating"), minRating));
+            if (consultTime != null && !consultTime.isBlank()) predicates.add(cb.equal(root.get("consultTime"), consultTime));
+            if (minExperienceYears != null) predicates.add(cb.greaterThanOrEqualTo(root.get("experienceYears"), minExperienceYears));
+            if (maxPrice != null) predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    // tax_accountants, accountants, labor_attorneys 공통 Specification
+    private <T> Specification<T> buildSpec(BigDecimal minRating, String consultTime,
+                                           Integer minExperienceYears, Integer maxPrice) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (minRating != null) predicates.add(cb.greaterThanOrEqualTo(root.get("rating"), minRating));
+            if (consultTime != null && !consultTime.isBlank()) predicates.add(cb.equal(root.get("consultTime"), consultTime));
+            if (minExperienceYears != null) predicates.add(cb.greaterThanOrEqualTo(root.get("experienceYears"), minExperienceYears));
+            if (maxPrice != null) predicates.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
+    private List<ExpertDto> fetchPatent(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return patentAttorneyRepository.findAll(buildPatentSpec(minRating, consultTime, minExp, maxPrice))
+                .stream().map(ExpertDto::from).collect(Collectors.toList());
+    }
+
+    private List<ExpertDto> fetchTax(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return taxAccountantRepository.findAll(buildSpec(minRating, consultTime, minExp, maxPrice))
+                .stream().map(ExpertDto::from).collect(Collectors.toList());
+    }
+
+    private List<ExpertDto> fetchAccount(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return accountantRepository.findAll(buildSpec(minRating, consultTime, minExp, maxPrice))
+                .stream().map(ExpertDto::from).collect(Collectors.toList());
+    }
+
+    private List<ExpertDto> fetchLabor(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return laborAttorneyRepository.findAll(buildSpec(minRating, consultTime, minExp, maxPrice))
+                .stream().map(ExpertDto::from).collect(Collectors.toList());
     }
 }
