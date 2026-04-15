@@ -40,48 +40,106 @@
                 <form id="searchForm" class="space-y-8">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">지역</label>
-                        <div class="relative">
-                            <i data-lucide="map-pin" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
-                            <input type="text" id="locationInput" placeholder="예: 강남구, 성수동" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all">
+                        <div class="flex flex-col gap-2.5">
+                            <div class="relative">
+                                <i data-lucide="map-pin" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                                <select id="regionSelect" onchange="onRegionChange()" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all appearance-none cursor-pointer">
+                                    <option value="">전체 지역</option>
+                                    <option value="서울">서울</option>
+                                </select>
+                            </div>
+                            <div class="relative">
+                                <i data-lucide="navigation" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                                <select id="districtSelect" disabled class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400">
+                                    <option value="">먼저 지역을 선택하세요</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">공간 유형</label>
                         <div class="flex flex-wrap gap-2.5">
-                            <c:forEach var="type" items="${['shop', 'warehouse', 'studio', 'meeting', 'consulting', 'office']}">
-                                <div class="relative">
-                                    <input type="checkbox" id="type_${type}" name="spaceType" value="${type}" class="hidden hidden-checkbox">
-                                    <label for="type_${type}" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">
-                                        ${type == 'shop' ? '상점' : type == 'warehouse' ? '창고' : type == 'studio' ? '스튜디오' : type == 'meeting' ? '회의실' : type == 'consulting' ? '상담실' : '사무실'}
-                                    </label>
-                                </div>
-                            </c:forEach>
+                            <div class="relative">
+                                <input type="checkbox" id="type_shop" name="spaceType" value="shop" class="hidden hidden-checkbox">
+                                <label for="type_shop" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">상점</label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" id="type_warehouse" name="spaceType" value="warehouse" class="hidden hidden-checkbox">
+                                <label for="type_warehouse" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">창고</label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" id="type_studio" name="spaceType" value="studio" class="hidden hidden-checkbox">
+                                <label for="type_studio" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">스튜디오</label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" id="type_meeting" name="spaceType" value="meeting" class="hidden hidden-checkbox">
+                                <label for="type_meeting" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">회의실</label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" id="type_consulting" name="spaceType" value="consulting" class="hidden hidden-checkbox">
+                                <label for="type_consulting" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">상담실</label>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" id="type_office" name="spaceType" value="office" class="hidden hidden-checkbox">
+                                <label for="type_office" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">사무실</label>
+                            </div>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">가격 (1시간 기준)</label>
-                        <div class="flex items-center gap-2.5 mb-4">
-                            <input type="number" id="minPrice" placeholder="0" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all">
-                            <span class="text-slate-400 font-bold">~</span>
-                            <input type="number" id="maxPrice" value="50000" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all">
-                            <span class="text-sm font-medium text-slate-600">원</span>
+                        <div class="flex flex-col gap-3">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="priceRange" value="all" class="accent-blue-600 w-4 h-4" checked>
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">전체</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="priceRange" value="10000" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">1만원 이하</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="priceRange" value="10001-20000" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">1만원 ~ 2만원</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="priceRange" value="20001-30000" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">2만원 ~ 3만원</span>
+                            </label>
                         </div>
-                        <input type="range" id="priceRange" min="0" max="100000" step="5000" value="50000" class="w-full h-1.5 bg-slate-200 rounded-full appearance-none cursor-pointer accent-blue-600">
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">날짜</label>
-                            <input type="date" class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all text-slate-600">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">인원</label>
-                            <div class="relative">
-                                <input type="number" min="1" placeholder="1" class="w-full pl-3.5 pr-9 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all pr-8">
-                                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-500 font-medium">명</span>
-                            </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">인원</label>
+                        <div class="flex flex-col gap-3">
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="capacity" value="all" class="accent-blue-600 w-4 h-4" checked>
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">전체</span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="capacity" value="4" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                                    <i data-lucide="users" class="w-4 h-4 text-slate-400"></i> 4명 이상
+                                </span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="capacity" value="8" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                                    <i data-lucide="users" class="w-4 h-4 text-slate-400"></i> 8명 이상
+                                </span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="capacity" value="15" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                                    <i data-lucide="users" class="w-4 h-4 text-slate-400"></i> 15명 이상
+                                </span>
+                            </label>
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <input type="radio" name="capacity" value="20" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors flex items-center gap-1">
+                                    <i data-lucide="users" class="w-4 h-4 text-slate-400"></i> 20명 이상
+                                </span>
+                            </label>
                         </div>
                     </div>
 
@@ -135,32 +193,97 @@
     // [AI/ML] FastAPI 서버와 통신하는 예시 함수
     async function requestAiRecommendation() {
         try {
-            // const response = await axios.post('http://ai-server:8000/recommend', { user_id: 123 });
             alert('AI가 사용자 데이터를 분석하여 최적의 장소를 추천합니다. (FastAPI 연결 지점)');
         } catch (error) {
             console.error('AI 서버 통신 오류', error);
         }
     }
 
-    // [Backend] Spring Boot API와 통신하여 공간 리스트 가져오기
-    async function searchSpaces() {
-        try {
-            // const response = await axios.get('/api/spaces', { params: { location: '강남' } });
-            alert('검색 필터에 맞는 데이터를 Spring Boot 서버에 요청합니다.');
-        } catch (error) {
-            console.error('API 서버 통신 오류', error);
+    // 서울 25개 구 목록
+    const districtMap = {
+        '서울': [
+            '강남구', '강동구', '강북구', '강서구', '관악구',
+            '광진구', '구로구', '금천구', '노원구', '도봉구',
+            '동대문구', '동작구', '마포구', '서대문구', '서초구',
+            '성동구', '성북구', '송파구', '양천구', '영등포구',
+            '용산구', '은평구', '종로구', '중구', '중랑구'
+        ]
+    };
+
+    function onRegionChange() {
+        const regionSelect = document.getElementById('regionSelect');
+        const districtSelect = document.getElementById('districtSelect');
+        const region = regionSelect.value;
+
+        districtSelect.innerHTML = '';
+
+        if (region && districtMap[region]) {
+            districtSelect.disabled = false;
+            districtSelect.insertAdjacentHTML('beforeend', '<option value="">전체 구</option>');
+            districtMap[region].forEach(function(district) {
+                districtSelect.insertAdjacentHTML('beforeend',
+                    '<option value="' + district + '">' + district + '</option>');
+            });
+        } else {
+            districtSelect.disabled = true;
+            districtSelect.insertAdjacentHTML('beforeend', '<option value="">먼저 지역을 선택하세요</option>');
         }
     }
 
-    // 가격 슬라이더 동기화
-    const maxPriceInput = document.getElementById('maxPrice');
-    const priceRange = document.getElementById('priceRange');
-    priceRange.addEventListener('input', function() { maxPriceInput.value = this.value; });
-    maxPriceInput.addEventListener('input', function() {
-        let val = parseInt(this.value);
-        if(val > parseInt(priceRange.max)) val = priceRange.max;
-        priceRange.value = val;
+    // 공간 유형 체크박스 토글 스타일
+    document.querySelectorAll('.hidden-checkbox').forEach(function(checkbox) {
+        checkbox.addEventListener('change', function() {
+            const label = this.nextElementSibling;
+            if (this.checked) {
+                label.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
+                label.classList.remove('text-slate-600', 'border-slate-200');
+            } else {
+                label.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
+                label.classList.add('text-slate-600', 'border-slate-200');
+            }
+        });
     });
+
+    // 검색 필터 수집
+    function getSelectedFilters() {
+        const region = document.getElementById('regionSelect').value;
+        const district = document.getElementById('districtSelect').value;
+        const spaceTypes = Array.from(document.querySelectorAll('input[name="spaceType"]:checked'))
+            .map(function(input) { return input.value; });
+
+        // 가격 라디오
+        const priceRadio = document.querySelector('input[name="priceRange"]:checked');
+        const priceVal = priceRadio ? priceRadio.value : 'all';
+        let minPrice = '';
+        let maxPrice = '';
+        if (priceVal !== 'all') {
+            if (priceVal.indexOf('-') !== -1) {
+                var parts = priceVal.split('-');
+                minPrice = parts[0];
+                maxPrice = parts[1];
+            } else {
+                maxPrice = priceVal;
+            }
+        }
+
+        // 인원 라디오
+        const capacityRadio = document.querySelector('input[name="capacity"]:checked');
+        const capacity = (capacityRadio && capacityRadio.value !== 'all') ? capacityRadio.value : '';
+
+        return {
+            region: region,
+            district: district,
+            spaceTypes: spaceTypes,
+            minPrice: minPrice,
+            maxPrice: maxPrice,
+            capacity: capacity
+        };
+    }
+
+    // 검색 버튼 클릭 시 필터 적용하여 새로 검색
+    function searchSpaces() {
+        loadSpaces(false);
+    }
 
     const PAGE_SIZE = 12;
     let currentPage = 0;
@@ -196,7 +319,7 @@
         }
     }
 
-    // db 공간가져오기
+    // db 공간가져오기 (필터 파라미터 포함)
     async function loadSpaces(appendMode) {
         if (isLoading) {
             return;
@@ -212,7 +335,31 @@
                 loadMoreButton.textContent = '불러오는 중...';
             }
 
-            const response = await fetch('/api/spaces?page=' + pageToLoad + '&size=' + PAGE_SIZE);
+            const filters = getSelectedFilters();
+            const query = new URLSearchParams();
+
+            if (filters.region) {
+                query.append('region', filters.region);
+            }
+            if (filters.district) {
+                query.append('district', filters.district);
+            }
+            filters.spaceTypes.forEach(function(type) {
+                query.append('spaceTypes', type);
+            });
+            if (filters.minPrice) {
+                query.append('minPrice', filters.minPrice);
+            }
+            if (filters.maxPrice) {
+                query.append('maxPrice', filters.maxPrice);
+            }
+            if (filters.capacity) {
+                query.append('capacity', filters.capacity);
+            }
+            query.append('page', String(pageToLoad));
+            query.append('size', String(PAGE_SIZE));
+
+            const response = await fetch('/api/spaces?' + query.toString());
             const payload = await response.json();
             const spaces = payload.items || [];
             currentPage = Number(payload.page || 0);
@@ -248,7 +395,9 @@
                                     Number(space.pricePerHour).toLocaleString() +
                                     '<span class="text-sm font-normal text-slate-500">원 / 시간</span>' +
                                 '</p>' +
-                                '<i data-lucide="arrow-right" class="w-5 h-5 text-blue-600 opacity-0 group-hover:opacity-100 transition duration-300 group-hover:translate-x-1"></i>' +
+                                '<span class="flex items-center gap-1 text-sm text-slate-500 font-medium">' +
+                                    '<i data-lucide="users" class="w-4 h-4"></i>' + space.capacity + '명' +
+                                '</span>' +
                             '</div>' +
                         '</div>' +
                     '</div>';
@@ -293,13 +442,25 @@
         }
     }
 
+    // 초기화 버튼
+    document.querySelector('button[type="reset"]').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('regionSelect').value = '';
+        onRegionChange();
+        document.querySelectorAll('input[name="spaceType"]:checked').forEach(function(cb) {
+            cb.checked = false;
+            cb.dispatchEvent(new Event('change'));
+        });
+        document.querySelector('input[name="priceRange"][value="all"]').checked = true;
+        document.querySelector('input[name="capacity"][value="all"]').checked = true;
+        loadSpaces(false);
+    });
+
     document.getElementById('loadMoreButton')?.addEventListener('click', function() {
         loadSpaces(true);
     });
 
     loadSpaces(false);
-
-    
 </script>
 
 <%-- 푸터 파일 로드 --%>
