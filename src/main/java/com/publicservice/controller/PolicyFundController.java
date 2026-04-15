@@ -62,7 +62,10 @@ public class PolicyFundController {
                 String pattern = "%" + keyword + "%";
                 predicates.add(criteriaBuilder.or(
                         criteriaBuilder.like(root.get("fundName"), pattern),
-                        criteriaBuilder.like(root.get("hashtags"), pattern)
+                        criteriaBuilder.like(root.get("supportTarget"), pattern),
+                        criteriaBuilder.like(root.get("businessDescription"), pattern),
+                        criteriaBuilder.like(root.get("hashtags"), pattern),
+                        criteriaBuilder.like(root.get("institution"), pattern)
                 ));
             }
 

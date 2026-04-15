@@ -125,7 +125,7 @@
 
             <%-- 통합 검색창 시작 --%>
             <div class="max-w-4xl mx-auto relative z-20">
-                <form action="/search" method="GET" class="bg-white p-2 rounded-3xl md:rounded-full shadow-xl border border-slate-200 flex flex-col md:flex-row items-center gap-2">
+                <form action="/search" method="GET" class="bg-white p-2 rounded-3xl md:rounded-full shadow-xl border border-slate-200 flex flex-col md:flex-row items-center gap-2" onsubmit="return validateSearch(event)">
                     
                     <%-- 1. 검색어 입력 (keyword) - 잘림 현상 수정을 위해 flex-[1.5] 및 md:min-w-[280px] 적용 --%>
                     <div class="flex-[1.5] md:min-w-[280px] flex items-center px-4 py-3 w-full border-b md:border-b-0 md:border-r border-slate-100">
@@ -137,8 +137,8 @@
                     <div class="flex-1 flex items-center px-4 py-3 w-full border-b md:border-b-0 md:border-r border-slate-100">
                         <i data-lucide="briefcase" class="w-5 h-5 text-indigo-400 mr-3 shrink-0"></i>
                         <select name="userType" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 outline-none cursor-pointer appearance-none text-base">
-                            <option value="" disabled selected>사용자 유형</option>
-                            <option value="예비창업자">예비창업자</option>
+                            <option value="" disabled>사용자 유형</option>
+                            <option value="예비창업자" selected>예비창업자</option>
                             <option value="초기창업기업">초기창업기업</option>
                             <option value="중소기업">중소기업</option>
                         </select>
@@ -148,8 +148,8 @@
                     <div class="flex-1 flex items-center px-4 py-3 w-full">
                         <i data-lucide="map-pin" class="w-5 h-5 text-emerald-400 mr-3 shrink-0"></i>
                         <select name="region" class="w-full bg-transparent border-none focus:ring-0 text-slate-700 outline-none cursor-pointer appearance-none text-base">
-                            <option value="" disabled selected>지역 선택</option>
-                            <option value="서울특별시 강남구">서울 강남구</option>
+                            <option value="" disabled>지역 선택</option>
+                            <option value="서울특별시 강남구" selected>서울 강남구</option>
                             <option value="서울특별시 강동구">서울 강동구</option>
                             <option value="서울특별시 강북구">서울 강북구</option>
                             <option value="서울특별시 강서구">서울 강서구</option>
@@ -256,8 +256,18 @@
     </footer>
 
     <script>
-        // 루사이드 아이콘 초기화
         lucide.createIcons();
+
+        function validateSearch(e) {
+            const keyword = document.querySelector('input[name="keyword"]').value.trim();
+            if (!keyword) {
+                e.preventDefault();
+                alert('검색어를 입력해주세요.');
+                document.querySelector('input[name="keyword"]').focus();
+                return false;
+            }
+            return true;
+        }
     </script>
 </body>
 </html>

@@ -48,6 +48,7 @@ public class ConsultantController {
     @GetMapping
     public Map<String, Object> getConsultants(
             @RequestParam(name = "type", required = false, defaultValue = "ALL") String type,
+            @RequestParam(name = "district", required = false) String district,
             @RequestParam(name = "minRating", required = false) BigDecimal minRating,
             @RequestParam(name = "consultTime", required = false) String consultTime,
             @RequestParam(name = "minExperienceYears", required = false) Integer minExperienceYears,
@@ -63,10 +64,10 @@ public class ConsultantController {
 
         if ("ALL".equals(upperType)) {
             List<ExpertDto> all = new ArrayList<>();
-            all.addAll(fetchPatent(minRating, consultTime, minExperienceYears, maxPrice));
-            all.addAll(fetchTax(minRating, consultTime, minExperienceYears, maxPrice));
-            all.addAll(fetchAccount(minRating, consultTime, minExperienceYears, maxPrice));
-            all.addAll(fetchLabor(minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchPatent(district, minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchTax(district, minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchAccount(district, minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchLabor(district, minRating, consultTime, minExperienceYears, maxPrice));
 
             totalElements = all.size();
             int start = page * size;
@@ -79,25 +80,25 @@ public class ConsultantController {
 
             switch (upperType) {
                 case "PATENT" -> {
-                    Page<PatentAttorney> result = patentAttorneyRepository.findAll(buildPatentSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    Page<PatentAttorney> result = patentAttorneyRepository.findAll(buildPatentSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
                 }
                 case "TAX" -> {
-                    Page<TaxAccountant> result = taxAccountantRepository.findAll(buildSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    Page<TaxAccountant> result = taxAccountantRepository.findAll(buildSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
                 }
                 case "ACCOUNT" -> {
-                    Page<Accountant> result = accountantRepository.findAll(buildSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    Page<Accountant> result = accountantRepository.findAll(buildSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
                 }
                 case "LABOR" -> {
-                    Page<LaborAttorney> result = laborAttorneyRepository.findAll(buildSpec(minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    Page<LaborAttorney> result = laborAttorneyRepository.findAll(buildSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
@@ -120,11 +121,12 @@ public class ConsultantController {
         return response;
     }
 
-    // patent_attorneys 전용 (필드명이 다름: address)
-    private Specification<PatentAttorney> buildPatentSpec(BigDecimal minRating, String consultTime,
+    // patent_attorneys 전용 (district → address LIKE 검색)
+    private Specification<PatentAttorney> buildPatentSpec(String district, BigDecimal minRating, String consultTime,
                                                            Integer minExperienceYears, Integer maxPrice) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            if (district != null && !district.isBlank()) predicates.add(cb.like(root.get("address"), "%" + district + "%"));
             if (minRating != null) predicates.add(cb.greaterThanOrEqualTo(root.get("rating"), minRating));
             if (consultTime != null && !consultTime.isBlank()) predicates.add(cb.equal(root.get("consultTime"), consultTime));
             if (minExperienceYears != null) predicates.add(cb.greaterThanOrEqualTo(root.get("experienceYears"), minExperienceYears));
@@ -134,10 +136,11 @@ public class ConsultantController {
     }
 
     // tax_accountants, accountants, labor_attorneys 공통 Specification
-    private <T> Specification<T> buildSpec(BigDecimal minRating, String consultTime,
+    private <T> Specification<T> buildSpec(String district, BigDecimal minRating, String consultTime,
                                            Integer minExperienceYears, Integer maxPrice) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+            if (district != null && !district.isBlank()) predicates.add(cb.equal(root.get("district"), district));
             if (minRating != null) predicates.add(cb.greaterThanOrEqualTo(root.get("rating"), minRating));
             if (consultTime != null && !consultTime.isBlank()) predicates.add(cb.equal(root.get("consultTime"), consultTime));
             if (minExperienceYears != null) predicates.add(cb.greaterThanOrEqualTo(root.get("experienceYears"), minExperienceYears));
@@ -146,23 +149,23 @@ public class ConsultantController {
         };
     }
 
-    private List<ExpertDto> fetchPatent(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
-        return patentAttorneyRepository.findAll(buildPatentSpec(minRating, consultTime, minExp, maxPrice))
+    private List<ExpertDto> fetchPatent(String district, BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return patentAttorneyRepository.findAll(buildPatentSpec(district, minRating, consultTime, minExp, maxPrice))
                 .stream().map(ExpertDto::from).collect(Collectors.toList());
     }
 
-    private List<ExpertDto> fetchTax(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
-        return taxAccountantRepository.findAll(buildSpec(minRating, consultTime, minExp, maxPrice))
+    private List<ExpertDto> fetchTax(String district, BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return taxAccountantRepository.findAll(buildSpec(district, minRating, consultTime, minExp, maxPrice))
                 .stream().map(ExpertDto::from).collect(Collectors.toList());
     }
 
-    private List<ExpertDto> fetchAccount(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
-        return accountantRepository.findAll(buildSpec(minRating, consultTime, minExp, maxPrice))
+    private List<ExpertDto> fetchAccount(String district, BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return accountantRepository.findAll(buildSpec(district, minRating, consultTime, minExp, maxPrice))
                 .stream().map(ExpertDto::from).collect(Collectors.toList());
     }
 
-    private List<ExpertDto> fetchLabor(BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
-        return laborAttorneyRepository.findAll(buildSpec(minRating, consultTime, minExp, maxPrice))
+    private List<ExpertDto> fetchLabor(String district, BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return laborAttorneyRepository.findAll(buildSpec(district, minRating, consultTime, minExp, maxPrice))
                 .stream().map(ExpertDto::from).collect(Collectors.toList());
     }
 }

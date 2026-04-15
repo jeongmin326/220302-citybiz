@@ -270,6 +270,16 @@
 
     document.getElementById('loadMoreButton').addEventListener('click', function() { loadPolicies(true); });
 
+    // search 페이지에서 넘어온 경우 keyword 자동 적용 + 상태필터 해제
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var keyword = params.get('keyword');
+        if (keyword) {
+            document.querySelector('input[name="keyword"]').value = keyword;
+            // 기본값 "접수중(Y)" 해제 → 상태 무관으로 변경 (search 결과와 건수 일치)
+            document.querySelector('input[name="application_available_yn"][value=""]').checked = true;
+        }
+    })();
     loadPolicies(false);
 </script>
 

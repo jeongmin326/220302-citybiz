@@ -110,9 +110,19 @@ public class HomeController {
             List<PolicyFund> policyResults = policyFundRepository.searchByKeyword(keyword.trim());
             model.addAttribute("policyResults", policyResults);
             model.addAttribute("policyCount", policyResults.size());
+            List<String> institutionList = policyResults.stream()
+                    .map(PolicyFund::getInstitution)
+                    .filter(i -> i != null && !i.isBlank())
+                    .distinct()
+                    .sorted()
+                    .collect(java.util.stream.Collectors.toList());
+            model.addAttribute("institutionList", institutionList);
+            model.addAttribute("institutionCount", institutionList.size());
         } else {
             model.addAttribute("policyResults", List.of());
             model.addAttribute("policyCount", 0);
+            model.addAttribute("institutionList", List.of());
+            model.addAttribute("institutionCount", 0);
         }
 
         // 공간 + 컨설팅 검색 (region = "서울특별시 강남구" 형태 → district = "강남구" 추출)

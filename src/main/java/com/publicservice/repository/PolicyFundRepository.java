@@ -17,4 +17,10 @@ public interface PolicyFundRepository extends JpaRepository<PolicyFund, Long>,
            "p.hashtags LIKE %:kw% OR " +
            "p.institution LIKE %:kw%")
     List<PolicyFund> searchByKeyword(@Param("kw") String kw);
+
+    @Query("SELECT COUNT(DISTINCT p.institution) FROM PolicyFund p")
+    long countDistinctInstitutions();
+
+    @Query("SELECT DISTINCT p.institution FROM PolicyFund p ORDER BY p.institution")
+    List<String> findDistinctInstitutions();
 }

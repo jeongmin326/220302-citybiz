@@ -460,6 +460,28 @@
         loadSpaces(true);
     });
 
+    // search 페이지에서 넘어온 경우 region 자동 적용
+    // region 형식: "서울특별시 강남구" → city="서울특별시", district="강남구"
+    (function() {
+        var params = new URLSearchParams(window.location.search);
+        var region = params.get('region');
+        if (region) {
+            var parts = region.split(' ');
+            var district = parts.length > 1 ? parts[parts.length - 1] : '';
+            // regionSelect는 "서울" 형식 → 시/도 전체명에서 "특별시","광역시","도" 제거
+            var cityFull = parts.slice(0, parts.length - 1).join(' ');
+            var cityShort = cityFull.replace(/특별시|광역시|특별자치시|특별자치도|도$/, '').trim();
+            var regionSelect = document.getElementById('regionSelect');
+            var districtSelect = document.getElementById('districtSelect');
+            if (regionSelect) {
+                regionSelect.value = cityShort;
+                onRegionChange();
+                if (district && districtSelect) {
+                    districtSelect.value = district;
+                }
+            }
+        }
+    })();
     loadSpaces(false);
 </script>
 

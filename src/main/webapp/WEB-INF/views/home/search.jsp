@@ -97,7 +97,7 @@
                 <i data-lucide="building" class="w-6 h-6 text-amber-600 group-hover:text-white"></i>
             </div>
             <div class="text-slate-400 text-sm font-semibold mb-1">지원기관</div>
-            <div class="text-3xl font-bold text-slate-900">6개</div>
+            <div class="text-3xl font-bold text-slate-900">${institutionCount}개</div>
         </div>
     </div>
 
@@ -106,53 +106,17 @@
 
             <section class="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
                 <div class="p-8 sm:p-10 border-b border-slate-50">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="sparkles" class="w-4 h-4 text-blue-600"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold text-slate-900 uppercase tracking-tight">1. 추천 지원 사업</h2>
-                    </div>
-                    <p class="text-slate-500">창업 단계와 지역 조건을 반영하여 활용 가능성이 높은 지원사업입니다.</p>
-                </div>
-                <div class="p-8 sm:p-10 space-y-4">
-                    <c:choose>
-                        <c:when test="${empty policyResults}">
-                            <div class="text-center py-8">
-                                <p class="text-slate-400 text-sm">검색 조건에 맞는 지원사업이 없습니다.</p>
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-blue-600"></i>
                             </div>
-                        </c:when>
-                        <c:otherwise>
-                            <c:forEach var="p" items="${policyResults}" begin="0" end="1">
-                                <div class="group border border-slate-100 rounded-2xl p-6 hover:bg-slate-50 hover:border-blue-200 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                                    <div class="flex-grow">
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span class="bg-indigo-50 text-indigo-600 border border-indigo-100 px-2.5 py-0.5 rounded-md text-xs font-bold">${p.category}</span>
-                                            <c:if test="${p.applicationAvailableYn == 'Y'}">
-                                                <span class="bg-rose-50 text-rose-600 border border-rose-100 px-2.5 py-0.5 rounded-full text-xs font-bold">접수중</span>
-                                            </c:if>
-                                        </div>
-                                        <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">${p.fundName}</h3>
-                                        <p class="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-2">${p.businessDescription}</p>
-                                        <div class="flex flex-wrap gap-2">
-                                            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">기관: ${p.institution}</span>
-                                            <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold">유형: ${p.category}</span>
-                                        </div>
-                                    </div>
-                                    <a href="/policy" class="shrink-0 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">상세보기</a>
-                                </div>
-                            </c:forEach>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </section>
-
-            <section class="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
-                <div class="p-8 sm:p-10 border-b border-slate-50">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
-                            <i data-lucide="layout" class="w-4 h-4 text-emerald-600"></i>
+                            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">1. 추천 창업 공간 / 회의실</h2>
                         </div>
-                        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">2. 추천 창업 공간 / 회의실</h2>
+                        <c:url value="/space" var="spaceUrl"><c:param name="region" value="${param.region}"/></c:url>
+                        <a href="${spaceUrl}" class="shrink-0 text-sm font-bold text-emerald-600 hover:text-emerald-800 flex items-center gap-1">
+                            전체보기 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="p-8 sm:p-10">
@@ -212,7 +176,68 @@
 
             <section class="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
                 <div class="p-8 sm:p-10 border-b border-slate-50">
-                    <h2 class="text-2xl font-bold text-slate-900 tracking-tight">3. 추천 컨설팅 기업 / 전문가</h2>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="briefcase" class="w-4 h-4 text-emerald-600"></i>
+                                </div>
+                                <h2 class="text-2xl font-bold text-slate-900 uppercase tracking-tight">2. 추천 지원 사업</h2>
+                            </div>
+                            <p class="text-slate-500">창업 단계와 지역 조건을 반영하여 활용 가능성이 높은 지원사업입니다.</p>
+                        </div>
+                        <c:url value="/policy" var="policyUrl"><c:param name="keyword" value="${param.keyword}"/></c:url>
+                        <a href="${policyUrl}" class="shrink-0 text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 mt-1">
+                            전체보기 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="p-8 sm:p-10 space-y-4">
+                    <c:choose>
+                        <c:when test="${empty policyResults}">
+                            <div class="text-center py-8">
+                                <p class="text-slate-400 text-sm">검색 조건에 맞는 지원사업이 없습니다.</p>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <c:forEach var="p" items="${policyResults}" begin="0" end="1">
+                                <div class="group border border-slate-100 rounded-2xl p-6 hover:bg-slate-50 hover:border-blue-200 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                                    <div class="flex-grow">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="bg-indigo-50 text-indigo-600 border border-indigo-100 px-2.5 py-0.5 rounded-md text-xs font-bold">${p.category}</span>
+                                            <c:if test="${p.applicationAvailableYn == 'Y'}">
+                                                <span class="bg-rose-50 text-rose-600 border border-rose-100 px-2.5 py-0.5 rounded-full text-xs font-bold">접수중</span>
+                                            </c:if>
+                                        </div>
+                                        <h3 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">${p.fundName}</h3>
+                                        <p class="text-slate-500 text-sm leading-relaxed mb-4 line-clamp-2">${p.businessDescription}</p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="bg-blue-50 text-blue-600 px-3 py-1 rounded-lg text-xs font-bold">기관: ${p.institution}</span>
+                                            <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold">유형: ${p.category}</span>
+                                        </div>
+                                    </div>
+                                    <a href="/policy" class="shrink-0 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">상세보기</a>
+                                </div>
+                            </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </section>
+
+            <section class="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
+                <div class="p-8 sm:p-10 border-b border-slate-50">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="users" class="w-4 h-4 text-purple-600"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-900 tracking-tight">3. 추천 컨설팅 기업 / 전문가</h2>
+                        </div>
+                        <c:url value="/consulting" var="consultingUrl"><c:param name="region" value="${param.region}"/></c:url>
+                        <a href="${consultingUrl}" class="shrink-0 text-sm font-bold text-purple-600 hover:text-purple-800 flex items-center gap-1">
+                            전체보기 <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </a>
+                    </div>
                 </div>
                 <div class="p-8 sm:p-10 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <c:choose>
@@ -235,6 +260,32 @@
                                     </div>
                                 </div>
                             </c:forEach>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </section>
+            <section class="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
+                <div class="p-8 sm:p-10 border-b border-slate-50">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <i data-lucide="building" class="w-4 h-4 text-amber-600"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-900 tracking-tight">4. 지원기관</h2>
+                    </div>
+                </div>
+                <div class="p-8 sm:p-10">
+                    <c:choose>
+                        <c:when test="${empty institutionList}">
+                            <div class="text-center py-8">
+                                <p class="text-slate-400 text-sm">등록된 지원기관이 없습니다.</p>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="flex flex-wrap gap-2">
+                                <c:forEach var="inst" items="${institutionList}">
+                                    <span class="bg-amber-50 text-amber-700 border border-amber-100 px-3 py-1.5 rounded-xl text-sm font-semibold">${inst}</span>
+                                </c:forEach>
+                            </div>
                         </c:otherwise>
                     </c:choose>
                 </div>

@@ -245,6 +245,14 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         let selectedMain = null;
         let selectedSubs = [];
         let currentPage = 0;
+
+        // search 페이지에서 넘어온 region 파라미터에서 district 추출
+        // 예: "서울특별시 강남구" → "강남구"
+        const _urlParams = new URLSearchParams(window.location.search);
+        const _regionParam = _urlParams.get('region');
+        const urlDistrict = _regionParam && _regionParam.includes(' ')
+            ? _regionParam.substring(_regionParam.lastIndexOf(' ') + 1)
+            : (_regionParam || '');
         let totalElements = 0;
         let hasNext = false;
         let loading = false;
@@ -462,6 +470,9 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             const query = new URLSearchParams();
             const selectedFilters = getSelectedFilters();
             query.append('type', type || 'ALL');
+            if (urlDistrict) {
+                query.append('district', urlDistrict);
+            }
             if (selectedFilters.minRating) {
                 query.append('minRating', selectedFilters.minRating);
             }
