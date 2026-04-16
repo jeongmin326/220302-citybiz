@@ -32,7 +32,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             <div class="flex justify-between items-center mb-8 pb-4 border-b border-slate-100">
                
  <h3 class="font-extrabold text-xl flex items-center gap-2.5 text-slate-900">
-                    <i data-lucide="sliders-horizontal" class="w-6 h-6 text-purple-500"></i> 상세 필터
+                    <i data-lucide="sliders-horizontal" class="w-6 h-6 text-blue-500"></i> 상세 검색
                 </h3>
                 <button type="reset" form="consultingSearchForm" class="text-sm font-medium text-slate-400 hover:text-rose-500 underline transition-colors flex items-center gap-1.5">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>초기화

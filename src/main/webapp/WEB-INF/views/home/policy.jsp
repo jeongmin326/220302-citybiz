@@ -46,7 +46,7 @@
 
         <aside class="w-full md:w-[320px] flex-shrink-0 bg-white rounded-3xl border border-slate-100 p-8 sticky top-28 max-h-[calc(100vh-10rem)] overflow-y-auto shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
             <div class="flex justify-between items-center mb-8 pb-4 border-b border-slate-100">
-                <h3 class="font-extrabold text-lg flex items-center gap-2.5 text-slate-900"><i data-lucide="filter" class="w-5 h-5 text-indigo-500"></i> 맞춤 필터</h3>
+                <h3 class="font-extrabold text-xl flex items-center gap-2.5 text-slate-900"><i data-lucide="sliders-horizontal" class="w-6 h-6 text-blue-500"></i> 상세 검색</h3>
                 <button type="reset" form="policySearchForm" class="text-xs font-medium text-slate-400 hover:text-rose-500 underline">초기화</button>
             </div>
 
