@@ -91,7 +91,7 @@
 
             <div class="flex justify-between items-center px-4 py-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
                 <%-- [Backend] 검색 결과 카운트 --%>
-                <p class="text-slate-600">총 <strong class="text-indigo-600 font-bold" id="policyCount">42</strong>건의 지원사업이 있습니다.</p>
+                <p class="text-slate-600">총 <strong class="text-indigo-600 font-bold" id="policyCount">42</strong>건의 지원사업을 발견했습니다.</p>
                 <div class="flex items-center gap-2 text-sm font-medium text-slate-600 cursor-pointer hover:text-indigo-600 transition">
                     마감임박순 <i data-lucide="chevron-down" class="w-4 h-4"></i>
                 </div>

@@ -108,6 +108,7 @@ public class HomeController {
         // 정책자금 검색
         if (keyword != null && !keyword.isBlank()) {
             List<PolicyFund> policyResults = policyFundRepository.searchByKeyword(keyword.trim());
+            Collections.shuffle(policyResults);
             model.addAttribute("policyResults", policyResults);
             model.addAttribute("policyCount", policyResults.size());
             List<String> institutionList = policyResults.stream()
@@ -130,6 +131,7 @@ public class HomeController {
             String district = region.contains(" ") ? region.substring(region.lastIndexOf(" ") + 1) : region;
 
             List<Space> spaceResults = spaceRepository.findByDistrict(district);
+            Collections.shuffle(spaceResults);
             model.addAttribute("spaceResults", spaceResults);
             model.addAttribute("spaceCount", spaceResults.size());
 

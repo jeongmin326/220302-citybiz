@@ -151,7 +151,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 
                 <%-- 정렬 영역 --%>
                 <div class="flex justify-between items-center mt-2">
-                    <p class="text-slate-600 font-medium text-sm">총 <strong class="text-blue-600 font-bold" id="resultCount">0</strong>명의 전문가</p>
+                    <p class="text-slate-600 font-medium text-sm">총 <strong class="text-blue-600 font-bold" id="resultCount">0</strong>명의 전문가를 발견했습니다.</p>
                     <select class="text-sm border border-slate-200 rounded-lg bg-transparent font-medium text-slate-600 focus:ring-2 focus:ring-blue-100 px-3 py-1.5 cursor-pointer outline-none">
                         <option>추천순</option>
                         <option>평점 높은 순</option>
