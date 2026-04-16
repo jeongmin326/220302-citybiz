@@ -95,8 +95,62 @@ public class HomeController {
 
     // 전문가(Expert) 프로필 수정 페이지 매핑
     @GetMapping("/mypage/expertProfile")
-    public String expertProfilePage() {
-        return "mypage/expertProfile"; 
+    public String expertProfilePage(jakarta.servlet.http.HttpSession session,
+                                    org.springframework.ui.Model model) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId != null) {
+            com.publicservice.dto.ExpertProfileRequest profile = new com.publicservice.dto.ExpertProfileRequest();
+            boolean found = false;
+
+            java.util.Optional<com.publicservice.entity.TaxAccountant> tax = taxAccountantRepository.findByUserId(userId);
+            if (tax.isPresent()) {
+                com.publicservice.entity.TaxAccountant e = tax.get();
+                profile.setExpertType("세무사");
+                profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
+                profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
+                profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                found = true;
+            }
+            if (!found) {
+                java.util.Optional<com.publicservice.entity.Accountant> acc = accountantRepository.findByUserId(userId);
+                if (acc.isPresent()) {
+                    com.publicservice.entity.Accountant e = acc.get();
+                    profile.setExpertType("회계사");
+                    profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
+                    profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                    profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    found = true;
+                }
+            }
+            if (!found) {
+                java.util.Optional<com.publicservice.entity.LaborAttorney> labor = laborAttorneyRepository.findByUserId(userId);
+                if (labor.isPresent()) {
+                    com.publicservice.entity.LaborAttorney e = labor.get();
+                    profile.setExpertType("노무사");
+                    profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
+                    profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                    profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    found = true;
+                }
+            }
+            if (!found) {
+                java.util.Optional<com.publicservice.entity.Lawyer> lawyer = lawyerRepository.findByUserId(userId);
+                if (lawyer.isPresent()) {
+                    com.publicservice.entity.Lawyer e = lawyer.get();
+                    profile.setExpertType("변호사");
+                    profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
+                    profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                    profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    found = true;
+                }
+            }
+            if (found) model.addAttribute("profile", profile);
+        }
+        return "mypage/expertProfile";
     }
 
     // 전문가(Expert) 컨설팅 신청 관리 페이지 매핑
