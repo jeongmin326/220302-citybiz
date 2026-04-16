@@ -138,6 +138,15 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                     </div>
                 </div>
 
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">전문가 검색</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                        <input type="text" id="consultingKeyword" placeholder="이름 또는 사무소명 검색"
+                               class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all">
+                    </div>
+                </div>
+
                 <button type="button" onclick="searchConsultants()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 tracking-wide">
                     조건 적용하기
                 </button>
@@ -332,7 +341,10 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 consultTime = consultTimeOptions[0];
             }
 
+            const keyword = document.getElementById('consultingKeyword').value.trim();
+
             return {
+                keyword: keyword,
                 minRating: rating && rating.value !== 'all' ? rating.value : '',
                 consultTime: consultTime,
                 minExperienceYears: experienceYears && experienceYears.value !== 'all' ? experienceYears.value : '',
@@ -472,6 +484,9 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             query.append('type', type || 'ALL');
             if (urlDistrict) {
                 query.append('district', urlDistrict);
+            }
+            if (selectedFilters.keyword) {
+                query.append('keyword', selectedFilters.keyword);
             }
             if (selectedFilters.minRating) {
                 query.append('minRating', selectedFilters.minRating);

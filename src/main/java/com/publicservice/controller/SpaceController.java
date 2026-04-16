@@ -68,6 +68,7 @@ public class SpaceController {
     public Map<String, Object> getSpaces(
             @RequestParam(name = "region",     required = false) String region,
             @RequestParam(name = "district",   required = false) String district,
+            @RequestParam(name = "keyword",    required = false) String keyword,
             @RequestParam(name = "spaceTypes", required = false) List<String> spaceTypes,
             @RequestParam(name = "minPrice",   required = false) Integer minPrice,
             @RequestParam(name = "maxPrice",   required = false) Integer maxPrice,
@@ -86,6 +87,8 @@ public class SpaceController {
                 predicates.add(cb.equal(root.get("region"), region));
             if (district   != null && !district.isBlank())
                 predicates.add(cb.equal(root.get("district"), district));
+            if (keyword    != null && !keyword.isBlank())
+                predicates.add(cb.like(root.get("name"), "%" + keyword + "%"));
             if (spaceTypes != null && !spaceTypes.isEmpty())
                 predicates.add(root.get("spaceType").in(spaceTypes));
             if (minPrice   != null)

@@ -143,6 +143,15 @@
                         </div>
                     </div>
 
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">공간 검색</label>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                            <input type="text" id="spaceKeyword" placeholder="공간 장소명 검색"
+                                   class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all">
+                        </div>
+                    </div>
+
                     <button type="button" onclick="searchSpaces()" class="w-full bg-slate-900 text-white font-bold py-4 rounded-xl hover:bg-slate-800 transition-all duration-300 mt-4 shadow-md hover:shadow-lg hover:-translate-y-0.5 tracking-wide">
                         공간 검색하기
                     </button>
@@ -549,9 +558,12 @@
         const capacityRadio = document.querySelector('input[name="capacity"]:checked');
         const capacity = (capacityRadio && capacityRadio.value !== 'all') ? capacityRadio.value : '';
 
+        const keyword = document.getElementById('spaceKeyword').value.trim();
+
         return {
             region: region,
             district: district,
+            keyword: keyword,
             spaceTypes: spaceTypes,
             minPrice: minPrice,
             maxPrice: maxPrice,
@@ -622,6 +634,9 @@
             }
             if (filters.district) {
                 query.append('district', filters.district);
+            }
+            if (filters.keyword) {
+                query.append('keyword', filters.keyword);
             }
             filters.spaceTypes.forEach(function(type) {
                 query.append('spaceTypes', type);
