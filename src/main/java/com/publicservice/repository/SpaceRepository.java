@@ -9,4 +9,6 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,
         JpaSpecificationExecutor<Space> {
 
     List<Space> findByDistrict(String district);
+
+    List<Space> findByHostId(Long hostId);
 }

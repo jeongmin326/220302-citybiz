@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -431,6 +432,104 @@ public class SpaceController {
         result.put("success", true);
         result.put("status",  newStatus);
         return result;
+    }
+
+    // ---------------------------------------------------------------
+    // GET /api/spaces/host/spaces — 호스트 본인의 공간 목록
+    // ---------------------------------------------------------------
+    @GetMapping("/host/spaces")
+    public List<Map<String, Object>> getHostSpaces(HttpSession session) {
+        Long hostId = (Long) session.getAttribute("loginUserId");
+        if (hostId == null) return List.of();
+
+        List<Space> spaces = spaceRepository.findByHostId(hostId);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Space s : spaces) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("spaceId",      s.getSpaceId());
+            item.put("name",         s.getName());
+            item.put("region",       s.getRegion());
+            item.put("district",     s.getDistrict());
+            item.put("spaceType",    s.getSpaceType());
+            item.put("pricePerHour", s.getPricePerHour());
+            item.put("availableYn",  s.getAvailableYn());
+            item.put("mainImageUrl", s.getMainImageUrl());
+            result.add(item);
+        }
+        return result;
+    }
+
+    // ---------------------------------------------------------------
+    // PUT /api/spaces/{id} — 공간 정보 수정 (호스트 전용)
+    // ---------------------------------------------------------------
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, Object>> updateSpace(
+            @PathVariable("id")                                Long spaceId,
+            @RequestParam("name")                              String name,
+            @RequestParam("spaceType")                         String spaceType,
+            @RequestParam("description")                       String description,
+            @RequestParam("region")                            String region,
+            @RequestParam("district")                          String district,
+            @RequestParam("address")                           String address,
+            @RequestParam(value = "detailAddress", defaultValue = "") String detailAddress,
+            @RequestParam("maxCapacity")                       int capacity,
+            @RequestParam("pricePerHour")                      int pricePerHour,
+            @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
+            HttpSession session) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        Long hostId = (Long) session.getAttribute("loginUserId");
+        if (hostId == null) {
+            result.put("error", "로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(result);
+        }
+
+        Optional<Space> spaceOpt = spaceRepository.findById(spaceId);
+        if (spaceOpt.isEmpty() || !hostId.equals(spaceOpt.get().getHostId())) {
+            result.put("error", "공간을 찾을 수 없거나 권한이 없습니다.");
+            return ResponseEntity.status(403).body(result);
+        }
+
+        Space space = spaceOpt.get();
+
+        // 새 이미지가 첨부된 경우에만 덮어쓰기
+        if (mainImage != null && !mainImage.isEmpty()) {
+            try {
+                String ext = Optional.ofNullable(mainImage.getOriginalFilename())
+                        .filter(f -> f.contains("."))
+                        .map(f -> f.substring(f.lastIndexOf('.')))
+                        .orElse(".jpg");
+                String fileName = UUID.randomUUID().toString() + ext;
+                Path uploadDir = Paths.get(uploadPath).isAbsolute()
+                        ? Paths.get(uploadPath)
+                        : Paths.get(System.getProperty("user.dir"), uploadPath);
+                Files.createDirectories(uploadDir);
+                Files.copy(mainImage.getInputStream(), uploadDir.resolve(fileName),
+                        StandardCopyOption.REPLACE_EXISTING);
+                space.setMainImageUrl("/images/spaces/" + fileName);
+            } catch (IOException e) {
+                result.put("error", "이미지 저장 실패: " + e.getMessage());
+                return ResponseEntity.status(500).body(result);
+            }
+        }
+
+        String fullAddress = detailAddress.isBlank() ? address : address + " " + detailAddress;
+        space.setName(name);
+        space.setSpaceType(spaceType);
+        space.setDescription(description);
+        space.setRegion(region);
+        space.setDistrict(district);
+        space.setAddress(fullAddress);
+        space.setCapacity(capacity);
+        space.setPricePerHour(pricePerHour);
+        space.setAvailableYn("Y");
+        space.setUpdatedAt(LocalDateTime.now());
+        spaceRepository.save(space);
+
+        result.put("success", true);
+        result.put("spaceId", space.getSpaceId());
+        return ResponseEntity.ok(result);
     }
 
     // ---------------------------------------------------------------

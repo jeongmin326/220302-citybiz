@@ -32,6 +32,14 @@ public class User {
 
     private String status;
 
+    @Column(name = "company_name")
+    private String companyName;
+
+    @Column(name = "biz_no")
+    private String bizNo;
+
+    private String industry;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

@@ -95,7 +95,12 @@
                     <div class="flex gap-3 w-full md:w-auto">
                         <c:choose>
                             <c:when test="${sessionScope.loginRole == 'PROVIDER'}">
-                                <a href="/mypage/spaceRegi" class="flex-1 md:flex-none text-center bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">공간 등록하기</a>
+                                <a href="/mypage/spaceRegi?mode=new" class="flex-1 md:flex-none text-center bg-blue-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">추가 공간 등록</a>
+                                <button type="button" id="toggleMySpacesBtn" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all flex items-center gap-2 justify-center">
+                                    공간 수정
+                                    <span id="spaceCountBadge" class="hidden text-xs bg-slate-700 text-white font-bold px-1.5 py-0.5 rounded-full min-w-[1.2rem] text-center leading-none">0</span>
+                                    <svg id="mySpacesChevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300" style="pointer-events:none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
                                 <a href="/mypage/spaceManagement" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">예약 관리</a>
                             </c:when>
                             <c:when test="${sessionScope.loginRole == 'EXPERT'}">
@@ -108,6 +113,16 @@
                         </c:choose>
                     </div>
                 </div>
+
+                <%-- PROVIDER 전용: 내 공간 목록 패널 (공간 수정 클릭 시 표시) --%>
+                <c:if test="${sessionScope.loginRole == 'PROVIDER'}">
+                    <div id="mySpacesPanel" class="hidden mt-6 pt-6 border-t border-slate-100 w-full">
+                        <p class="text-sm font-semibold text-slate-500 mb-4">수정할 공간을 선택하세요</p>
+                        <div id="mySpacesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div class="text-sm text-slate-400 col-span-full py-4 text-center">불러오는 중...</div>
+                        </div>
+                    </div>
+                </c:if>
             </div>
         </c:if>
 
@@ -267,6 +282,72 @@
                 return false;
             }
             return true;
+        }
+
+        // ── PROVIDER 대시보드 ──────────────────────────────────────────────
+        const toggleBtn    = document.getElementById('toggleMySpacesBtn');
+        const spacesPanel  = document.getElementById('mySpacesPanel');
+        const chevron      = document.getElementById('mySpacesChevron');
+        const countBadge   = document.getElementById('spaceCountBadge');
+
+        let mySpacesData   = null;   // 로드된 공간 목록 캐시
+        let panelOpen      = false;
+
+        if (toggleBtn && spacesPanel) {
+            // 공간 목록 미리 로드 (페이지 오픈과 동시에)
+            loadMySpaces();
+
+            toggleBtn.addEventListener('click', function () {
+                panelOpen = !panelOpen;
+                spacesPanel.classList.toggle('hidden', !panelOpen);
+                chevron.style.transform = panelOpen ? 'rotate(180deg)' : '';
+            });
+        }
+
+        async function loadMySpaces() {
+            try {
+                const res   = await fetch('/api/spaces/host/spaces');
+                const items = await res.json();
+                mySpacesData = items;
+
+                // 뱃지 업데이트
+                if (countBadge && items.length > 0) {
+                    countBadge.textContent = items.length;
+                    countBadge.classList.remove('hidden');
+                }
+
+                // 목록 렌더링
+                const list = document.getElementById('mySpacesList');
+                if (!list) return;
+
+                if (!items || items.length === 0) {
+                    list.innerHTML = '<div class="text-sm text-slate-400 col-span-full py-4 text-center">등록된 공간이 없습니다.</div>';
+                    return;
+                }
+
+                const typeLabel = { shop:'상점', warehouse:'창고', studio:'스튜디오', meeting:'회의실', consulting:'상담실', office:'사무실' };
+                list.innerHTML = items.map(function(s) {
+                    const badgeHtml = s.availableYn === 'N'
+                        ? '<span style="font-size:10px;background:#fef3c7;color:#d97706;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">미완성</span>'
+                        : '';
+                    const typeTxt   = typeLabel[s.spaceType] || s.spaceType;
+                    const locTxt    = (s.district && s.district !== '미설정') ? s.district : (s.region && s.region !== '미설정' ? s.region : '위치 미설정');
+                    return '<a href="/mypage/spaceEdit?spaceId=' + s.spaceId + '" '
+                         + 'class="flex items-center gap-3 p-4 bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-300 rounded-2xl transition-all group">'
+                         + '<div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 text-sm font-bold">'
+                         +   (s.name ? s.name.charAt(0) : '?')
+                         + '</div>'
+                         + '<div class="min-w-0 flex-1">'
+                         +   '<p class="text-sm font-bold text-slate-800 truncate">' + s.name + badgeHtml + '</p>'
+                         +   '<p class="text-xs text-slate-400 mt-0.5">' + locTxt + ' · ' + typeTxt + '</p>'
+                         + '</div>'
+                         + '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-300 group-hover:text-blue-500 ml-auto shrink-0 transition-colors"><polyline points="9 18 15 12 9 6"></polyline></svg>'
+                         + '</a>';
+                }).join('');
+            } catch (err) {
+                const list = document.getElementById('mySpacesList');
+                if (list) list.innerHTML = '<div class="text-sm text-rose-400 col-span-full py-4 text-center">공간 목록을 불러오지 못했습니다.</div>';
+            }
         }
     </script>
 </body>

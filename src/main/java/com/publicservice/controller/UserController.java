@@ -1,9 +1,12 @@
 package com.publicservice.controller;
 
+import com.publicservice.entity.Space;
 import com.publicservice.entity.User;
+import com.publicservice.repository.SpaceRepository;
 import com.publicservice.repository.UserRepository;
 import com.publicservice.service.UserService;
 import com.publicservice.dao.UserDAO;
+import java.time.LocalDateTime;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,6 +33,8 @@ public class UserController {
     private UserRepository userRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private SpaceRepository spaceRepository;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -124,6 +129,26 @@ public class UserController {
                     industry,
                     status
             );
+
+            // PROVIDER 가입 시: 시설명으로 draft 공간 자동 생성
+            if ("PROVIDER".equals(role) && companyName != null && !companyName.trim().isEmpty()) {
+                Optional<User> newUser = userRepository.findByEmail(email);
+                if (newUser.isPresent()) {
+                    Space draft = new Space();
+                    draft.setHostId(newUser.get().getUserId());
+                    draft.setName(companyName.trim());
+                    draft.setRegion("미설정");
+                    draft.setDistrict("미설정");
+                    draft.setAddress("미설정");
+                    draft.setSpaceType("office");
+                    draft.setPricePerHour(0);
+                    draft.setCapacity(1);
+                    draft.setAvailableYn("N");
+                    draft.setCreatedAt(LocalDateTime.now());
+                    draft.setUpdatedAt(LocalDateTime.now());
+                    spaceRepository.save(draft);
+                }
+            }
 
             return "redirect:/login?signup=success";
         } catch (Exception e) {

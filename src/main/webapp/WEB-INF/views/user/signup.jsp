@@ -314,7 +314,7 @@
             html = `
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">운영 기관/시설명</label>
-                    <input type="text" id="facilityName" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="예: 시티비즈 공유오피스 강남점">
+                    <input type="text" id="facilityName" name="company_name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="예: 시티비즈 공유오피스 강남점">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">사업자 등록번호</label>

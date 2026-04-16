@@ -28,9 +28,22 @@
         
         <div class="mb-8">
             <span class="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">공급자(Host) 전용</span>
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">새로운 공간 등록하기</h1>
-            <p class="text-slate-500 mt-2">비즈니스에 최적화된 공간을 등록하고, 더 많은 창업자들과 연결되세요.</p>
+            <c:choose>
+                <c:when test="${not empty draftSpace}">
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">공간 정보 완성하기</h1>
+                    <p class="text-slate-500 mt-2">가입 시 등록한 시설명으로 공간 정보를 완성해 주세요.</p>
+                </c:when>
+                <c:otherwise>
+                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">새로운 공간 등록하기</h1>
+                    <p class="text-slate-500 mt-2">비즈니스에 최적화된 공간을 등록하고, 더 많은 창업자들과 연결되세요.</p>
+                </c:otherwise>
+            </c:choose>
         </div>
+
+        <%-- draft 공간 ID (수정 모드에서 사용) --%>
+        <c:if test="${not empty draftSpace}">
+            <input type="hidden" id="editSpaceId" value="${draftSpace.spaceId}">
+        </c:if>
 
         <%-- 사진 업로드가 포함된 폼이므로 반드시 multipart/form-data 가 필요합니다. --%>
         <form action="/api/spaces" method="POST" enctype="multipart/form-data" class="space-y-8">
@@ -44,7 +57,21 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">공간명 <span class="text-rose-500">*</span></label>
-                        <input type="text" name="name" required placeholder="예: 스타트업 라운지 강남점 4인 회의실" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        <c:choose>
+                            <c:when test="${not empty draftSpace}">
+                                <input type="text" name="name" required value="${draftSpace.name}"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                            </c:when>
+                            <c:when test="${not empty facilityName}">
+                                <input type="text" name="name" required value="${facilityName}"
+                                    class="w-full px-4 py-3 bg-indigo-50 border border-indigo-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                <p class="text-xs text-indigo-500 mt-1">가입 시 등록한 시설명이 자동 입력되었습니다. 필요시 수정 가능합니다.</p>
+                            </c:when>
+                            <c:otherwise>
+                                <input type="text" name="name" required placeholder="예: 스타트업 라운지 강남점 4인 회의실"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                            </c:otherwise>
+                        </c:choose>
                     </div>
 
                     <div>
@@ -188,7 +215,10 @@
                     취소
                 </button>
                 <button type="submit" class="px-10 py-4 font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5">
-                    내 공간 등록하기
+                    <c:choose>
+                        <c:when test="${not empty draftSpace}">공간 정보 완성하기</c:when>
+                        <c:otherwise>내 공간 등록하기</c:otherwise>
+                    </c:choose>
                 </button>
             </div>
 
@@ -236,29 +266,34 @@
             }
         });
 
-        // 등록 완료 후 관리 페이지로 이동
+        // 등록/수정 완료 후 관리 페이지로 이동
+        const editSpaceIdEl = document.getElementById('editSpaceId');
+        const editSpaceId   = editSpaceIdEl ? editSpaceIdEl.value : null;
+
         document.querySelector('form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = this.querySelector('button[type="submit"]');
             btn.disabled = true;
-            btn.textContent = '등록 중...';
+            btn.textContent = editSpaceId ? '수정 중...' : '등록 중...';
 
             const formData = new FormData(this);
             try {
-                const res  = await fetch('/api/spaces', { method: 'POST', body: formData });
-                const data = await res.json();
+                const url    = editSpaceId ? '/api/spaces/' + editSpaceId : '/api/spaces';
+                const method = editSpaceId ? 'PUT' : 'POST';
+                const res    = await fetch(url, { method, body: formData });
+                const data   = await res.json();
                 if (data.success) {
-                    alert('공간이 성공적으로 등록되었습니다!');
+                    alert(editSpaceId ? '공간 정보가 완성되었습니다!' : '공간이 성공적으로 등록되었습니다!');
                     location.href = '/mypage/spaceManagement';
                 } else {
-                    alert('등록 실패: ' + (data.error || '알 수 없는 오류'));
+                    alert((editSpaceId ? '수정' : '등록') + ' 실패: ' + (data.error || '알 수 없는 오류'));
                     btn.disabled = false;
-                    btn.textContent = '내 공간 등록하기';
+                    btn.textContent = editSpaceId ? '공간 정보 완성하기' : '내 공간 등록하기';
                 }
             } catch (err) {
                 alert('서버 통신 오류가 발생했습니다.');
                 btn.disabled = false;
-                btn.textContent = '내 공간 등록하기';
+                btn.textContent = editSpaceId ? '공간 정보 완성하기' : '내 공간 등록하기';
             }
         });
     </script>

@@ -3,6 +3,7 @@ package com.publicservice.controller;
 import com.publicservice.dto.ExpertDto;
 import com.publicservice.entity.PolicyFund;
 import com.publicservice.entity.Space;
+import com.publicservice.entity.User;
 import com.publicservice.repository.AccountantRepository;
 import com.publicservice.repository.LaborAttorneyRepository;
 import com.publicservice.repository.LawyerRepository;
@@ -10,9 +11,12 @@ import com.publicservice.repository.PatentAttorneyRepository;
 import com.publicservice.repository.PolicyFundRepository;
 import com.publicservice.repository.SpaceRepository;
 import com.publicservice.repository.TaxAccountantRepository;
+import com.publicservice.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +32,7 @@ public class HomeController {
     private final AccountantRepository accountantRepository;
     private final LaborAttorneyRepository laborAttorneyRepository;
     private final LawyerRepository lawyerRepository;
+    private final UserRepository userRepository;
 
     public HomeController(PolicyFundRepository policyFundRepository,
                           SpaceRepository spaceRepository,
@@ -35,7 +40,8 @@ public class HomeController {
                           TaxAccountantRepository taxAccountantRepository,
                           AccountantRepository accountantRepository,
                           LaborAttorneyRepository laborAttorneyRepository,
-                          LawyerRepository lawyerRepository) {
+                          LawyerRepository lawyerRepository,
+                          UserRepository userRepository) {
         this.policyFundRepository = policyFundRepository;
         this.spaceRepository = spaceRepository;
         this.patentAttorneyRepository = patentAttorneyRepository;
@@ -43,6 +49,7 @@ public class HomeController {
         this.accountantRepository = accountantRepository;
         this.laborAttorneyRepository = laborAttorneyRepository;
         this.lawyerRepository = lawyerRepository;
+        this.userRepository = userRepository;
     }
     // 03/29 07:20 /main이 없어져서 다시 추가했어용
     @GetMapping("/main")
@@ -81,16 +88,49 @@ public class HomeController {
     }
 
     // 공급자(Host) 공간 등록 페이지 매핑
-    @GetMapping("/mypage/spaceRegi") // 웹 브라우저에 입력할 주소 (예: localhost:8080/mypage/spaceRegi)
-    public String spaceRegisterPage() {
-        // views/mypage 폴더 안의 spaceRegi.jsp를 화면에 띄우라는 뜻입니다.
-        return "mypage/spaceRegi"; 
+    @GetMapping("/mypage/spaceRegi")
+    public String spaceRegisterPage(
+            @RequestParam(value = "mode", required = false) String mode,
+            HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId != null) {
+            // 가입 시 입력한 시설명(company_name) 전달
+            Optional<User> userOpt = userRepository.findById(userId);
+            userOpt.ifPresent(u -> model.addAttribute("facilityName", u.getCompanyName()));
+
+            // mode=new 이면 항상 빈 폼 (추가 공간 등록)
+            // 그 외엔 draft 공간이 있을 경우 완성 모드로 전환
+            if (!"new".equals(mode)) {
+                List<Space> hostSpaces = spaceRepository.findByHostId(userId);
+                hostSpaces.stream()
+                        .filter(s -> "N".equals(s.getAvailableYn())
+                                  && "미설정".equals(s.getRegion()))
+                        .findFirst()
+                        .ifPresent(draft -> model.addAttribute("draftSpace", draft));
+            }
+        }
+        return "mypage/spaceRegi";
+    }
+
+    // 공급자(Host) 공간 수정 페이지 매핑
+    @GetMapping("/mypage/spaceEdit")
+    public String spaceEditPage(@RequestParam("spaceId") Long spaceId,
+                                HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId == null) return "redirect:/login";
+
+        Optional<Space> spaceOpt = spaceRepository.findById(spaceId);
+        if (spaceOpt.isEmpty() || !userId.equals(spaceOpt.get().getHostId())) {
+            return "redirect:/mypage/spaceManagement";
+        }
+        model.addAttribute("space", spaceOpt.get());
+        return "mypage/spaceEdit";
     }
 
     // 공급자(Host) 예약 관리(대시보드) 페이지 매핑
     @GetMapping("/mypage/spaceManagement")
     public String spaceManagementPage() {
-        return "mypage/spaceManagement"; 
+        return "mypage/spaceManagement";
     }
 
     // 전문가(Expert) 프로필 수정 페이지 매핑
