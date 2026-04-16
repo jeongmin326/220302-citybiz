@@ -138,6 +138,7 @@
     var currentPage = 0;
     var hasNextPage = false;
     var isLoading = false;
+    var scrappedPolicyIds = new Set();
 
     function escapeHtml(val) {
         return String(val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -185,11 +186,21 @@
     function createPolicyCard(p) {
         var catStyle = getCategoryStyle(p.category);
         var hashtags = parseHashtags(p.hashtags, 3);
+        var isScrapped = scrappedPolicyIds.has(Number(p.id));
+        var scrapBtnClass = isScrapped
+            ? 'text-rose-500 hover:text-rose-700'
+            : 'text-slate-300 hover:text-rose-500';
+        var scrapFill = isScrapped ? 'fill-rose-500' : '';
         return '' +
-            '<a href="#" class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col h-full">' +
+            '<div class="bg-white rounded-3xl p-6 border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col h-full" data-policy-id="' + p.id + '">' +
                 '<div class="flex justify-between items-start mb-4">' +
                     '<span class="px-2.5 py-1 rounded-md text-xs font-bold border ' + catStyle + '">' + escapeHtml(p.category) + '</span>' +
-                    getStatusBadge(p.applicationAvailableYn) +
+                    '<div class="flex items-center gap-2">' +
+                        getStatusBadge(p.applicationAvailableYn) +
+                        '<button type="button" onclick="toggleScrap(event,' + p.id + ')" class="transition-colors ' + scrapBtnClass + '" title="스크랩">' +
+                            '<i data-lucide="bookmark" class="w-5 h-5 ' + scrapFill + '"></i>' +
+                        '</button>' +
+                    '</div>' +
                 '</div>' +
                 '<h4 class="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-indigo-600 transition line-clamp-2">' + escapeHtml(p.fundName) + '</h4>' +
                 '<p class="text-sm text-slate-500 mb-4 line-clamp-2 flex-grow">' + escapeHtml(p.businessDescription) + '</p>' +
@@ -203,7 +214,42 @@
                         '<i data-lucide="arrow-right" class="w-5 h-5"></i>' +
                     '</div>' +
                 '</div>' +
-            '</a>';
+            '</div>';
+    }
+
+    async function toggleScrap(event, policyId) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        var res = await fetch('/api/policies/' + policyId + '/scrap', { method: 'POST' });
+        var data = await res.json();
+
+        if (data.error) {
+            alert('로그인 후 스크랩할 수 있습니다.');
+            return;
+        }
+
+        if (data.scrapped) {
+            scrappedPolicyIds.add(Number(policyId));
+        } else {
+            scrappedPolicyIds.delete(Number(policyId));
+        }
+
+        // 해당 카드의 버튼만 업데이트
+        var card = document.querySelector('[data-policy-id="' + policyId + '"]');
+        if (card) {
+            var btn = card.querySelector('button[title="스크랩"]');
+            if (btn) {
+                var icon = btn.querySelector('i');
+                if (data.scrapped) {
+                    btn.className = btn.className.replace('text-slate-300 hover:text-rose-500', 'text-rose-500 hover:text-rose-700');
+                    if (icon) icon.className = icon.className.replace('fill-rose-500', '').trim() + ' fill-rose-500';
+                } else {
+                    btn.className = btn.className.replace('text-rose-500 hover:text-rose-700', 'text-slate-300 hover:text-rose-500');
+                    if (icon) icon.className = icon.className.replace('fill-rose-500', '').trim();
+                }
+            }
+        }
     }
 
     async function loadPolicies(appendMode) {
@@ -229,6 +275,13 @@
             var items = data.items || [];
             currentPage = Number(data.page || 0);
             hasNextPage = Boolean(data.hasNext);
+
+            // 첫 로드 시 스크랩 목록 초기화, 더보기 시 추가
+            if (!appendMode) {
+                scrappedPolicyIds = new Set((data.scrappedPolicyIds || []).map(Number));
+            } else {
+                (data.scrappedPolicyIds || []).forEach(function(id) { scrappedPolicyIds.add(Number(id)); });
+            }
 
             var container = document.getElementById('policyListContainer');
             if (!appendMode) container.innerHTML = '';

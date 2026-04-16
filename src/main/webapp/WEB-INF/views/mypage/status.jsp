@@ -39,7 +39,7 @@
                 </div>
                 <div>
                     <p class="text-sm font-medium text-slate-500">다가오는 예약</p>
-                    <p class="text-2xl font-bold text-slate-900 mt-1">2<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1"><span id="upcomingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-5">
@@ -48,7 +48,7 @@
                 </div>
                 <div>
                     <p class="text-sm font-medium text-slate-500">스크랩한 정책</p>
-                    <p class="text-2xl font-bold text-slate-900 mt-1">5<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1"><span id="scrapCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
                 </div>
             </div>
             <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-5">
@@ -75,18 +75,8 @@
                         </h2>
                         <a href="/space" class="text-sm font-medium text-blue-600 hover:underline">더보기</a>
                     </div>
-                    <div class="p-6 space-y-4">
-                        <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:border-blue-100 hover:bg-blue-50/30 transition-colors">
-                            <div class="flex gap-4 items-center">
-                                <div class="w-16 h-16 rounded-lg bg-slate-200 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=200')] bg-cover bg-center"></div>
-                                <div>
-                                    <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded mb-1">예약 확정</span>
-                                    <h3 class="font-bold text-slate-900">스타트업 라운지 강남점 (4인 회의실)</h3>
-                                    <p class="text-sm text-slate-500 mt-0.5">2026. 04. 15 (수) 14:00 - 16:00</p>
-                                </div>
-                            </div>
-                            <button class="px-4 py-2 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50">상세 보기</button>
-                        </div>
+                    <div class="p-6 space-y-4" id="reservationList">
+                        <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
                     </div>
                 </section>
 
@@ -98,27 +88,8 @@
                         </h2>
                         <a href="/policy" class="text-sm font-medium text-indigo-600 hover:underline">더보기</a>
                     </div>
-                    <div class="p-6 space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-xs font-bold px-2 py-0.5 bg-rose-100 text-rose-600 rounded">D-5</span>
-                                    <span class="text-xs text-slate-500">중소벤처기업부</span>
-                                </div>
-                                <h3 class="font-bold text-slate-900 hover:text-indigo-600 cursor-pointer">2026년 청년창업사관학교 입교생 모집</h3>
-                            </div>
-                            <button class="text-slate-400 hover:text-rose-500 transition-colors"><i data-lucide="heart" class="w-5 h-5 fill-rose-500 text-rose-500"></i></button>
-                        </div>
-                        <div class="flex justify-between items-center border-b border-slate-100 pb-4 last:border-0 last:pb-0">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">상시</span>
-                                    <span class="text-xs text-slate-500">기술보증기금</span>
-                                </div>
-                                <h3 class="font-bold text-slate-900 hover:text-indigo-600 cursor-pointer">예비창업자 사전보증 제도</h3>
-                            </div>
-                            <button class="text-slate-400 hover:text-rose-500 transition-colors"><i data-lucide="heart" class="w-5 h-5 fill-rose-500 text-rose-500"></i></button>
-                        </div>
+                    <div class="p-6 space-y-4" id="scrapList">
+                        <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
                     </div>
                 </section>
 
@@ -197,8 +168,168 @@
     <jsp:include page="../common/footer.jsp" />
 
     <script>
-        // 루사이드 아이콘 초기화
+        function escapeHtml(val) {
+            return String(val || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        var allScrapItems = [];
+        var scrapExpanded = false;
+        var SCRAP_SHOW = 3;
+
+        function renderScrapList() {
+            var container = document.getElementById('scrapList');
+            if (allScrapItems.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">스크랩한 정책이 없습니다.<br><a href="/policy" class="text-indigo-500 hover:underline mt-1 inline-block">정책 둘러보기</a></p>';
+                lucide.createIcons();
+                return;
+            }
+
+            var visible = scrapExpanded ? allScrapItems : allScrapItems.slice(0, SCRAP_SHOW);
+            var remaining = allScrapItems.length - SCRAP_SHOW;
+
+            var html = visible.map(function(p) {
+                var badge = p.applicationAvailableYn === 'Y'
+                    ? '<span class="text-xs font-bold px-2 py-0.5 bg-rose-100 text-rose-600 rounded">접수중</span>'
+                    : '<span class="text-xs font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded">마감</span>';
+                return '<div class="flex justify-between items-center border-b border-slate-100 pb-4 last:border-0 last:pb-0" data-policy-id="' + p.id + '">' +
+                    '<div>' +
+                        '<div class="flex items-center gap-2 mb-1">' +
+                            badge +
+                            '<span class="text-xs text-slate-500">' + escapeHtml(p.institution) + '</span>' +
+                        '</div>' +
+                        '<h3 class="font-bold text-slate-900 hover:text-indigo-600 cursor-pointer">' + escapeHtml(p.fundName) + '</h3>' +
+                    '</div>' +
+                    '<button onclick="removeScrap(event,' + p.id + ')" class="text-rose-500 hover:text-rose-700 transition-colors flex-shrink-0 ml-4" title="스크랩 해제">' +
+                        '<i data-lucide="bookmark" class="w-5 h-5 fill-rose-500"></i>' +
+                    '</button>' +
+                '</div>';
+            }).join('');
+
+            if (!scrapExpanded && remaining > 0) {
+                html += '<button onclick="toggleScrapExpand()" class="w-full mt-2 py-2.5 text-sm font-medium text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors flex items-center justify-center gap-1">' +
+                    '<i data-lucide="chevron-down" class="w-4 h-4"></i> 더보기 (' + remaining + '개 더)' +
+                '</button>';
+            } else if (scrapExpanded && allScrapItems.length > SCRAP_SHOW) {
+                html += '<button onclick="toggleScrapExpand()" class="w-full mt-2 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-50 rounded-xl transition-colors flex items-center justify-center gap-1">' +
+                    '<i data-lucide="chevron-up" class="w-4 h-4"></i> 접기' +
+                '</button>';
+            }
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function toggleScrapExpand() {
+            scrapExpanded = !scrapExpanded;
+            renderScrapList();
+        }
+
+        async function loadScrappedPolicies() {
+            try {
+                var res = await fetch('/api/policies/my-scraps');
+                var data = await res.json();
+                allScrapItems = data.items || [];
+                document.getElementById('scrapCount').textContent = data.count || 0;
+                renderScrapList();
+            } catch (err) {
+                console.error('스크랩 목록 로딩 오류:', err);
+                document.getElementById('scrapList').innerHTML = '<p class="text-sm text-slate-400 text-center py-4">불러오기 실패</p>';
+            }
+        }
+
+        async function removeScrap(event, policyId) {
+            event.preventDefault();
+            event.stopPropagation();
+            var res = await fetch('/api/policies/' + policyId + '/scrap', { method: 'POST' });
+            var data = await res.json();
+            if (!data.error) {
+                // 삭제 후 접혀있던 상태 유지
+                if (allScrapItems.length - 1 <= SCRAP_SHOW) scrapExpanded = false;
+                loadScrappedPolicies();
+            }
+        }
+
+        // ── 공간 예약 내역 로드 ──────────────────────────────────────
+        function statusBadgeClass(status) {
+            if (status === 'PENDING')   return 'bg-amber-100 text-amber-700';
+            if (status === 'APPROVED')  return 'bg-blue-100 text-blue-700';
+            if (status === 'REJECTED')  return 'bg-slate-100 text-slate-500';
+            if (status === 'CANCELLED') return 'bg-rose-100 text-rose-500';
+            return 'bg-slate-100 text-slate-500';
+        }
+        function statusLabel(status) {
+            if (status === 'PENDING')   return '승인 대기';
+            if (status === 'APPROVED')  return '예약 확정';
+            if (status === 'REJECTED')  return '거절됨';
+            if (status === 'CANCELLED') return '취소됨';
+            return status;
+        }
+
+        async function cancelReservation(reservationId) {
+            if (!confirm('예약을 취소하시겠습니까?\n취소 후에는 되돌릴 수 없습니다.')) return;
+            try {
+                const res  = await fetch('/api/spaces/reservations/' + reservationId + '/cancel', { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    loadMyReservations();
+                } else {
+                    alert('취소 실패: ' + (data.error || '알 수 없는 오류'));
+                }
+            } catch (err) {
+                alert('서버 통신 오류가 발생했습니다.');
+            }
+        }
+
+        async function loadMyReservations() {
+            try {
+                const res  = await fetch('/api/spaces/my/reservations');
+                const data = await res.json();
+                const items = data.items || [];
+
+                document.getElementById('upcomingCount').textContent = data.upcomingCount || 0;
+
+                const container = document.getElementById('reservationList');
+                if (items.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">예약 내역이 없습니다.<br><a href="/space" class="text-blue-500 hover:underline mt-1 inline-block">공간 둘러보기</a></p>';
+                    lucide.createIcons();
+                    return;
+                }
+
+                const canCancel = function(status) { return status === 'PENDING' || status === 'APPROVED'; };
+
+                container.innerHTML = items.slice(0, 5).map(function(r) {
+                    const imgStyle = r.mainImageUrl
+                        ? 'background-image:url(\'' + escapeHtml(r.mainImageUrl) + '\')'
+                        : 'background-color:#e2e8f0';
+                    const cancelBtn = canCancel(r.status)
+                        ? '<button onclick="cancelReservation(' + r.reservationId + ')" ' +
+                          'class="mt-1.5 text-xs text-rose-500 hover:text-rose-700 hover:underline transition-colors">예약 취소</button>'
+                        : '';
+                    return '<div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:bg-slate-50/60 transition-colors">' +
+                        '<div class="flex gap-4 items-center min-w-0">' +
+                            '<div class="w-14 h-14 rounded-lg bg-slate-200 bg-cover bg-center flex-shrink-0" style="' + imgStyle + '"></div>' +
+                            '<div class="min-w-0">' +
+                                '<span class="inline-block px-2 py-0.5 ' + statusBadgeClass(r.status) + ' text-xs font-bold rounded mb-1">' + statusLabel(r.status) + '</span>' +
+                                '<h3 class="font-bold text-slate-900 truncate">' + escapeHtml(r.spaceName) + '</h3>' +
+                                '<p class="text-xs text-slate-500 mt-0.5">' + escapeHtml(r.useDate) + ' ' + escapeHtml(r.startTime) + ' ~ ' + escapeHtml(r.endTime) + '</p>' +
+                                cancelBtn +
+                            '</div>' +
+                        '</div>' +
+                        '<p class="text-sm font-bold text-slate-700 flex-shrink-0 ml-4">' + Number(r.totalPrice).toLocaleString() + '원</p>' +
+                    '</div>';
+                }).join('');
+                lucide.createIcons();
+            } catch (err) {
+                console.error('예약 목록 로딩 오류:', err);
+                document.getElementById('reservationList').innerHTML =
+                    '<p class="text-sm text-slate-400 text-center py-4">불러오기 실패</p>';
+            }
+        }
+
+        // 루사이드 아이콘 초기화 및 데이터 로드
         lucide.createIcons();
+        loadScrappedPolicies();
+        loadMyReservations();
     </script>
 </body>
 </html>

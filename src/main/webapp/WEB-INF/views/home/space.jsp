@@ -190,7 +190,285 @@
     </main>
 
 <script>
-    // [AI/ML] FastAPI 서버와 통신하는 예시 함수
+    // ── 예약 모달 ───────────────────────────────────────────────────
+    const spacesData = {};   // spaceId → space 객체 캐시
+
+    function getSpaceTypeLabel(spaceType) {
+        switch (spaceType) {
+            case 'shop': return '상점';
+            case 'warehouse': return '창고';
+            case 'studio': return '스튜디오';
+            case 'meeting': return '회의실';
+            case 'consulting': return '상담실';
+            case 'office': return '사무실';
+            default: return spaceType;
+        }
+    }
+
+    // ── 타임라인 상태 ──────────────────────────────────────────────
+    const SLOT_START = 8;   // 08:00
+    const SLOT_END   = 22;  // 22:00 (마지막 셀: 21:00~22:00)
+    let timelineBookedHours = new Set();
+    let selStart = null;   // 선택 시작 시각 (정수, e.g. 9 = 09:00)
+    let selEnd   = null;   // 선택 종료 시각 (정수, e.g. 12 = 12:00, selStart보다 큰 값)
+    let tlPricePerHour = 0;
+
+    function openReservationModal(spaceId) {
+        const space = spacesData[spaceId];
+        if (!space) return;
+
+        document.getElementById('modalSpaceId').value            = space.spaceId;
+        document.getElementById('modalSpaceType').textContent    = getSpaceTypeLabel(space.spaceType);
+        document.getElementById('modalSpaceName').textContent    = space.name;
+        document.getElementById('modalSpaceAddress').textContent = space.address;
+        document.getElementById('modalPrice').textContent        = Number(space.pricePerHour).toLocaleString() + '원 / 시간';
+        document.getElementById('modalCapacity').textContent     = space.capacity;
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('resUseDate').value = today;
+        document.getElementById('resUseDate').min   = today;
+        document.getElementById('resUserMemo').value = '';
+
+        resetTimelineState(false);   // 타임라인 초기화 (placeholder 표시)
+
+        document.getElementById('reservationModal').classList.remove('hidden');
+        lucide.createIcons();
+
+        loadTimeline();   // 오늘 날짜로 바로 로드
+    }
+
+    function closeReservationModal() {
+        document.getElementById('reservationModal').classList.add('hidden');
+    }
+
+    function closeModalOnBackdrop(e) {
+        if (e.target === document.getElementById('reservationModal')) {
+            closeReservationModal();
+        }
+    }
+
+    // ── 타임라인 로직 ──────────────────────────────────────────────
+    function resetTimelineState(keepGrid) {
+        selStart = null;
+        selEnd   = null;
+        document.getElementById('selectionInfo').classList.add('hidden');
+        document.getElementById('priceSection').classList.add('hidden');
+        document.getElementById('reserveSubmitBtn').disabled = true;
+        document.getElementById('resetSelBtn').classList.add('hidden');
+        if (!keepGrid) {
+            document.getElementById('timelinePlaceholder').classList.remove('hidden');
+            document.getElementById('timelineLoading').classList.add('hidden');
+            document.getElementById('timelineGrid').classList.add('hidden');
+            document.getElementById('timelineLegend').classList.add('hidden');
+        }
+    }
+
+    function resetSelection() {
+        selStart = null;
+        selEnd   = null;
+        document.getElementById('selectionInfo').classList.add('hidden');
+        document.getElementById('priceSection').classList.add('hidden');
+        document.getElementById('reserveSubmitBtn').disabled = true;
+        document.getElementById('resetSelBtn').classList.add('hidden');
+        renderTimelineGrid();
+    }
+
+    async function loadTimeline() {
+        const spaceId = document.getElementById('modalSpaceId').value;
+        const date    = document.getElementById('resUseDate').value;
+        if (!date || !spaceId) return;
+
+        selStart = null;
+        selEnd   = null;
+
+        document.getElementById('timelinePlaceholder').classList.add('hidden');
+        document.getElementById('timelineLoading').classList.remove('hidden');
+        document.getElementById('timelineGrid').classList.add('hidden');
+        document.getElementById('timelineLegend').classList.add('hidden');
+        document.getElementById('selectionInfo').classList.add('hidden');
+        document.getElementById('priceSection').classList.add('hidden');
+        document.getElementById('reserveSubmitBtn').disabled = true;
+        document.getElementById('resetSelBtn').classList.add('hidden');
+
+        try {
+            const res  = await fetch('/api/spaces/' + spaceId + '/availability?date=' + date);
+            const data = await res.json();
+
+            tlPricePerHour = data.pricePerHour || 0;
+
+            // 예약된 시간대 계산
+            timelineBookedHours = new Set();
+            (data.bookedSlots || []).forEach(function(slot) {
+                const s = parseInt(slot.startTime.split(':')[0]);
+                const e = parseInt(slot.endTime.split(':')[0]);
+                for (let h = s; h < e; h++) timelineBookedHours.add(h);
+            });
+
+            document.getElementById('timelineLoading').classList.add('hidden');
+            document.getElementById('timelineGrid').classList.remove('hidden');
+            document.getElementById('timelineLegend').classList.remove('hidden');
+            renderTimelineGrid();
+        } catch (err) {
+            document.getElementById('timelineLoading').classList.add('hidden');
+            document.getElementById('timelineGrid').innerHTML =
+                '<p class="text-sm text-rose-500 text-center py-4">예약 현황을 불러오지 못했습니다.</p>';
+            document.getElementById('timelineGrid').classList.remove('hidden');
+        }
+    }
+
+    function renderTimelineGrid() {
+        const grid = document.getElementById('timelineGrid');
+
+        // ── 헤더 행 (시각 라벨) ─────────────────────────────────
+        let headerHtml = '<div class="flex min-w-max gap-px">';
+        for (let h = SLOT_START; h < SLOT_END; h++) {
+            const displayH = h < 12 ? h : (h === 12 ? 12 : h - 12);
+            const ampm     = (h === SLOT_START) ? '오전' : (h === 12 ? '오후' : '');
+            headerHtml +=
+                '<div class="flex-shrink-0 w-10 text-center">' +
+                    '<p class="text-xs font-bold text-blue-400 h-4">' + ampm + '</p>' +
+                    '<p class="text-xs font-semibold text-slate-500">' + displayH + '시</p>' +
+                '</div>';
+        }
+        headerHtml += '</div>';
+
+        // ── 셀 행 ────────────────────────────────────────────────
+        let cellsHtml = '<div class="flex min-w-max gap-px mt-1">';
+        for (let h = SLOT_START; h < SLOT_END; h++) {
+            const booked   = timelineBookedHours.has(h);
+            const inRange  = selStart !== null && selEnd !== null && h >= selStart && h < selEnd;
+            const isOnlyStart = selStart !== null && selEnd === null && h === selStart;
+            const isFirst  = inRange && h === selStart;
+            const isLast   = inRange && h === selEnd - 1;
+
+            let cls = 'flex-shrink-0 w-10 h-12 flex flex-col items-center justify-center text-xs font-medium transition-all select-none ';
+            let inner = '';
+
+            if (booked) {
+                cls += 'bg-slate-200 text-slate-400 cursor-not-allowed';
+                inner = '<span class="text-xs leading-none">마감</span>';
+            } else if (isFirst || isLast) {
+                const rounded = isFirst && isLast ? 'rounded-lg' : (isFirst ? 'rounded-l-xl' : 'rounded-r-xl');
+                cls += 'bg-blue-600 text-white cursor-pointer ' + rounded;
+            } else if (inRange) {
+                cls += 'bg-blue-500 text-white cursor-pointer';
+            } else if (isOnlyStart) {
+                cls += 'bg-blue-600 text-white cursor-pointer rounded-xl ring-2 ring-blue-300';
+            } else {
+                cls += 'bg-white border border-slate-200 text-slate-400 hover:bg-blue-50 hover:border-blue-300 cursor-pointer';
+            }
+
+            const onclick = booked ? '' : 'onclick="handleCellClick(' + h + ')"';
+            cellsHtml += '<div class="' + cls + '" ' + onclick + '>' + inner + '</div>';
+        }
+        cellsHtml += '</div>';
+
+        grid.innerHTML = '<div class="overflow-x-auto pb-1">' + headerHtml + cellsHtml + '</div>';
+
+        updateSelectionInfo();
+    }
+
+    function handleCellClick(h) {
+        if (timelineBookedHours.has(h)) return;
+
+        if (selStart === null || selEnd !== null) {
+            // 새 선택 시작
+            selStart = h;
+            selEnd   = null;
+        } else if (h < selStart) {
+            // 시작보다 앞을 클릭 → 새 시작점
+            selStart = h;
+            selEnd   = null;
+        } else {
+            // 시작 이상 클릭 → 범위 내 마감 없으면 종료 확정
+            let allFree = true;
+            for (let i = selStart; i <= h; i++) {
+                if (timelineBookedHours.has(i)) { allFree = false; break; }
+            }
+            if (allFree) {
+                selEnd = h + 1;   // endTime = (h+1):00
+            } else {
+                selStart = h;
+                selEnd   = null;
+            }
+        }
+        renderTimelineGrid();
+    }
+
+    function updateSelectionInfo() {
+        const info    = document.getElementById('selectionInfo');
+        const text    = document.getElementById('selectionText');
+        const priceSec = document.getElementById('priceSection');
+        const preview  = document.getElementById('totalPricePreview');
+        const btn      = document.getElementById('reserveSubmitBtn');
+        const resetBtn = document.getElementById('resetSelBtn');
+
+        if (selStart === null) {
+            info.classList.add('hidden');
+            priceSec.classList.add('hidden');
+            btn.disabled = true;
+            resetBtn.classList.add('hidden');
+            return;
+        }
+
+        resetBtn.classList.remove('hidden');
+        info.classList.remove('hidden');
+
+        if (selEnd === null) {
+            text.textContent = selStart + ':00 선택됨 — 종료 시간 셀을 클릭하세요';
+            priceSec.classList.add('hidden');
+            btn.disabled = true;
+        } else {
+            const hours = selEnd - selStart;
+            text.textContent = selStart + ':00 ~ ' + selEnd + ':00  (' + hours + '시간)';
+            preview.textContent = Number(hours * tlPricePerHour).toLocaleString() + '원';
+            priceSec.classList.remove('hidden');
+            btn.disabled = false;
+        }
+    }
+
+    async function submitReservation(e) {
+        e.preventDefault();
+
+        if (selStart === null || selEnd === null) {
+            alert('이용 시간을 선택해 주세요.');
+            return;
+        }
+
+        const spaceId  = document.getElementById('modalSpaceId').value;
+        const useDate  = document.getElementById('resUseDate').value;
+        const userMemo = document.getElementById('resUserMemo').value;
+        const btn      = document.getElementById('reserveSubmitBtn');
+
+        const startTime = String(selStart).padStart(2, '0') + ':00';
+        const endTime   = String(selEnd).padStart(2, '0')   + ':00';
+
+        btn.disabled    = true;
+        btn.textContent = '신청 중...';
+
+        try {
+            const params = new URLSearchParams({ useDate, startTime, endTime, userMemo });
+            const res    = await fetch('/api/spaces/' + spaceId + '/reserve?' + params,
+                                       { method: 'POST' });
+            const data   = await res.json();
+
+            if (data.success) {
+                closeReservationModal();
+                alert('예약이 신청되었습니다!\n' + startTime + ' ~ ' + endTime +
+                      '\n총 금액: ' + Number(data.totalPrice).toLocaleString() + '원\n호스트 승인 후 확정됩니다.');
+            } else {
+                alert('예약 실패: ' + (data.error || '알 수 없는 오류'));
+                loadTimeline();   // 타임라인 새로고침
+            }
+        } catch (err) {
+            alert('서버 통신 오류가 발생했습니다.');
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '예약 신청하기';
+        }
+    }
+
+    // ── AI/ML ──────────────────────────────────────────────────────
     async function requestAiRecommendation() {
         try {
             alert('AI가 사용자 데이터를 분석하여 최적의 장소를 추천합니다. (FastAPI 연결 지점)');
@@ -377,8 +655,10 @@
             }
 
             spaces.forEach(space => {
+                spacesData[space.spaceId] = space;   // 모달에서 참조
+
                 const card =
-                    '<div class="bg-white rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] cursor-pointer group">' +
+                    '<div class="bg-white rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] group">' +
                         '<div class="h-56 bg-slate-100 relative overflow-hidden">' +
                             '<img src="' + space.mainImageUrl + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="' + space.name + '">' +
                             '<div class="absolute top-4 left-4 bg-white/80 px-3 py-1.5 rounded-full text-xs font-bold text-blue-600 backdrop-blur-sm shadow-inner">' +
@@ -395,7 +675,11 @@
                                     Number(space.pricePerHour).toLocaleString() +
                                     '<span class="text-sm font-normal text-slate-500">원 / 시간</span>' +
                                 '</p>' +
-                                '<span class="flex items-center gap-1 text-sm text-slate-500 font-medium">' +
+                                '<button onclick="openReservationModal(' + space.spaceId + ')" ' +
+                                    'class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm">' +
+                                    '예약하기' +
+                                '</button>' +
+                                '<span class="hidden flex items-center gap-1 text-sm text-slate-500 font-medium">' +
                                     '<i data-lucide="users" class="w-4 h-4"></i>' + space.capacity + '명' +
                                 '</span>' +
                             '</div>' +
@@ -403,6 +687,7 @@
                     '</div>';
 
                 container.insertAdjacentHTML('beforeend', card);
+                lucide.createIcons();
             });
 
             const resultCount = document.getElementById('resultCount');
@@ -484,6 +769,105 @@
     })();
     loadSpaces(false);
 </script>
+
+<%-- ── 예약 모달 ────────────────────────────────────────────────── --%>
+<div id="reservationModal"
+     class="fixed inset-0 z-50 hidden flex items-center justify-center p-4"
+     onclick="closeModalOnBackdrop(event)">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+
+        <%-- 모달 헤더 --%>
+        <div class="px-8 pt-8 pb-5 border-b border-slate-100 sticky top-0 bg-white z-10 rounded-t-3xl">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-blue-600 mb-1" id="modalSpaceType"></p>
+                    <h2 class="text-xl font-extrabold text-slate-900" id="modalSpaceName"></h2>
+                    <p class="text-sm text-slate-500 mt-1" id="modalSpaceAddress"></p>
+                </div>
+                <button onclick="closeReservationModal()" class="text-slate-400 hover:text-slate-700 transition-colors mt-1">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="mt-3 flex items-center gap-4 text-sm text-slate-600">
+                <span class="font-extrabold text-blue-600 text-lg" id="modalPrice"></span>
+                <span class="text-slate-300">|</span>
+                <span class="flex items-center gap-1"><i data-lucide="users" class="w-4 h-4"></i><span id="modalCapacity"></span>명</span>
+            </div>
+        </div>
+
+        <%-- 예약 폼 --%>
+        <form id="reservationForm" class="px-8 py-6 space-y-5" onsubmit="submitReservation(event)">
+            <input type="hidden" id="modalSpaceId">
+
+            <%-- 날짜 선택 --%>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">이용 날짜 <span class="text-rose-500">*</span></label>
+                <input type="date" id="resUseDate" required onchange="loadTimeline()"
+                       class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-700">
+            </div>
+
+            <%-- 타임라인 --%>
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label class="text-sm font-semibold text-slate-700">이용 시간 <span class="text-rose-500">*</span></label>
+                    <button type="button" id="resetSelBtn" onclick="resetSelection()"
+                            class="hidden text-xs text-slate-400 hover:text-rose-500 transition-colors">선택 초기화</button>
+                </div>
+
+                <%-- 안내 문구 (날짜 미선택) --%>
+                <div id="timelinePlaceholder"
+                     class="bg-slate-50 border border-dashed border-slate-200 rounded-2xl p-6 text-center text-sm text-slate-400">
+                    날짜를 선택하면 예약 현황이 표시됩니다.
+                </div>
+
+                <%-- 로딩 --%>
+                <div id="timelineLoading" class="hidden bg-slate-50 rounded-2xl p-6 text-center">
+                    <div class="inline-block w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+
+                <%-- 타임라인 그리드 --%>
+                <div id="timelineGrid" class="hidden space-y-2"></div>
+
+                <%-- 범례 --%>
+                <div id="timelineLegend" class="hidden flex items-center gap-4 mt-2 text-xs text-slate-500">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-sm bg-slate-200 inline-block"></span>마감
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-sm bg-white border border-slate-300 inline-block"></span>예약 가능
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-sm bg-blue-500 inline-block"></span>선택됨
+                    </span>
+                </div>
+
+                <%-- 선택 정보 --%>
+                <div id="selectionInfo" class="hidden mt-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center justify-between">
+                    <p class="text-sm font-semibold text-slate-700" id="selectionText"></p>
+                </div>
+            </div>
+
+            <%-- 총 금액 --%>
+            <div id="priceSection" class="hidden bg-blue-50 rounded-2xl px-5 py-4 flex justify-between items-center">
+                <span class="text-sm font-semibold text-slate-600">예상 총 금액</span>
+                <span class="text-2xl font-extrabold text-blue-600" id="totalPricePreview">-</span>
+            </div>
+
+            <%-- 메모 --%>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">요청 메모 <span class="text-slate-400 font-normal">(선택)</span></label>
+                <textarea id="resUserMemo" rows="2" placeholder="호스트에게 전달할 내용을 입력하세요."
+                          class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none text-slate-700 text-sm"></textarea>
+            </div>
+
+            <button type="submit" id="reserveSubmitBtn" disabled
+                    class="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-lg shadow-blue-200 disabled:shadow-none transition-all text-base">
+                예약 신청하기
+            </button>
+        </form>
+    </div>
+</div>
 
 <%-- 푸터 파일 로드 --%>
 <jsp:include page="/WEB-INF/views/common/footer.jsp" />

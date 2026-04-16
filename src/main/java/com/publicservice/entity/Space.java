@@ -15,6 +15,9 @@ public class Space {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long spaceId;
 
+    @Column(name = "host_id")
+    private Long hostId;
+
     private String name;
 
     private String region;

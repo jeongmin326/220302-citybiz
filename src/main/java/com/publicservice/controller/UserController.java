@@ -54,6 +54,7 @@ public class UserController {
                 session.setAttribute("loginUser", user.getEmail());
                 session.setAttribute("loginName", user.getName());
                 session.setAttribute("loginRole", user.getRole());
+                session.setAttribute("loginUserId", user.getUserId());
 
                 if (rememberId != null) {
                     Cookie rememberCookie = new Cookie("rememberEmail", user.getEmail());

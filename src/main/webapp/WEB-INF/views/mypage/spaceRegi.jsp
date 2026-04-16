@@ -75,14 +75,32 @@
                 <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
                     <i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i> 위치 및 상세 옵션
                 </h2>
-                
+
                 <div class="space-y-6">
+                    <%-- 지역 / 구 선택 --%>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">광역 지역 <span class="text-rose-500">*</span></label>
+                            <select id="regionSelect" name="region" required onchange="onRegionChange()"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                <option value="">지역 선택</option>
+                                <option value="서울">서울</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">구/군 <span class="text-rose-500">*</span></label>
+                            <select id="districtSelect" name="district" required disabled
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:text-slate-400">
+                                <option value="">먼저 지역을 선택하세요</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold text-slate-700 mb-2">도로명 주소 <span class="text-rose-500">*</span></label>
                             <div class="flex gap-2">
-                                <input type="text" id="address" name="address" required readonly placeholder="주소 검색 버튼을 클릭하세요" class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none">
-                                <button type="button" onclick="alert('주소 검색 API(예: 카카오 우편번호) 연동 필요')" class="bg-slate-900 text-white px-6 py-3 rounded-xl font-medium hover:bg-slate-800 transition-colors">주소 찾기</button>
+                                <input type="text" id="address" name="address" required placeholder="예: 서울특별시 강남구 테헤란로 123" class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                             </div>
                         </div>
                         <div>
@@ -181,15 +199,66 @@
     <jsp:include page="/WEB-INF/views/common/footer.jsp" />
 
     <script>
-        // 루사이드 아이콘 초기화
         lucide.createIcons();
 
-        // 이미지 업로드 시 파일명 표시 (단순 편의 기능)
+        // 서울 25개 구 목록
+        const districtMap = {
+            '서울': ['강남구','강동구','강북구','강서구','관악구','광진구','구로구','금천구',
+                     '노원구','도봉구','동대문구','동작구','마포구','서대문구','서초구',
+                     '성동구','성북구','송파구','양천구','영등포구','용산구','은평구',
+                     '종로구','중구','중랑구']
+        };
+
+        function onRegionChange() {
+            const regionVal   = document.getElementById('regionSelect').value;
+            const districtSel = document.getElementById('districtSelect');
+            districtSel.innerHTML = '';
+            if (regionVal && districtMap[regionVal]) {
+                districtSel.disabled = false;
+                districtSel.insertAdjacentHTML('beforeend', '<option value="">구/군 선택</option>');
+                districtMap[regionVal].forEach(function(d) {
+                    districtSel.insertAdjacentHTML('beforeend',
+                        '<option value="' + d + '">' + d + '</option>');
+                });
+            } else {
+                districtSel.disabled = true;
+                districtSel.insertAdjacentHTML('beforeend',
+                    '<option value="">먼저 지역을 선택하세요</option>');
+            }
+        }
+
+        // 이미지 업로드 시 파일명 표시
         document.getElementById('dropzone-file').addEventListener('change', function(e) {
-            if(e.target.files.length > 0) {
-                const fileName = e.target.files[0].name;
+            if (e.target.files.length > 0) {
+                const fileName  = e.target.files[0].name;
                 const uploadText = this.previousElementSibling.querySelector('p.font-medium');
                 uploadText.innerHTML = `<span class='text-blue-600 font-bold'>선택된 파일:</span> \${fileName}`;
+            }
+        });
+
+        // 등록 완료 후 관리 페이지로 이동
+        document.querySelector('form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.textContent = '등록 중...';
+
+            const formData = new FormData(this);
+            try {
+                const res  = await fetch('/api/spaces', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    alert('공간이 성공적으로 등록되었습니다!');
+                    location.href = '/mypage/spaceManagement';
+                } else {
+                    alert('등록 실패: ' + (data.error || '알 수 없는 오류'));
+                    btn.disabled = false;
+                    btn.textContent = '내 공간 등록하기';
+                }
+            } catch (err) {
+                alert('서버 통신 오류가 발생했습니다.');
+                btn.disabled = false;
+                btn.textContent = '내 공간 등록하기';
             }
         });
     </script>
