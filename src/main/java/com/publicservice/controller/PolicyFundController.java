@@ -7,6 +7,7 @@ import com.publicservice.repository.PolicyScrapRepository;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,8 +86,11 @@ public class PolicyFundController {
 
         Page<PolicyFund> result = policyFundRepository.findAll(specification, pageable);
 
+        List<PolicyFund> items = new ArrayList<>(result.getContent());
+        Collections.shuffle(items);
+
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("items", result.getContent());
+        response.put("items", items);
         response.put("page", result.getNumber());
         response.put("size", result.getSize());
         response.put("totalElements", result.getTotalElements());

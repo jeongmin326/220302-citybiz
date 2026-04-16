@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -98,8 +99,11 @@ public class SpaceController {
 
         Page<Space> result = spaceRepository.findAll(spec, pageable);
 
+        List<Space> items = new ArrayList<>(result.getContent());
+        Collections.shuffle(items);
+
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("items",         result.getContent());
+        response.put("items",         items);
         response.put("page",          result.getNumber());
         response.put("size",          result.getSize());
         response.put("totalElements", result.getTotalElements());

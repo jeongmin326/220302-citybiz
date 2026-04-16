@@ -12,6 +12,7 @@ import com.publicservice.repository.TaxAccountantRepository;
 import jakarta.persistence.criteria.Predicate;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,11 +69,12 @@ public class ConsultantController {
             all.addAll(fetchTax(district, minRating, consultTime, minExperienceYears, maxPrice));
             all.addAll(fetchAccount(district, minRating, consultTime, minExperienceYears, maxPrice));
             all.addAll(fetchLabor(district, minRating, consultTime, minExperienceYears, maxPrice));
+            Collections.shuffle(all);
 
             totalElements = all.size();
             int start = page * size;
             int end = (int) Math.min((long) start + size, totalElements);
-            items = start < totalElements ? all.subList(start, end) : new ArrayList<>();
+            items = start < totalElements ? new ArrayList<>(all.subList(start, end)) : new ArrayList<>();
             hasNext = end < totalElements;
 
         } else {
@@ -82,24 +84,28 @@ public class ConsultantController {
                 case "PATENT" -> {
                     Page<PatentAttorney> result = patentAttorneyRepository.findAll(buildPatentSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    Collections.shuffle(items);
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
                 }
                 case "TAX" -> {
                     Page<TaxAccountant> result = taxAccountantRepository.findAll(buildSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    Collections.shuffle(items);
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
                 }
                 case "ACCOUNT" -> {
                     Page<Accountant> result = accountantRepository.findAll(buildSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    Collections.shuffle(items);
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
                 }
                 case "LABOR" -> {
                     Page<LaborAttorney> result = laborAttorneyRepository.findAll(buildSpec(district, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    Collections.shuffle(items);
                     totalElements = result.getTotalElements();
                     hasNext = result.hasNext();
                 }
