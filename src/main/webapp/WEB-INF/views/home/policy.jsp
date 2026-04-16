@@ -240,13 +240,16 @@
         if (card) {
             var btn = card.querySelector('button[title="스크랩"]');
             if (btn) {
-                var icon = btn.querySelector('i');
+                // lucide.createIcons() 호출 후 <i>가 <svg>로 교체되므로 두 경우 모두 처리
+                var icon = btn.querySelector('svg') || btn.querySelector('i');
                 if (data.scrapped) {
-                    btn.className = btn.className.replace('text-slate-300 hover:text-rose-500', 'text-rose-500 hover:text-rose-700');
-                    if (icon) icon.className = icon.className.replace('fill-rose-500', '').trim() + ' fill-rose-500';
+                    btn.classList.remove('text-slate-300', 'hover:text-rose-500');
+                    btn.classList.add('text-rose-500', 'hover:text-rose-700');
+                    if (icon) icon.classList.add('fill-rose-500');
                 } else {
-                    btn.className = btn.className.replace('text-rose-500 hover:text-rose-700', 'text-slate-300 hover:text-rose-500');
-                    if (icon) icon.className = icon.className.replace('fill-rose-500', '').trim();
+                    btn.classList.remove('text-rose-500', 'hover:text-rose-700');
+                    btn.classList.add('text-slate-300', 'hover:text-rose-500');
+                    if (icon) icon.classList.remove('fill-rose-500');
                 }
             }
         }
