@@ -265,13 +265,100 @@
             return status;
         }
 
+        var allReservationItems = [];
+        var reservationExpanded = false;
+        var RES_SHOW = 3;
+
+        function getTodayStr() {
+            var d = new Date();
+            return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        }
+
+        function updateUpcomingCount() {
+            var now = new Date();
+            var count = allReservationItems.filter(function(r) {
+                if (r.status !== 'PENDING' && r.status !== 'APPROVED') return false;
+                // 종료 시간 기준으로 아직 끝나지 않은 예약만 카운트
+                var endDateTime = new Date(r.useDate + 'T' + r.endTime);
+                return endDateTime > now;
+            }).length;
+            document.getElementById('upcomingCount').textContent = count;
+        }
+
+        function renderReservationList() {
+            var container = document.getElementById('reservationList');
+
+            if (allReservationItems.length === 0) {
+                container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">예약 내역이 없습니다.<br><a href="/space" class="text-blue-500 hover:underline mt-1 inline-block">공간 둘러보기</a></p>';
+                lucide.createIcons();
+                return;
+            }
+
+            var now = new Date();
+            var visible   = reservationExpanded ? allReservationItems : allReservationItems.slice(0, RES_SHOW);
+            var remaining = allReservationItems.length - RES_SHOW;
+
+            var html = visible.map(function(r) {
+                var isPast = new Date(r.useDate + 'T' + r.endTime) <= now;
+                var isCompleted = isPast && (r.status === 'PENDING' || r.status === 'APPROVED');
+
+                var badgeClass = isCompleted ? 'bg-slate-100 text-slate-500' : statusBadgeClass(r.status);
+                var label      = isCompleted ? '이용 완료'                    : statusLabel(r.status);
+                var cancelBtn  = (!isPast && (r.status === 'PENDING' || r.status === 'APPROVED'))
+                    ? '<button onclick="cancelReservation(' + r.reservationId + ')" ' +
+                      'class="mt-1.5 text-xs text-rose-500 hover:text-rose-700 hover:underline transition-colors">예약 취소</button>'
+                    : '';
+
+                var imgStyle = r.mainImageUrl
+                    ? 'background-image:url(\'' + escapeHtml(r.mainImageUrl) + '\')'
+                    : 'background-color:#e2e8f0';
+                return '<div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:bg-slate-50/60 transition-colors">' +
+                    '<div class="flex gap-4 items-center min-w-0">' +
+                        '<div class="w-14 h-14 rounded-lg bg-slate-200 bg-cover bg-center flex-shrink-0" style="' + imgStyle + '"></div>' +
+                        '<div class="min-w-0">' +
+                            '<span class="inline-block px-2 py-0.5 ' + badgeClass + ' text-xs font-bold rounded mb-1">' + label + '</span>' +
+                            '<h3 class="font-bold text-slate-900 truncate">' + escapeHtml(r.spaceName) + '</h3>' +
+                            '<p class="text-xs text-slate-500 mt-0.5">' + escapeHtml(r.useDate) + ' ' + escapeHtml(r.startTime) + ' ~ ' + escapeHtml(r.endTime) + '</p>' +
+                            cancelBtn +
+                        '</div>' +
+                    '</div>' +
+                    '<p class="text-sm font-bold text-slate-700 flex-shrink-0 ml-4">' + Number(r.totalPrice).toLocaleString() + '원</p>' +
+                '</div>';
+            }).join('');
+
+            if (!reservationExpanded && remaining > 0) {
+                html += '<button onclick="toggleReservationExpand()" ' +
+                    'class="w-full mt-2 py-2.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-xl transition-colors flex items-center justify-center gap-1">' +
+                    '<i data-lucide="chevron-down" class="w-4 h-4"></i> 더보기 (' + remaining + '개 더)' +
+                '</button>';
+            } else if (reservationExpanded && allReservationItems.length > RES_SHOW) {
+                html += '<button onclick="toggleReservationExpand()" ' +
+                    'class="w-full mt-2 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-50 rounded-xl transition-colors flex items-center justify-center gap-1">' +
+                    '<i data-lucide="chevron-up" class="w-4 h-4"></i> 접기' +
+                '</button>';
+            }
+
+            container.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function toggleReservationExpand() {
+            reservationExpanded = !reservationExpanded;
+            renderReservationList();
+        }
+
         async function cancelReservation(reservationId) {
             if (!confirm('예약을 취소하시겠습니까?\n취소 후에는 되돌릴 수 없습니다.')) return;
             try {
                 const res  = await fetch('/api/spaces/reservations/' + reservationId + '/cancel', { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
-                    loadMyReservations();
+                    // 전체 재로드 없이 해당 항목 상태만 업데이트
+                    var item = allReservationItems.find(function(r) { return r.reservationId === reservationId; });
+                    if (item) item.status = 'CANCELLED';
+                    if (allReservationItems.length - 1 <= RES_SHOW) reservationExpanded = false;
+                    updateUpcomingCount();
+                    renderReservationList();
                 } else {
                     alert('취소 실패: ' + (data.error || '알 수 없는 오류'));
                 }
@@ -284,41 +371,10 @@
             try {
                 const res  = await fetch('/api/spaces/my/reservations');
                 const data = await res.json();
-                const items = data.items || [];
 
-                document.getElementById('upcomingCount').textContent = data.upcomingCount || 0;
-
-                const container = document.getElementById('reservationList');
-                if (items.length === 0) {
-                    container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">예약 내역이 없습니다.<br><a href="/space" class="text-blue-500 hover:underline mt-1 inline-block">공간 둘러보기</a></p>';
-                    lucide.createIcons();
-                    return;
-                }
-
-                const canCancel = function(status) { return status === 'PENDING' || status === 'APPROVED'; };
-
-                container.innerHTML = items.slice(0, 5).map(function(r) {
-                    const imgStyle = r.mainImageUrl
-                        ? 'background-image:url(\'' + escapeHtml(r.mainImageUrl) + '\')'
-                        : 'background-color:#e2e8f0';
-                    const cancelBtn = canCancel(r.status)
-                        ? '<button onclick="cancelReservation(' + r.reservationId + ')" ' +
-                          'class="mt-1.5 text-xs text-rose-500 hover:text-rose-700 hover:underline transition-colors">예약 취소</button>'
-                        : '';
-                    return '<div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:bg-slate-50/60 transition-colors">' +
-                        '<div class="flex gap-4 items-center min-w-0">' +
-                            '<div class="w-14 h-14 rounded-lg bg-slate-200 bg-cover bg-center flex-shrink-0" style="' + imgStyle + '"></div>' +
-                            '<div class="min-w-0">' +
-                                '<span class="inline-block px-2 py-0.5 ' + statusBadgeClass(r.status) + ' text-xs font-bold rounded mb-1">' + statusLabel(r.status) + '</span>' +
-                                '<h3 class="font-bold text-slate-900 truncate">' + escapeHtml(r.spaceName) + '</h3>' +
-                                '<p class="text-xs text-slate-500 mt-0.5">' + escapeHtml(r.useDate) + ' ' + escapeHtml(r.startTime) + ' ~ ' + escapeHtml(r.endTime) + '</p>' +
-                                cancelBtn +
-                            '</div>' +
-                        '</div>' +
-                        '<p class="text-sm font-bold text-slate-700 flex-shrink-0 ml-4">' + Number(r.totalPrice).toLocaleString() + '원</p>' +
-                    '</div>';
-                }).join('');
-                lucide.createIcons();
+                allReservationItems = data.items || [];
+                updateUpcomingCount();
+                renderReservationList();
             } catch (err) {
                 console.error('예약 목록 로딩 오류:', err);
                 document.getElementById('reservationList').innerHTML =
