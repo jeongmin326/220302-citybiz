@@ -3,10 +3,12 @@ package com.publicservice.controller;
 import com.publicservice.dto.ExpertDto;
 import com.publicservice.entity.Accountant;
 import com.publicservice.entity.LaborAttorney;
+import com.publicservice.entity.Lawyer;
 import com.publicservice.entity.PatentAttorney;
 import com.publicservice.entity.TaxAccountant;
 import com.publicservice.repository.AccountantRepository;
 import com.publicservice.repository.LaborAttorneyRepository;
+import com.publicservice.repository.LawyerRepository;
 import com.publicservice.repository.PatentAttorneyRepository;
 import com.publicservice.repository.TaxAccountantRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -35,15 +37,18 @@ public class ConsultantController {
     private final TaxAccountantRepository taxAccountantRepository;
     private final AccountantRepository accountantRepository;
     private final LaborAttorneyRepository laborAttorneyRepository;
+    private final LawyerRepository lawyerRepository;
 
     public ConsultantController(PatentAttorneyRepository patentAttorneyRepository,
                                 TaxAccountantRepository taxAccountantRepository,
                                 AccountantRepository accountantRepository,
-                                LaborAttorneyRepository laborAttorneyRepository) {
+                                LaborAttorneyRepository laborAttorneyRepository,
+                                LawyerRepository lawyerRepository) {
         this.patentAttorneyRepository = patentAttorneyRepository;
         this.taxAccountantRepository = taxAccountantRepository;
         this.accountantRepository = accountantRepository;
         this.laborAttorneyRepository = laborAttorneyRepository;
+        this.lawyerRepository = lawyerRepository;
     }
 
     @GetMapping
@@ -70,6 +75,7 @@ public class ConsultantController {
             all.addAll(fetchTax(district, keyword, minRating, consultTime, minExperienceYears, maxPrice));
             all.addAll(fetchAccount(district, keyword, minRating, consultTime, minExperienceYears, maxPrice));
             all.addAll(fetchLabor(district, keyword, minRating, consultTime, minExperienceYears, maxPrice));
+            all.addAll(fetchLawyer(district, keyword, minRating, consultTime, minExperienceYears, maxPrice));
             Collections.shuffle(all);
 
             totalElements = all.size();
@@ -105,6 +111,13 @@ public class ConsultantController {
                 }
                 case "LABOR" -> {
                     Page<LaborAttorney> result = laborAttorneyRepository.findAll(buildSpec(district, keyword, minRating, consultTime, minExperienceYears, maxPrice), pageable);
+                    items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
+                    Collections.shuffle(items);
+                    totalElements = result.getTotalElements();
+                    hasNext = result.hasNext();
+                }
+                case "LAWYER" -> {
+                    Page<Lawyer> result = lawyerRepository.findAll(buildSpec(district, keyword, minRating, consultTime, minExperienceYears, maxPrice), pageable);
                     items = result.getContent().stream().map(ExpertDto::from).collect(Collectors.toList());
                     Collections.shuffle(items);
                     totalElements = result.getTotalElements();
@@ -181,6 +194,11 @@ public class ConsultantController {
 
     private List<ExpertDto> fetchLabor(String district, String keyword, BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
         return laborAttorneyRepository.findAll(buildSpec(district, keyword, minRating, consultTime, minExp, maxPrice))
+                .stream().map(ExpertDto::from).collect(Collectors.toList());
+    }
+
+    private List<ExpertDto> fetchLawyer(String district, String keyword, BigDecimal minRating, String consultTime, Integer minExp, Integer maxPrice) {
+        return lawyerRepository.findAll(buildSpec(district, keyword, minRating, consultTime, minExp, maxPrice))
                 .stream().map(ExpertDto::from).collect(Collectors.toList());
     }
 }

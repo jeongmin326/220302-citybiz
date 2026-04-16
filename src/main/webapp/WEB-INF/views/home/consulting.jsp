@@ -259,7 +259,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         const categoryMap = {
             ALL:     { ready: true  },
             PATENT:  { ready: true  },
-            LAWYER:  { ready: false },
+            LAWYER:  { ready: true  },
             TAX:     { ready: true  },
             ACCOUNT: { ready: true  },
             LABOR:   { ready: true  }

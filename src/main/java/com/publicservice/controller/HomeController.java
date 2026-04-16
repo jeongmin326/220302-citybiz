@@ -5,6 +5,7 @@ import com.publicservice.entity.PolicyFund;
 import com.publicservice.entity.Space;
 import com.publicservice.repository.AccountantRepository;
 import com.publicservice.repository.LaborAttorneyRepository;
+import com.publicservice.repository.LawyerRepository;
 import com.publicservice.repository.PatentAttorneyRepository;
 import com.publicservice.repository.PolicyFundRepository;
 import com.publicservice.repository.SpaceRepository;
@@ -26,19 +27,22 @@ public class HomeController {
     private final TaxAccountantRepository taxAccountantRepository;
     private final AccountantRepository accountantRepository;
     private final LaborAttorneyRepository laborAttorneyRepository;
+    private final LawyerRepository lawyerRepository;
 
     public HomeController(PolicyFundRepository policyFundRepository,
                           SpaceRepository spaceRepository,
                           PatentAttorneyRepository patentAttorneyRepository,
                           TaxAccountantRepository taxAccountantRepository,
                           AccountantRepository accountantRepository,
-                          LaborAttorneyRepository laborAttorneyRepository) {
+                          LaborAttorneyRepository laborAttorneyRepository,
+                          LawyerRepository lawyerRepository) {
         this.policyFundRepository = policyFundRepository;
         this.spaceRepository = spaceRepository;
         this.patentAttorneyRepository = patentAttorneyRepository;
         this.taxAccountantRepository = taxAccountantRepository;
         this.accountantRepository = accountantRepository;
         this.laborAttorneyRepository = laborAttorneyRepository;
+        this.lawyerRepository = lawyerRepository;
     }
     // 03/29 07:20 /main이 없어져서 다시 추가했어용
     @GetMapping("/main")
@@ -138,7 +142,8 @@ public class HomeController {
             long consultingCount = taxAccountantRepository.countByDistrict(district)
                     + accountantRepository.countByDistrict(district)
                     + laborAttorneyRepository.countByDistrict(district)
-                    + patentAttorneyRepository.countByAddressContaining(district);
+                    + patentAttorneyRepository.countByAddressContaining(district)
+                    + lawyerRepository.countByDistrict(district);
             model.addAttribute("consultingCount", consultingCount);
 
             // 컨설팅 추천 2개: 타입별로 랜덤 1명씩 후보 모아서 2개 선택
@@ -162,6 +167,11 @@ public class HomeController {
             if (!patentList.isEmpty()) {
                 Collections.shuffle(patentList);
                 consultingCandidates.add(ExpertDto.from(patentList.get(0)));
+            }
+            List<com.publicservice.entity.Lawyer> lawyerList = lawyerRepository.findByDistrict(district);
+            if (!lawyerList.isEmpty()) {
+                Collections.shuffle(lawyerList);
+                consultingCandidates.add(ExpertDto.from(lawyerList.get(0)));
             }
             Collections.shuffle(consultingCandidates);
             model.addAttribute("consultingResults",
