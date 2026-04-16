@@ -1,11 +1,20 @@
 package com.publicservice.controller;
 
+import com.publicservice.entity.Accountant;
+import com.publicservice.entity.LaborAttorney;
+import com.publicservice.entity.Lawyer;
 import com.publicservice.entity.Space;
+import com.publicservice.entity.TaxAccountant;
 import com.publicservice.entity.User;
+import com.publicservice.repository.AccountantRepository;
+import com.publicservice.repository.LaborAttorneyRepository;
+import com.publicservice.repository.LawyerRepository;
 import com.publicservice.repository.SpaceRepository;
+import com.publicservice.repository.TaxAccountantRepository;
 import com.publicservice.repository.UserRepository;
 import com.publicservice.service.UserService;
 import com.publicservice.dao.UserDAO;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.servlet.http.Cookie;
@@ -35,6 +44,14 @@ public class UserController {
     private UserService userService;
     @Autowired
     private SpaceRepository spaceRepository;
+    @Autowired
+    private TaxAccountantRepository taxAccountantRepository;
+    @Autowired
+    private AccountantRepository accountantRepository;
+    @Autowired
+    private LaborAttorneyRepository laborAttorneyRepository;
+    @Autowired
+    private LawyerRepository lawyerRepository;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -129,6 +146,76 @@ public class UserController {
                     industry,
                     status
             );
+
+            // EXPERT 가입 시: 전문가 테이블 자동 삽입
+            if ("EXPERT".equals(role)) {
+                String expertType       = request.getParameter("expert_type");
+                String expertOffice     = request.getParameter("expert_office");
+                String expertCity       = request.getParameter("expert_city");
+                String expertDistrict   = request.getParameter("expert_district");
+                String expertRoadAddr   = request.getParameter("expert_road_address");
+                String expertField      = request.getParameter("expert_field");
+                String expertConsultTime= request.getParameter("expert_consult_time");
+                String expYrsStr        = request.getParameter("expert_experience_years");
+                String priceStr         = request.getParameter("expert_price");
+
+                int expYrs  = (expYrsStr  != null && !expYrsStr.isEmpty())  ? Integer.parseInt(expYrsStr)  : 0;
+                int expPrice= (priceStr   != null && !priceStr.isEmpty())   ? Integer.parseInt(priceStr)   : 0;
+
+                if (expertType != null && !expertType.trim().isEmpty()) {
+                    Optional<User> newUser = userRepository.findByEmail(email);
+                    if (newUser.isPresent()) {
+                        Long newUserId = newUser.get().getUserId();
+                        String safeName   = name   != null ? name   : "";
+                        String safePhone  = phone  != null ? phone  : "";
+                        String safeOffice = expertOffice   != null ? expertOffice   : "";
+                        String safeCity   = expertCity     != null ? expertCity     : "";
+                        String safeDist   = expertDistrict != null ? expertDistrict : "";
+                        String safeRoad   = expertRoadAddr != null ? expertRoadAddr : "";
+                        String safeField  = expertField    != null ? expertField    : "";
+                        String safeCT     = expertConsultTime != null ? expertConsultTime : "평일";
+
+                        switch (expertType) {
+                            case "세무사" -> {
+                                TaxAccountant e = new TaxAccountant();
+                                e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
+                                e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
+                                e.setRoadAddress(safeRoad); e.setField(safeField);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setRating(BigDecimal.ZERO);
+                                taxAccountantRepository.save(e);
+                            }
+                            case "회계사" -> {
+                                Accountant e = new Accountant();
+                                e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
+                                e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
+                                e.setRoadAddress(safeRoad); e.setField(safeField);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setRating(BigDecimal.ZERO);
+                                accountantRepository.save(e);
+                            }
+                            case "노무사" -> {
+                                LaborAttorney e = new LaborAttorney();
+                                e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
+                                e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
+                                e.setRoadAddress(safeRoad); e.setField(safeField);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setRating(BigDecimal.ZERO);
+                                laborAttorneyRepository.save(e);
+                            }
+                            case "변호사" -> {
+                                Lawyer e = new Lawyer();
+                                e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
+                                e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
+                                e.setRoadAddress(safeRoad); e.setField(safeField);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setRating(BigDecimal.ZERO);
+                                lawyerRepository.save(e);
+                            }
+                        }
+                    }
+                }
+            }
 
             // PROVIDER 가입 시: 시설명으로 draft 공간 자동 생성
             if ("PROVIDER".equals(role) && companyName != null && !companyName.trim().isEmpty()) {

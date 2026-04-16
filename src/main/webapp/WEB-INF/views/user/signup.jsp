@@ -350,7 +350,77 @@
         } else {
             subtitle.innerText = "전문가 풀 등록을 위한 정보를 입력해주세요.";
             rightSectionTitle.innerHTML = '<span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">2</span>전문가 정보';
-            html = `<p class='text-slate-400 pt-10 text-center'>해당 역할에 맞는 필드를 준비 중입니다.</p>`;
+            html = `
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">전문가 유형 <span class="text-rose-500">*</span></label>
+                    <select name="expert_type" id="expertTypeSignup" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
+                        <option value="">선택하세요</option>
+                        <option value="세무사">세무사</option>
+                        <option value="회계사">회계사</option>
+                        <option value="노무사">노무사</option>
+                        <option value="변호사">변호사</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">사무소명 <span class="text-rose-500">*</span></label>
+                    <input type="text" name="expert_office" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                        placeholder="예: 길동 세무사 사무소">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">시/도 <span class="text-rose-500">*</span></label>
+                        <input type="text" name="expert_city" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                            placeholder="예: 서울특별시">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">구/군 <span class="text-rose-500">*</span></label>
+                        <input type="text" name="expert_district" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                            placeholder="예: 강남구">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">도로명 주소 <span class="text-rose-500">*</span></label>
+                    <input type="text" name="expert_road_address" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                        placeholder="예: 테헤란로 123">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">전문 분야 <span class="text-rose-500">*</span></label>
+                    <select name="expert_field" id="expertFieldSignup" required disabled
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none disabled:text-slate-400">
+                        <option value="">유형을 먼저 선택하세요</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">상담 가능 시간 <span class="text-rose-500">*</span></label>
+                        <select name="expert_consult_time" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
+                            <option value="">선택</option>
+                            <option value="평일">평일</option>
+                            <option value="야간">야간</option>
+                            <option value="주말">주말</option>
+                            <option value="주말야간">주말야간</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">경력 (년수) <span class="text-rose-500">*</span></label>
+                        <input type="number" name="expert_experience_years" min="0" max="50" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                            placeholder="예: 5">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">상담 가격 (만원) <span class="text-rose-500">*</span></label>
+                    <input type="number" name="expert_price" min="0" required
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
+                        placeholder="예: 10">
+                </div>
+            `;
         }
         dynamicFields.innerHTML = html;
         if (window.lucide) { lucide.createIcons(); } // 동적 생성된 아이콘 로드
@@ -361,6 +431,35 @@
         roleSelectionSection.classList.remove('hidden');
         subtitle.innerText = "CityBiz 플랫폼에서 활동하실 역할을 선택해주세요.";
     }
+
+    // 전문가 유형 선택 시 전문분야 옵션 동적 생성
+    const expertFieldOptions = {
+        '세무사': ['부가가치세', '종합소득세', '법인세', '절세 컨설팅', '세무조사 대응'],
+        '회계사': ['재무회계', '결산', '세무회계', '외부감사', '회계감사', '스타트업 회계', '투자유치', '기업가치평가'],
+        '노무사': ['근로계약', '인사관리', '임금·체불', '부당해고·징계', '산업재해', '4대보험', '노무관리'],
+        '변호사': ['계약·기업법', '노동·인사', '지식재산권', '민사 분쟁', '스타트업·투자']
+    };
+
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'expertTypeSignup') {
+            const fieldSel = document.getElementById('expertFieldSignup');
+            if (!fieldSel) return;
+            const type = e.target.value;
+            fieldSel.innerHTML = '';
+            if (type && expertFieldOptions[type]) {
+                fieldSel.disabled = false;
+                fieldSel.insertAdjacentHTML('beforeend', '<option value="">선택하세요</option>');
+                expertFieldOptions[type].forEach(function (opt) {
+                    fieldSel.insertAdjacentHTML('beforeend',
+                        '<option value="' + opt + '">' + opt + '</option>');
+                });
+            } else {
+                fieldSel.disabled = true;
+                fieldSel.insertAdjacentHTML('beforeend',
+                    '<option value="">유형을 먼저 선택하세요</option>');
+            }
+        }
+    });
 
     // 3. 가입 완료하기 로직
     async function handleSignup(e) {

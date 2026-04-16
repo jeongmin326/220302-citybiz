@@ -41,23 +41,23 @@
                             <label class="block text-sm font-semibold text-slate-700 mb-2">전문가 유형 <span class="text-rose-500">*</span></label>
                             <select name="expertType" id="expertTypeSelect" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                                 <option value="">선택하세요</option>
-                                <option value="세무사">세무사</option>
-                                <option value="회계사">회계사</option>
-                                <option value="노무사">노무사</option>
-                                <option value="변호사">변호사</option>
+                                <option value="세무사" ${profile.expertType == '세무사' ? 'selected' : ''}>세무사</option>
+                                <option value="회계사" ${profile.expertType == '회계사' ? 'selected' : ''}>회계사</option>
+                                <option value="노무사" ${profile.expertType == '노무사' ? 'selected' : ''}>노무사</option>
+                                <option value="변호사" ${profile.expertType == '변호사' ? 'selected' : ''}>변호사</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">성명 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="name" placeholder="홍길동" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="text" name="name" value="${profile.name}" placeholder="홍길동" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">사무실명 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="office" placeholder="예: 길동 세무사 사무소" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="text" name="office" value="${profile.office}" placeholder="예: 길동 세무사 사무소" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">전화번호 <span class="text-rose-500">*</span></label>
-                            <input type="tel" name="phone" placeholder="예: 02-1234-5678" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="tel" name="phone" value="${profile.phone}" placeholder="예: 02-1234-5678" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                     </div>
                 </section>
@@ -70,15 +70,15 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">시/도 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="city" placeholder="예: 서울특별시" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="text" name="city" value="${profile.city}" placeholder="예: 서울특별시" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">구/군 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="district" placeholder="예: 강남구" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="text" name="district" value="${profile.district}" placeholder="예: 강남구" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold text-slate-700 mb-2">도로명 주소 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="roadAddress" placeholder="예: 테헤란로 123" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="text" name="roadAddress" value="${profile.roadAddress}" placeholder="예: 테헤란로 123" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                     </div>
                 </section>
@@ -99,19 +99,19 @@
                             <label class="block text-sm font-semibold text-slate-700 mb-2">상담 가능 시간 <span class="text-rose-500">*</span></label>
                             <select name="consultTime" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                                 <option value="">선택하세요</option>
-                                <option value="평일">평일</option>
-                                <option value="야간">야간</option>
-                                <option value="주말">주말</option>
-                                <option value="주말야간">주말야간</option>
+                                <option value="평일"    ${profile.consultTime == '평일'    ? 'selected' : ''}>평일</option>
+                                <option value="야간"    ${profile.consultTime == '야간'    ? 'selected' : ''}>야간</option>
+                                <option value="주말"    ${profile.consultTime == '주말'    ? 'selected' : ''}>주말</option>
+                                <option value="주말야간" ${profile.consultTime == '주말야간' ? 'selected' : ''}>주말야간</option>
                             </select>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">경력 (년수) <span class="text-rose-500">*</span></label>
-                            <input type="number" name="experienceYears" min="0" max="50" placeholder="예: 10" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="number" name="experienceYears" min="0" max="50" value="${profile.experienceYears}" placeholder="예: 10" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">상담 가격 (만원) <span class="text-rose-500">*</span></label>
-                            <input type="number" name="price" min="0" placeholder="예: 10" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="number" name="price" min="0" value="${profile.price}" placeholder="예: 10" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                     </div>
                 </section>
@@ -160,26 +160,40 @@
             '변호사': ['계약', '기업법', '노동', '인사', '지식재산권', '민사', '분쟁', '스타트업', '투자']
         };
 
-        document.getElementById('expertTypeSelect').addEventListener('change', function () {
+        function populateFieldSelect(type, selectedField) {
             const fieldSelect = document.getElementById('fieldSelect');
-            const type = this.value;
-            fieldSelect.innerHTML = '<option value="">선택하세요</option>';
+            fieldSelect.innerHTML = '';
             if (type && fieldOptions[type]) {
+                fieldSelect.disabled = false;
+                fieldSelect.insertAdjacentHTML('beforeend', '<option value="">선택하세요</option>');
                 fieldOptions[type].forEach(function (opt) {
                     const option = document.createElement('option');
                     option.value = opt;
                     option.textContent = opt;
+                    if (opt === selectedField) option.selected = true;
                     fieldSelect.appendChild(option);
                 });
-                fieldSelect.disabled = false;
             } else {
-                fieldSelect.innerHTML = '<option value="">직종을 먼저 선택하세요</option>';
                 fieldSelect.disabled = true;
+                fieldSelect.insertAdjacentHTML('beforeend',
+                    '<option value="">직종을 먼저 선택하세요</option>');
             }
+        }
+
+        document.getElementById('expertTypeSelect').addEventListener('change', function () {
+            populateFieldSelect(this.value, '');
         });
 
-        // 초기 비활성화
-        document.getElementById('fieldSelect').disabled = true;
+        // 페이지 로드 시 저장된 값으로 자동 초기화
+        (function () {
+            const savedType  = '${profile.expertType}';
+            const savedField = '${profile.field}';
+            if (savedType) {
+                populateFieldSelect(savedType, savedField);
+            } else {
+                document.getElementById('fieldSelect').disabled = true;
+            }
+        })();
     </script>
 </body>
 </html>
