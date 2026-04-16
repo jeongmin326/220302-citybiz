@@ -39,6 +39,15 @@
                 <%-- [Backend/DB] 검색 폼 데이터 제출 시 PostGIS의 ST_DWithin 등을 사용하여 반경 검색 구현 권장 --%>
                 <form id="searchForm" class="space-y-8">
                     <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">공간 검색</label>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                            <input type="text" id="spaceKeyword" placeholder="공간 장소명 검색"
+                                   class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all">
+                        </div>
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">지역</label>
                         <div class="flex flex-col gap-2.5">
                             <div class="relative">
@@ -140,15 +149,6 @@
                                     <i data-lucide="users" class="w-4 h-4 text-slate-400"></i> 20명 이상
                                 </span>
                             </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">공간 검색</label>
-                        <div class="relative">
-                            <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
-                            <input type="text" id="spaceKeyword" placeholder="공간 장소명 검색"
-                                   class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all">
                         </div>
                     </div>
 

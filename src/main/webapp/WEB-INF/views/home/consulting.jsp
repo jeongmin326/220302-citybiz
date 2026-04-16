@@ -40,8 +40,18 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             </div>
 
             <form id="consultingSearchForm" class="space-y-8">
-         
-                <%-- 대분류 필터 (왼쪽 사이드바) --%>
+
+                <%-- 전문가 검색 --%>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">전문가 검색</label>
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                        <input type="text" id="consultingKeyword" placeholder="이름 또는 사무소명 검색"
+                               class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all">
+                    </div>
+                </div>
+
+                <%-- 대분류 필터 --%>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">전문가</label>
                     <div class="grid grid-cols-1 gap-2.5">
@@ -66,20 +76,23 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                     </div>
                 </div>
 
-                <%-- 별점 필터 --%>
+                <%-- 지역 필터 --%>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">전문가 평점</label>
-                    <div class="flex flex-col gap-3">
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="rating" value="all" class="accent-purple-600 w-4 h-4" checked> 
-                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="rating" value="4.0" class="accent-purple-600 w-4 h-4"> 
-                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors flex items-center gap-1">
-                                <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i> 4.0 이상
-                            </span>
-                        </label>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">지역</label>
+                    <div class="flex flex-col gap-2.5">
+                        <div class="relative">
+                            <i data-lucide="map-pin" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                            <select id="consultingRegionSelect" onchange="onConsultingRegionChange()" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all appearance-none cursor-pointer">
+                                <option value="">전체 지역</option>
+                                <option value="서울">서울</option>
+                            </select>
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="navigation" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                            <select id="consultingDistrictSelect" disabled class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400">
+                                <option value="">먼저 지역을 선택하세요</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -96,25 +109,6 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                             <input type="checkbox" name="consultTimeOption" value="야간" class="accent-purple-600 w-4 h-4">
                             <span class="text-sm font-medium text-slate-700 flex-grow">야간</span>
                             <i data-lucide="phone" class="w-4 h-4 text-slate-400"></i>
-                        </label>
-                    </div>
-                </div>
-
-                <%-- 경력 필터 --%>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">경력</label>
-                    <div class="flex flex-col gap-3">
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="experienceYears" value="all" class="accent-purple-600 w-4 h-4" checked>
-                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="experienceYears" value="5" class="accent-purple-600 w-4 h-4">
-                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">5년 이상</span>
-                        </label>
-                        <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="experienceYears" value="10" class="accent-purple-600 w-4 h-4">
-                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">10년 이상</span>
                         </label>
                     </div>
                 </div>
@@ -138,12 +132,39 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                     </div>
                 </div>
 
+                <%-- 경력 필터 --%>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">전문가 검색</label>
-                    <div class="relative">
-                        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
-                        <input type="text" id="consultingKeyword" placeholder="이름 또는 사무소명 검색"
-                               class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all">
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">경력</label>
+                    <div class="flex flex-col gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="experienceYears" value="all" class="accent-purple-600 w-4 h-4" checked>
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="experienceYears" value="5" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">5년 이상</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="experienceYears" value="10" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">10년 이상</span>
+                        </label>
+                    </div>
+                </div>
+
+                <%-- 별점 필터 --%>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">전문가 평점</label>
+                    <div class="flex flex-col gap-3">
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="rating" value="all" class="accent-purple-600 w-4 h-4" checked>
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="rating" value="4.0" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors flex items-center gap-1">
+                                <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i> 4.0 이상
+                            </span>
+                        </label>
                     </div>
                 </div>
 
@@ -325,6 +346,33 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             return [];
         }
 
+        const consultingDistrictMap = {
+            '서울': [
+                '강남구', '강동구', '강북구', '강서구', '관악구',
+                '광진구', '구로구', '금천구', '노원구', '도봉구',
+                '동대문구', '동작구', '마포구', '서대문구', '서초구',
+                '성동구', '성북구', '송파구', '양천구', '영등포구',
+                '용산구', '은평구', '종로구', '중구', '중랑구'
+            ]
+        };
+
+        window.onConsultingRegionChange = function () {
+            const regionSelect = document.getElementById('consultingRegionSelect');
+            const districtSelect = document.getElementById('consultingDistrictSelect');
+            const region = regionSelect.value;
+            districtSelect.innerHTML = '';
+            if (region && consultingDistrictMap[region]) {
+                districtSelect.disabled = false;
+                districtSelect.insertAdjacentHTML('beforeend', '<option value="">전체 구</option>');
+                consultingDistrictMap[region].forEach(function (d) {
+                    districtSelect.insertAdjacentHTML('beforeend', '<option value="' + d + '">' + d + '</option>');
+                });
+            } else {
+                districtSelect.disabled = true;
+                districtSelect.insertAdjacentHTML('beforeend', '<option value="">먼저 지역을 선택하세요</option>');
+            }
+        };
+
         function getSelectedFilters() {
             const rating = document.querySelector('input[name="rating"]:checked');
             const consultTimeOptions = Array.from(document.querySelectorAll('input[name="consultTimeOption"]:checked'))
@@ -342,9 +390,11 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             }
 
             const keyword = document.getElementById('consultingKeyword').value.trim();
+            const district = document.getElementById('consultingDistrictSelect').value;
 
             return {
                 keyword: keyword,
+                district: district,
                 minRating: rating && rating.value !== 'all' ? rating.value : '',
                 consultTime: consultTime,
                 minExperienceYears: experienceYears && experienceYears.value !== 'all' ? experienceYears.value : '',
@@ -482,8 +532,9 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             const query = new URLSearchParams();
             const selectedFilters = getSelectedFilters();
             query.append('type', type || 'ALL');
-            if (urlDistrict) {
-                query.append('district', urlDistrict);
+            const activeDistrict = selectedFilters.district || urlDistrict;
+            if (activeDistrict) {
+                query.append('district', activeDistrict);
             }
             if (selectedFilters.keyword) {
                 query.append('keyword', selectedFilters.keyword);
@@ -565,6 +616,9 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             document.querySelectorAll('.main-cat-btn').forEach(function (btn) {
                 btn.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700', 'shadow-md');
             });
+
+            document.getElementById('consultingRegionSelect').value = '';
+            onConsultingRegionChange();
 
             setTimeout(function () {
                 loadConsultants('ALL', false);
