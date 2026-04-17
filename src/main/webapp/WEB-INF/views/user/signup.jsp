@@ -88,7 +88,7 @@
                 </div>
 
                 <div>
-                    <label for="name" class="block text-sm font-bold text-slate-700 mb-2">담당자 이름 (실명)</label>
+                    <label for="name" class="block text-sm font-bold text-slate-700 mb-2">이름</label>
                     <input type="text"
                         id="name"
                         name="name"
@@ -313,38 +313,24 @@
             rightSectionTitle.innerHTML = '<span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm">2</span>시설 및 사업자 정보';
             html = `
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">운영 기관/시설명</label>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">운영 기관/시설명 <span class="text-rose-500">*</span></label>
                     <input type="text" id="facilityName" name="company_name" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="예: 시티비즈 공유오피스 강남점">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">사업자 등록번호</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="providerBizNo" required class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="000-00-00000">
-                        <button type="button" onclick="alert('사업자 확인이 완료되었습니다.')" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">진위 확인</button>
-                    </div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">공간 유형 <span class="text-rose-500">*</span></label>
+                    <select name="space_type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="">선택하세요</option>
+                        <option value="meeting">회의실</option>
+                        <option value="office">사무실</option>
+                        <option value="consulting">상담실</option>
+                        <option value="studio">스튜디오</option>
+                        <option value="shop">상점</option>
+                        <option value="warehouse">창고</option>
+                    </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">사업자 등록증 첨부</label>
-                    <label class="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition-all">
-                        <i data-lucide="upload-cloud" class="w-8 h-8 text-slate-400 mb-2"></i>
-                        <span class="text-xs text-slate-500">클릭하여 PDF 또는 이미지 업로드</span>
-                        <input type="file" class="hidden">
-                    </label>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">정산 은행</label>
-                        <select class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option>신한은행</option>
-                            <option>국민은행</option>
-                            <option>우리은행</option>
-                            <option>농협은행</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">계좌 번호</label>
-                        <input type="text" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" placeholder="'-' 제외 입력">
-                    </div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">한 줄 소개 <span class="text-rose-500">*</span></label>
+                    <input type="text" name="space_description" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="예: 화이트보드와 빔프로젝터가 구비된 쾌적한 회의실입니다.">
                 </div>
             `;
         } else {
@@ -363,62 +349,17 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">사무소명 <span class="text-rose-500">*</span></label>
-                    <input type="text" name="expert_office" required
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
-                        placeholder="예: 길동 세무사 사무소">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">시/도 <span class="text-rose-500">*</span></label>
-                        <input type="text" name="expert_city" required
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
-                            placeholder="예: 서울특별시">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">구/군 <span class="text-rose-500">*</span></label>
-                        <input type="text" name="expert_district" required
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
-                            placeholder="예: 강남구">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">도로명 주소 <span class="text-rose-500">*</span></label>
-                    <input type="text" name="expert_road_address" required
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
-                        placeholder="예: 테헤란로 123">
-                </div>
-                <div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">전문 분야 <span class="text-rose-500">*</span></label>
                     <select name="expert_field" id="expertFieldSignup" required disabled
                         class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none disabled:text-slate-400">
                         <option value="">유형을 먼저 선택하세요</option>
                     </select>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">상담 가능 시간 <span class="text-rose-500">*</span></label>
-                        <select name="expert_consult_time" required
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none">
-                            <option value="">선택</option>
-                            <option value="평일">평일</option>
-                            <option value="야간">야간</option>
-                            <option value="주말">주말</option>
-                            <option value="주말야간">주말야간</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">경력 (년수) <span class="text-rose-500">*</span></label>
-                        <input type="number" name="expert_experience_years" min="0" max="50" required
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
-                            placeholder="예: 5">
-                    </div>
-                </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-2">상담 가격 (만원) <span class="text-rose-500">*</span></label>
-                    <input type="number" name="expert_price" min="0" required
+                    <label class="block text-sm font-bold text-slate-700 mb-2">사무소명 <span class="text-rose-500">*</span></label>
+                    <input type="text" name="expert_office" required
                         class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none"
-                        placeholder="예: 10">
+                        placeholder="예: 길동 세무사 사무소">
                 </div>
             `;
         }

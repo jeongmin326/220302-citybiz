@@ -302,6 +302,11 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 .replace(/'/g, '&#39;');
         }
 
+        // onclick 속성에 삽입할 때 작은따옴표·백슬래시만 이스케이프
+        function escapeAttr(value) {
+            return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        }
+
         function getFieldLabel(fieldCode) {
             return fieldLabels[fieldCode] || fieldCode || '전문 분야';
         }
@@ -467,7 +472,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
                 + '<button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>'
-                + '<button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
+                + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
                 + '</div>'
                 + '</div>'
                 + '<div class="flex md:hidden flex-col gap-3 mt-1">'
@@ -477,7 +482,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
                 + '<button class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>'
-                + '<button class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
+                + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
                 + '</div>'
                 + '</div>'
                 + '</div>';
@@ -718,6 +723,122 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         selectMainCategory('ALL');
         refreshIcons();
     })();
+</script>
+
+<%-- 자문요청 모달 --%>
+<div id="requestModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRequestModal()"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 p-8 flex flex-col gap-5">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-xl font-extrabold text-slate-900">자문요청 남기기</h3>
+                <p id="modalExpertInfo" class="text-sm text-slate-500 mt-1"></p>
+            </div>
+            <button onclick="closeRequestModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">자문 제목 <span class="text-red-500">*</span></label>
+                <input type="text" id="modalTitle" maxlength="200" placeholder="예: 초기 스타트업 절세 방법 문의"
+                       class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">상세 내용</label>
+                <textarea id="modalContent" rows="4" maxlength="1000" placeholder="고민하시는 내용을 자세히 적어주세요. 전문가가 더 정확한 답변을 드릴 수 있습니다."
+                          class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all resize-none"></textarea>
+            </div>
+        </div>
+
+        <div id="modalError" class="hidden text-sm text-red-500 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5"></div>
+
+        <div class="flex gap-3 pt-1">
+            <button onclick="closeRequestModal()" class="flex-1 py-3 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">취소</button>
+            <button id="modalSubmitBtn" onclick="submitRequest()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-colors shadow-sm">자문요청 보내기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 자문요청 모달
+    let _reqExpertId   = null;
+    let _reqExpertType = '';
+
+    window.openRequestModal = function (expertId, expertType, expertName, expertOffice) {
+        _reqExpertId   = expertId;
+        _reqExpertType = expertType;
+
+        document.getElementById('modalExpertInfo').textContent =
+            expertOffice + ' · ' + expertName + ' ' + expertType;
+        document.getElementById('modalTitle').value   = '';
+        document.getElementById('modalContent').value = '';
+        document.getElementById('modalError').classList.add('hidden');
+        document.getElementById('modalError').textContent = '';
+
+        const modal = document.getElementById('requestModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('modalTitle').focus();
+    };
+
+    window.closeRequestModal = function () {
+        const modal = document.getElementById('requestModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    };
+
+    window.submitRequest = async function () {
+        const title   = document.getElementById('modalTitle').value.trim();
+        const content = document.getElementById('modalContent').value.trim();
+        const errEl   = document.getElementById('modalError');
+        const btn     = document.getElementById('modalSubmitBtn');
+
+        if (!title) {
+            errEl.textContent = '자문 제목을 입력해 주세요.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        btn.disabled    = true;
+        btn.textContent = '전송 중...';
+        errEl.classList.add('hidden');
+
+        try {
+            const params = new URLSearchParams();
+            params.append('expertId',   _reqExpertId);
+            params.append('expertType', _reqExpertType);
+            params.append('title',      title);
+            if (content) params.append('content', content);
+
+            const res  = await fetch('/api/consulting/requests', { method: 'POST', body: params });
+            const data = await res.json();
+
+            if (data.error) {
+                errEl.textContent = data.error;
+                errEl.classList.remove('hidden');
+            } else {
+                closeRequestModal();
+                showToast('자문요청이 성공적으로 전송되었습니다!');
+            }
+        } catch (e) {
+            errEl.textContent = '요청 중 오류가 발생했습니다. 다시 시도해 주세요.';
+            errEl.classList.remove('hidden');
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '자문요청 보내기';
+        }
+    };
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm font-semibold px-6 py-3 rounded-2xl shadow-xl z-[300] transition-all duration-300';
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(function () { toast.style.opacity = '0'; }, 2500);
+        setTimeout(function () { toast.remove(); }, 3000);
+    }
 </script>
 
 <%-- 푸터 파일 로드 --%>

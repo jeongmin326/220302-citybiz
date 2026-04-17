@@ -259,12 +259,20 @@
                                 <div class="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-purple-200 transition-all group">
                                     <div class="text-purple-600 text-[10px] font-black tracking-widest uppercase mb-2">${c.expertType}</div>
                                     <h4 class="text-lg font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors truncate">${c.office}</h4>
-                                    <p class="text-slate-500 text-sm mb-6 leading-relaxed">${c.field} 전문</p>
+                                    <p class="text-slate-500 text-sm mb-4 leading-relaxed">${c.field} 전문</p>
                                     <div class="flex items-center justify-between">
                                         <span class="text-xs font-bold text-slate-400 underline decoration-slate-200 underline-offset-4">
                                             평점 ${c.rating}점 / 경력 ${c.experienceYears}년
                                         </span>
-                                        <i data-lucide="arrow-right-circle" class="w-6 h-6 text-slate-300 group-hover:text-purple-500 transition-all"></i>
+                                        <button
+                                            data-expert-id="${c.id}"
+                                            data-expert-type="${c.expertType}"
+                                            data-expert-name="${c.name}"
+                                            data-expert-office="${c.office}"
+                                            onclick="openSearchRequestModal(this)"
+                                            class="text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 flex-shrink-0">
+                                            자문요청
+                                        </button>
                                     </div>
                                 </div>
                             </c:forEach>
@@ -700,6 +708,115 @@
             btn.textContent = '예약 신청하기';
         }
     }
+</script>
+
+<%-- 자문요청 모달 --%>
+<div id="searchRequestModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSearchRequestModal()"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg mx-4 p-8 flex flex-col gap-5">
+        <div class="flex justify-between items-center">
+            <div>
+                <h3 class="text-xl font-extrabold text-slate-900">자문요청 남기기</h3>
+                <p id="searchModalExpertInfo" class="text-sm text-slate-500 mt-1"></p>
+            </div>
+            <button onclick="closeSearchRequestModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div class="flex flex-col gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">자문 제목 <span class="text-red-500">*</span></label>
+                <input type="text" id="searchModalTitle" maxlength="200" placeholder="예: 초기 스타트업 절세 방법 문의"
+                       class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">상세 내용</label>
+                <textarea id="searchModalContent" rows="4" maxlength="1000" placeholder="고민하시는 내용을 자세히 적어주세요."
+                          class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all resize-none"></textarea>
+            </div>
+        </div>
+        <div id="searchModalError" class="hidden text-sm text-red-500 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5"></div>
+        <div class="flex gap-3 pt-1">
+            <button onclick="closeSearchRequestModal()" class="flex-1 py-3 border border-slate-200 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">취소</button>
+            <button id="searchModalSubmitBtn" onclick="submitSearchRequest()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-colors shadow-sm">자문요청 보내기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let _searchExpertId   = null;
+    let _searchExpertType = '';
+
+    window.openSearchRequestModal = function (btn) {
+        _searchExpertId   = btn.dataset.expertId;
+        _searchExpertType = btn.dataset.expertType;
+        const name   = btn.dataset.expertName;
+        const office = btn.dataset.expertOffice;
+
+        document.getElementById('searchModalExpertInfo').textContent =
+            office + ' · ' + name + ' ' + _searchExpertType;
+        document.getElementById('searchModalTitle').value   = '';
+        document.getElementById('searchModalContent').value = '';
+        document.getElementById('searchModalError').classList.add('hidden');
+
+        const modal = document.getElementById('searchRequestModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('searchModalTitle').focus();
+    };
+
+    window.closeSearchRequestModal = function () {
+        const modal = document.getElementById('searchRequestModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    };
+
+    window.submitSearchRequest = async function () {
+        const title   = document.getElementById('searchModalTitle').value.trim();
+        const content = document.getElementById('searchModalContent').value.trim();
+        const errEl   = document.getElementById('searchModalError');
+        const btn     = document.getElementById('searchModalSubmitBtn');
+
+        if (!title) {
+            errEl.textContent = '자문 제목을 입력해 주세요.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        btn.disabled    = true;
+        btn.textContent = '전송 중...';
+        errEl.classList.add('hidden');
+
+        try {
+            const params = new URLSearchParams();
+            params.append('expertId',   _searchExpertId);
+            params.append('expertType', _searchExpertType);
+            params.append('title',      title);
+            if (content) params.append('content', content);
+
+            const res  = await fetch('/api/consulting/requests', { method: 'POST', body: params });
+            const data = await res.json();
+
+            if (data.error) {
+                errEl.textContent = data.error;
+                errEl.classList.remove('hidden');
+            } else {
+                closeSearchRequestModal();
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-sm font-semibold px-6 py-3 rounded-2xl shadow-xl z-[300]';
+                toast.textContent = '자문요청이 성공적으로 전송되었습니다!';
+                document.body.appendChild(toast);
+                setTimeout(function () { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.5s'; }, 2500);
+                setTimeout(function () { toast.remove(); }, 3000);
+            }
+        } catch (e) {
+            errEl.textContent = '요청 중 오류가 발생했습니다. 다시 시도해 주세요.';
+            errEl.classList.remove('hidden');
+        } finally {
+            btn.disabled    = false;
+            btn.textContent = '자문요청 보내기';
+        }
+    };
 </script>
 
 <jsp:include page="/WEB-INF/views/common/footer.jsp" />

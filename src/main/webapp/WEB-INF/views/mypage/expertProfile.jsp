@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>전문가 프로필 수정 - City Biz Hub</title>
+    <title>전문가 정보 수정 - City Biz Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -22,7 +22,7 @@
 
         <div class="mb-8">
             <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">전문가 설정</span>
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">프로필 수정</h1>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">전문가 정보 수정</h1>
             <p class="text-slate-500 mt-2">클라이언트에게 보여질 나의 전문 분야와 이력을 매력적으로 작성해 보세요.</p>
         </div>
 
@@ -36,16 +36,15 @@
                     <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center gap-2">
                         <i data-lucide="user" class="w-5 h-5 text-purple-500"></i> 기본 정보
                     </h2>
+                    <%-- 전문가 유형은 가입 시 확정되므로 변경 불가 --%>
+                    <input type="hidden" name="expertType" value="${profile.expertType}">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">전문가 유형 <span class="text-rose-500">*</span></label>
-                            <select name="expertType" id="expertTypeSelect" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
-                                <option value="">선택하세요</option>
-                                <option value="세무사" ${profile.expertType == '세무사' ? 'selected' : ''}>세무사</option>
-                                <option value="회계사" ${profile.expertType == '회계사' ? 'selected' : ''}>회계사</option>
-                                <option value="노무사" ${profile.expertType == '노무사' ? 'selected' : ''}>노무사</option>
-                                <option value="변호사" ${profile.expertType == '변호사' ? 'selected' : ''}>변호사</option>
-                            </select>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">전문가 유형</label>
+                            <div class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm text-slate-600 flex items-center gap-2">
+                                <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-0.5 rounded-full">${profile.expertType}</span>
+                                <span class="text-slate-400 text-xs">가입 시 선택한 유형은 변경할 수 없습니다</span>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">성명 <span class="text-rose-500">*</span></label>
@@ -180,11 +179,7 @@
             }
         }
 
-        document.getElementById('expertTypeSelect').addEventListener('change', function () {
-            populateFieldSelect(this.value, '');
-        });
-
-        // 페이지 로드 시 저장된 값으로 자동 초기화
+        // 페이지 로드 시 저장된 값으로 자동 초기화 (유형은 변경 불가)
         (function () {
             const savedType  = '${profile.expertType}';
             const savedField = '${profile.field}';

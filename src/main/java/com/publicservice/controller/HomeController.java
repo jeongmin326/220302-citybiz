@@ -236,7 +236,7 @@ public class HomeController {
             long consultingCount = taxAccountantRepository.countByDistrict(district)
                     + accountantRepository.countByDistrict(district)
                     + laborAttorneyRepository.countByDistrict(district)
-                    + patentAttorneyRepository.countByAddressContaining(district)
+                    + patentAttorneyRepository.countByAddrContaining(district)
                     + lawyerRepository.countByDistrict(district);
             model.addAttribute("consultingCount", consultingCount);
 
@@ -257,7 +257,7 @@ public class HomeController {
                 Collections.shuffle(laborList);
                 consultingCandidates.add(ExpertDto.from(laborList.get(0)));
             }
-            List<com.publicservice.entity.PatentAttorney> patentList = patentAttorneyRepository.findByAddressContaining(district);
+            List<com.publicservice.entity.PatentAttorney> patentList = patentAttorneyRepository.findByAddrContaining(district);
             if (!patentList.isEmpty()) {
                 Collections.shuffle(patentList);
                 consultingCandidates.add(ExpertDto.from(patentList.get(0)));

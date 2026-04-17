@@ -219,6 +219,8 @@ public class UserController {
 
             // PROVIDER 가입 시: 시설명으로 draft 공간 자동 생성
             if ("PROVIDER".equals(role) && companyName != null && !companyName.trim().isEmpty()) {
+                String spaceType        = request.getParameter("space_type");
+                String spaceDescription = request.getParameter("space_description");
                 Optional<User> newUser = userRepository.findByEmail(email);
                 if (newUser.isPresent()) {
                     Space draft = new Space();
@@ -227,7 +229,8 @@ public class UserController {
                     draft.setRegion("미설정");
                     draft.setDistrict("미설정");
                     draft.setAddress("미설정");
-                    draft.setSpaceType("office");
+                    draft.setSpaceType(spaceType != null && !spaceType.trim().isEmpty() ? spaceType.trim() : "office");
+                    draft.setDescription(spaceDescription != null ? spaceDescription.trim() : "");
                     draft.setPricePerHour(0);
                     draft.setCapacity(1);
                     draft.setAvailableYn("N");
@@ -344,6 +347,63 @@ public class UserController {
     public String logout(HttpSession session) {
         session.invalidate();
         return "redirect:/login";
+    }
+
+    // ---------------------------------------------------------------
+    // GET /api/user/profile — 로그인 사용자 프로필 조회
+    // ---------------------------------------------------------------
+    @GetMapping("/api/user/profile")
+    @ResponseBody
+    public Map<String, Object> getUserProfile(HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId == null) {
+            result.put("error", "로그인이 필요합니다.");
+            return result;
+        }
+        Optional<User> opt = userRepository.findById(userId);
+        if (opt.isEmpty()) {
+            result.put("error", "사용자를 찾을 수 없습니다.");
+            return result;
+        }
+        User user = opt.get();
+        result.put("name",          user.getName());
+        result.put("email",         user.getEmail());
+        result.put("companyName",   user.getCompanyName());
+        result.put("businessStage", user.getBusinessStage());
+        result.put("industry",      user.getIndustry());
+        result.put("role",          user.getRole());
+        return result;
+    }
+
+    // ---------------------------------------------------------------
+    // POST /api/user/profile — 로그인 사용자 프로필 수정
+    // ---------------------------------------------------------------
+    @PostMapping("/api/user/profile")
+    @ResponseBody
+    public Map<String, Object> updateUserProfile(
+            @RequestParam(value = "companyName",   required = false) String companyName,
+            @RequestParam(value = "businessStage", required = false) String businessStage,
+            @RequestParam(value = "industry",      required = false) String industry,
+            HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId == null) {
+            result.put("error", "로그인이 필요합니다.");
+            return result;
+        }
+        Optional<User> opt = userRepository.findById(userId);
+        if (opt.isEmpty()) {
+            result.put("error", "사용자를 찾을 수 없습니다.");
+            return result;
+        }
+        User user = opt.get();
+        if (companyName   != null) user.setCompanyName(companyName.trim());
+        if (businessStage != null) user.setBusinessStage(businessStage);
+        if (industry      != null) user.setIndustry(industry);
+        userRepository.save(user);
+        result.put("success", true);
+        return result;
     }
 
 }

@@ -57,7 +57,7 @@
                 </div>
                 <div>
                     <p class="text-sm font-medium text-slate-500">진행 중인 컨설팅</p>
-                    <p class="text-2xl font-bold text-slate-900 mt-1">1<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                    <p class="text-2xl font-bold text-slate-900 mt-1"><span id="consultingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
                 </div>
             </div>
         </div>
@@ -101,18 +101,8 @@
                         </h2>
                         <a href="/consulting" class="text-sm font-medium text-purple-600 hover:underline">새 문의하기</a>
                     </div>
-                    <div class="p-6 space-y-4">
-                        <div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50">
-                            <div>
-                                <div class="flex items-center gap-2 mb-1">
-                                    <span class="inline-block px-2 py-1 bg-purple-100 text-purple-700 text-xs font-bold rounded">답변 대기</span>
-                                    <span class="text-xs text-slate-500">김세무 전문가</span>
-                                </div>
-                                <h3 class="font-medium text-slate-900">법인 설립 시 초기 세무 기장 관련 문의드립니다.</h3>
-                                <p class="text-xs text-slate-400 mt-1">작성일: 2026.04.05</p>
-                            </div>
-                            <button class="text-sm text-slate-500 hover:text-slate-900 underline underline-offset-2">내용 보기</button>
-                        </div>
+                    <div class="p-6 space-y-4" id="consultingList">
+                        <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
                     </div>
                 </section>
 
@@ -132,28 +122,31 @@
                             아래 비즈니스 정보를 최신 상태로 유지하시면, 기업 조건에 맞는 <strong>지원 사업과 전문가를 더 정확하게 추천</strong>해 드립니다.
                         </p>
                         
-                        <form action="/mypage/updateProfile" method="POST" class="space-y-4">
+                        <form id="profileForm" class="space-y-4">
                             <div>
                                 <label class="block text-xs font-medium text-slate-400 mb-1">기업명 (또는 예비창업팀명)</label>
-                                <input type="text" value="시티비즈팀" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                                <input type="text" id="profileCompanyName" placeholder="기업명을 입력하세요"
+                                       class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-500">
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-400 mb-1">창업 단계</label>
-                                <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                                    <option value="pre">예비 창업자</option>
-                                    <option value="early" selected>초기 창업 (3년 미만)</option>
-                                    <option value="jump">도약기 (3~7년)</option>
+                                <select id="profileBusinessStage" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                                    <option value="PRE">예비 창업자</option>
+                                    <option value="EARLY">초기 창업 (3년 이내)</option>
+                                    <option value="GROWTH">도약기 창업 (3~7년)</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-medium text-slate-400 mb-1">관심 산업군</label>
-                                <select class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                                    <option value="it" selected>IT / 소프트웨어</option>
-                                    <option value="manu">제조업</option>
-                                    <option value="service">서비스업</option>
+                                <select id="profileIndustry" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                                    <option value="IT">IT / 소프트웨어</option>
+                                    <option value="BIO">바이오 / 헬스케어</option>
+                                    <option value="EDU">교육 / 서비스</option>
+                                    <option value="MFG">제조 / 하드웨어</option>
                                 </select>
                             </div>
-                            <button type="button" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-blue-900/50">
+                            <div id="profileMsg" class="hidden text-xs text-center py-1 rounded-lg"></div>
+                            <button type="button" onclick="saveProfile()" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-blue-900/50">
                                 정보 업데이트
                             </button>
                         </form>
@@ -163,6 +156,35 @@
 
         </div>
     </main>
+
+    <%-- 채팅 사이드 패널 (수락된 자문용) --%>
+    <div id="statusChatPanel" class="fixed top-0 right-0 h-full w-full md:w-[420px] bg-white shadow-2xl z-[150] flex flex-col border-l border-slate-200"
+         style="transform: translateX(100%); opacity: 0; pointer-events: none; transition: transform 0.3s ease, opacity 0.3s ease;">
+        <div class="bg-gradient-to-r from-violet-600 to-purple-600 px-6 py-5 flex items-center justify-between flex-shrink-0">
+            <div class="min-w-0">
+                <p class="text-purple-200 text-xs font-semibold mb-0.5">자문 채팅</p>
+                <h3 class="text-white font-bold text-base truncate" id="statusChatTitle">-</h3>
+                <p class="text-purple-200 text-xs mt-0.5">전문가와의 실시간 채팅</p>
+            </div>
+            <button onclick="closeStatusChat()" class="text-white/70 hover:text-white transition-colors ml-4 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="statusChatMessages" class="flex-1 overflow-y-auto p-5 space-y-3 bg-slate-50" style="scrollbar-width: thin;">
+            <p class="text-center text-slate-400 text-xs py-8">불러오는 중...</p>
+        </div>
+        <div class="px-4 py-4 bg-white border-t border-slate-100 flex-shrink-0">
+            <div class="flex gap-2 items-end">
+                <textarea id="statusChatInput" rows="2" placeholder="메시지를 입력하세요..."
+                    class="flex-1 bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-400 transition-all"
+                    onkeydown="handleStatusChatKey(event)"></textarea>
+                <button onclick="sendStatusChatMessage()" class="w-11 h-11 bg-violet-600 hover:bg-violet-700 rounded-2xl flex items-center justify-center text-white transition-colors shadow-sm flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="statusChatOverlay" class="fixed inset-0 bg-black/20 z-[140] hidden md:hidden" onclick="closeStatusChat()"></div>
 
     <%-- 3. 푸터 불러오기 (경로는 프로젝트 실제 구조에 맞게 수정해 주세요) --%>
     <jsp:include page="../common/footer.jsp" />
@@ -382,10 +404,241 @@
             }
         }
 
+        // ── 컨설팅 내역 로드 ──────────────────────────────────────────
+        function consultingStatusBadge(status) {
+            if (status === 'PENDING')   return '<span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded">답변 대기</span>';
+            if (status === 'ACCEPTED')  return '<span class="inline-block px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded">진행 중</span>';
+            if (status === 'REJECTED')  return '<span class="inline-block px-2 py-1 bg-red-100 text-red-600 text-xs font-bold rounded">거절됨</span>';
+            if (status === 'CANCELLED') return '<span class="inline-block px-2 py-1 bg-slate-100 text-slate-500 text-xs font-bold rounded">취소됨</span>';
+            return '';
+        }
+
+        async function loadMyConsultings() {
+            try {
+                var res  = await fetch('/api/consulting/my/requests');
+                var data = await res.json();
+                var items = data.items || [];
+
+                // 진행 중(PENDING + ACCEPTED) 건수
+                var activeCount = items.filter(function(i) {
+                    return i.status === 'PENDING' || i.status === 'ACCEPTED';
+                }).length;
+                document.getElementById('consultingCount').textContent = activeCount;
+
+                var container = document.getElementById('consultingList');
+                if (items.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-slate-400 text-center py-4">자문 요청 내역이 없습니다.<br><a href="/consulting" class="text-purple-500 hover:underline mt-1 inline-block">전문가 찾기</a></p>';
+                    lucide.createIcons();
+                    return;
+                }
+
+                var html = items.slice(0, 5).map(function(r) {
+                    var actionBtn = '';
+                    if (r.status === 'PENDING') {
+                        actionBtn = '<button onclick="cancelConsulting(' + r.requestId + ')" class="mt-2 text-xs text-rose-500 hover:underline">요청 취소</button>';
+                    } else if (r.status === 'ACCEPTED') {
+                        actionBtn = '<button onclick="openStatusChat(' + r.requestId + ')" class="mt-2 inline-flex items-center gap-1 text-xs font-bold text-violet-600 hover:text-violet-800 transition-colors">'
+                            + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>'
+                            + '채팅하기</button>';
+                    }
+                    return '<div class="flex items-start justify-between p-4 rounded-xl border border-slate-100 bg-slate-50">' +
+                        '<div class="min-w-0">' +
+                            '<div class="flex items-center gap-2 mb-1">' +
+                                consultingStatusBadge(r.status) +
+                                '<span class="text-xs text-slate-500">' + escapeHtml(r.expertOffice) + ' ' + escapeHtml(r.expertType) + '</span>' +
+                            '</div>' +
+                            '<h3 class="font-medium text-slate-900 truncate">' + escapeHtml(r.title) + '</h3>' +
+                            '<p class="text-xs text-slate-400 mt-1">작성일: ' + escapeHtml(r.createdAt) + '</p>' +
+                            actionBtn +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+
+                if (items.length > 5) {
+                    html += '<a href="/consulting" class="block text-center text-sm font-medium text-purple-600 hover:underline mt-2">전체 보기 (' + items.length + '건)</a>';
+                }
+
+                container.innerHTML = html;
+                lucide.createIcons();
+            } catch (err) {
+                console.error('컨설팅 목록 로딩 오류:', err);
+                document.getElementById('consultingList').innerHTML =
+                    '<p class="text-sm text-slate-400 text-center py-4">불러오기 실패</p>';
+            }
+        }
+
+        async function cancelConsulting(requestId) {
+            if (!confirm('자문요청을 취소하시겠습니까?')) return;
+            try {
+                var res  = await fetch('/api/consulting/requests/' + requestId + '/cancel', { method: 'POST' });
+                var data = await res.json();
+                if (data.success) {
+                    loadMyConsultings();
+                } else {
+                    alert('취소 실패: ' + (data.error || '알 수 없는 오류'));
+                }
+            } catch (err) {
+                alert('서버 통신 오류가 발생했습니다.');
+            }
+        }
+
+        // ── 프로필 로드 / 저장 ───────────────────────────────────────
+        async function loadUserProfile() {
+            try {
+                var res  = await fetch('/api/user/profile');
+                var data = await res.json();
+                if (data.error) return;
+
+                var companyEl  = document.getElementById('profileCompanyName');
+                var stageEl    = document.getElementById('profileBusinessStage');
+                var industryEl = document.getElementById('profileIndustry');
+
+                if (companyEl  && data.companyName)   companyEl.value  = data.companyName;
+                if (stageEl    && data.businessStage)  stageEl.value    = data.businessStage;
+                if (industryEl && data.industry)       industryEl.value = data.industry;
+            } catch (err) {
+                console.error('프로필 로딩 오류:', err);
+            }
+        }
+
+        async function saveProfile() {
+            var msgEl = document.getElementById('profileMsg');
+            try {
+                var params = new URLSearchParams();
+                params.append('companyName',   document.getElementById('profileCompanyName').value.trim());
+                params.append('businessStage', document.getElementById('profileBusinessStage').value);
+                params.append('industry',      document.getElementById('profileIndustry').value);
+
+                var res  = await fetch('/api/user/profile', { method: 'POST', body: params });
+                var data = await res.json();
+
+                msgEl.classList.remove('hidden');
+                if (data.success) {
+                    msgEl.className = 'text-xs text-center py-1 rounded-lg text-emerald-400';
+                    msgEl.textContent = '저장되었습니다.';
+                } else {
+                    msgEl.className = 'text-xs text-center py-1 rounded-lg text-red-400';
+                    msgEl.textContent = data.error || '저장 실패';
+                }
+                setTimeout(function() { msgEl.classList.add('hidden'); }, 3000);
+            } catch (err) {
+                msgEl.classList.remove('hidden');
+                msgEl.className = 'text-xs text-center py-1 rounded-lg text-red-400';
+                msgEl.textContent = '서버 오류가 발생했습니다.';
+            }
+        }
+
+        // ── 채팅 패널 (사용자 측) ──────────────────────────────────────
+        let _statusChatRequestId = null;
+        let _statusPollTimer = null;
+        let _statusLastMsgCount = 0;
+
+        window.openStatusChat = async function (requestId) {
+            _statusChatRequestId = requestId;
+            _statusLastMsgCount  = -1; // -1로 초기화해야 0개 메시지도 정상 렌더링됨
+            const panel   = document.getElementById('statusChatPanel');
+            const overlay = document.getElementById('statusChatOverlay');
+            panel.style.transform    = 'translateX(0)';
+            panel.style.opacity      = '1';
+            panel.style.pointerEvents= 'auto';
+            overlay.classList.remove('hidden');
+            document.getElementById('statusChatInput').value = ''; // 이전 입력 내용 초기화
+            document.getElementById('statusChatMessages').innerHTML =
+                '<p class="text-center text-slate-400 text-xs py-8">불러오는 중...</p>';
+            await fetchStatusMessages();
+            _statusPollTimer = setInterval(fetchStatusMessages, 3000);
+        };
+
+        window.closeStatusChat = function () {
+            if (_statusPollTimer) { clearInterval(_statusPollTimer); _statusPollTimer = null; }
+            _statusChatRequestId = null;
+            const panel   = document.getElementById('statusChatPanel');
+            const overlay = document.getElementById('statusChatOverlay');
+            panel.style.transform    = 'translateX(100%)';
+            panel.style.opacity      = '0';
+            panel.style.pointerEvents= 'none';
+            overlay.classList.add('hidden');
+        };
+
+        async function fetchStatusMessages() {
+            if (!_statusChatRequestId) return;
+            try {
+                const res  = await fetch('/api/consulting/requests/' + _statusChatRequestId + '/messages');
+                const data = await res.json();
+                if (data.error) return;
+
+                document.getElementById('statusChatTitle').textContent = data.requestTitle || '자문 채팅';
+
+                const items = data.items || [];
+                if (items.length === _statusLastMsgCount) return;
+                _statusLastMsgCount = items.length;
+
+                const box = document.getElementById('statusChatMessages');
+                if (items.length === 0) {
+                    box.innerHTML = '<p class="text-center text-slate-400 text-xs py-8">아직 메시지가 없습니다.<br>전문가의 첫 메시지를 기다려 주세요.</p>';
+                    return;
+                }
+
+                box.innerHTML = items.map(function(m) {
+                    var isMine = m.isMine;
+                    var bubbleCls = isMine
+                        ? 'background:#6d28d9;color:white;border-radius:18px 18px 4px 18px;'
+                        : 'background:#f1f5f9;color:#1e293b;border-radius:18px 18px 18px 4px;';
+                    var wrapCls = isMine ? 'display:flex;justify-content:flex-end;' : 'display:flex;justify-content:flex-start;';
+                    var roleLabel = m.senderRole === 'EXPERT' ? '전문가' : '나';
+                    return '<div style="' + wrapCls + 'margin-bottom:8px;">'
+                        + '<div style="max-width:75%;">'
+                        + (!isMine ? '<p style="font-size:10px;color:#94a3b8;margin-bottom:3px;margin-left:4px;">' + roleLabel + '</p>' : '')
+                        + '<div style="' + bubbleCls + 'padding:10px 14px;font-size:14px;line-height:1.5;">' + escapeHtml(m.content) + '</div>'
+                        + '<p style="font-size:10px;color:#94a3b8;margin-top:3px;' + (isMine ? 'text-align:right;margin-right:4px;' : 'margin-left:4px;') + '">' + escapeHtml(m.createdAt) + '</p>'
+                        + '</div>'
+                        + '</div>';
+                }).join('');
+
+                box.scrollTop = box.scrollHeight;
+            } catch (e) {
+                console.error('채팅 폴링 오류:', e);
+            }
+        }
+
+        window.handleStatusChatKey = function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendStatusChatMessage();
+            }
+        };
+
+        window.sendStatusChatMessage = async function () {
+            if (!_statusChatRequestId) return;
+            const input   = document.getElementById('statusChatInput');
+            const content = input.value.trim();
+            if (!content) return;
+            input.value    = '';
+            input.disabled = true;
+            try {
+                const params = new URLSearchParams();
+                params.append('content', content);
+                const res  = await fetch('/api/consulting/requests/' + _statusChatRequestId + '/messages', {
+                    method: 'POST', body: params
+                });
+                const data = await res.json();
+                if (data.error) { alert(data.error); return; }
+                _statusLastMsgCount = -1; // 강제 리렌더
+                await fetchStatusMessages();
+            } catch (e) {
+                alert('전송 중 오류가 발생했습니다.');
+            } finally {
+                input.disabled = false;
+                input.focus();
+            }
+        };
+
         // 루사이드 아이콘 초기화 및 데이터 로드
         lucide.createIcons();
         loadScrappedPolicies();
         loadMyReservations();
+        loadMyConsultings();
+        loadUserProfile();
     </script>
 </body>
 </html>

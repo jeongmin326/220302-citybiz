@@ -143,13 +143,12 @@
                     <i data-lucide="image" class="w-5 h-5 text-blue-500"></i> 공간 대표 사진
                 </h2>
 
-                <c:if test="${not empty space.mainImageUrl}">
-                    <div class="mb-4">
-                        <p class="text-xs text-slate-500 mb-2">현재 등록된 이미지</p>
-                        <img src="${space.mainImageUrl}" alt="현재 이미지"
-                            class="h-32 rounded-xl object-cover border border-slate-200">
-                    </div>
-                </c:if>
+                <div id="currentImageWrap" class="mb-4">
+                    <p class="text-xs text-slate-500 mb-2">현재 등록된 이미지</p>
+                    <img src="/space-images/main/${space.spaceId}" alt="현재 이미지"
+                         class="h-32 rounded-xl object-cover border border-slate-200"
+                         onerror="document.getElementById('currentImageWrap').style.display='none'">
+                </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">새 이미지로 변경 (선택)</label>

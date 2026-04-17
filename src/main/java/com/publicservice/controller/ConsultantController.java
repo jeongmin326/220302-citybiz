@@ -146,7 +146,7 @@ public class ConsultantController {
                                                            String consultTime, Integer minExperienceYears, Integer maxPrice) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (district != null && !district.isBlank()) predicates.add(cb.like(root.get("address"), "%" + district + "%"));
+            if (district != null && !district.isBlank()) predicates.add(cb.equal(root.get("district"), district));
             if (keyword != null && !keyword.isBlank()) {
                 String pattern = "%" + keyword + "%";
                 predicates.add(cb.or(cb.like(root.get("name"), pattern), cb.like(root.get("office"), pattern)));

@@ -23,7 +23,7 @@ public class ExpertDto {
 
     public static ExpertDto from(PatentAttorney e) {
         ExpertDto dto = new ExpertDto();
-        dto.id = e.getPatentAttorneyId();
+        dto.id = e.getId();
         dto.name = e.getName();
         dto.office = e.getOffice();
         dto.phone = e.getPhone();
@@ -32,7 +32,7 @@ public class ExpertDto {
         dto.consultTime = e.getConsultTime();
         dto.experienceYears = e.getExperienceYears();
         dto.price = e.getPrice();
-        dto.address = e.getAddress();
+        dto.address = e.getAddr();
         dto.expertType = "변리사";
         return dto;
     }

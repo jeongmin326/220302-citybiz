@@ -6,13 +6,10 @@ import com.publicservice.entity.User;
 import com.publicservice.repository.SpaceRepository;
 import com.publicservice.repository.SpaceReservationRepository;
 import com.publicservice.repository.UserRepository;
+import com.publicservice.service.SpaceImageService;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,8 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +38,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@SuppressWarnings("null")
 @RestController
 @RequestMapping("/api/spaces")
 public class SpaceController {
@@ -50,20 +46,20 @@ public class SpaceController {
     private final SpaceRepository spaceRepository;
     private final SpaceReservationRepository reservationRepository;
     private final UserRepository userRepository;
-
-    @Value("${upload.spaces.path}")
-    private String uploadPath;
+    private final SpaceImageService spaceImageService;
 
     public SpaceController(SpaceRepository spaceRepository,
                            SpaceReservationRepository reservationRepository,
-                           UserRepository userRepository) {
-        this.spaceRepository = spaceRepository;
+                           UserRepository userRepository,
+                           SpaceImageService spaceImageService) {
+        this.spaceRepository    = spaceRepository;
         this.reservationRepository = reservationRepository;
-        this.userRepository = userRepository;
+        this.userRepository     = userRepository;
+        this.spaceImageService  = spaceImageService;
     }
 
     // ---------------------------------------------------------------
-    // GET /api/spaces — 공간 검색 (기존)
+    // GET /api/spaces — 공간 검색
     // ---------------------------------------------------------------
     @GetMapping
     public Map<String, Object> getSpaces(
@@ -102,7 +98,6 @@ public class SpaceController {
         };
 
         Page<Space> result = spaceRepository.findAll(spec, pageable);
-
         List<Space> items = new ArrayList<>(result.getContent());
         Collections.shuffle(items);
 
@@ -117,7 +112,7 @@ public class SpaceController {
     }
 
     // ---------------------------------------------------------------
-    // GET /api/spaces/{id}/availability?date=YYYY-MM-DD — 타임라인용 예약 현황
+    // GET /api/spaces/{id}/availability?date=YYYY-MM-DD
     // ---------------------------------------------------------------
     @GetMapping("/{spaceId}/availability")
     public Map<String, Object> getAvailability(
@@ -125,7 +120,6 @@ public class SpaceController {
             @RequestParam("date") String date) {
 
         Map<String, Object> result = new LinkedHashMap<>();
-
         Optional<Space> spaceOpt = spaceRepository.findById(spaceId);
         if (spaceOpt.isEmpty()) {
             result.put("error", "공간을 찾을 수 없습니다.");
@@ -134,7 +128,6 @@ public class SpaceController {
 
         List<SpaceReservation> booked =
                 reservationRepository.findBookedSlots(spaceId, LocalDate.parse(date));
-
         List<Map<String, String>> slots = new ArrayList<>();
         for (SpaceReservation r : booked) {
             Map<String, String> slot = new LinkedHashMap<>();
@@ -166,35 +159,10 @@ public class SpaceController {
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
-
         Long hostId = (Long) session.getAttribute("loginUserId");
         if (hostId == null) {
             result.put("error", "로그인이 필요합니다.");
             return ResponseEntity.status(401).body(result);
-        }
-
-        // 이미지 저장
-        String imageUrl = null;
-        if (mainImage != null && !mainImage.isEmpty()) {
-            try {
-                String ext      = Optional.ofNullable(mainImage.getOriginalFilename())
-                                          .filter(f -> f.contains("."))
-                                          .map(f -> f.substring(f.lastIndexOf('.')))
-                                          .orElse(".jpg");
-                String fileName = UUID.randomUUID().toString() + ext;
-
-                Path uploadDir = Paths.get(uploadPath).isAbsolute()
-                        ? Paths.get(uploadPath)
-                        : Paths.get(System.getProperty("user.dir"), uploadPath);
-                Files.createDirectories(uploadDir);
-                Files.copy(mainImage.getInputStream(),
-                           uploadDir.resolve(fileName),
-                           StandardCopyOption.REPLACE_EXISTING);
-                imageUrl = "/images/spaces/" + fileName;
-            } catch (IOException e) {
-                result.put("error", "이미지 저장 실패: " + e.getMessage());
-                return ResponseEntity.status(500).body(result);
-            }
         }
 
         String fullAddress = detailAddress.isBlank() ? address : address + " " + detailAddress;
@@ -209,11 +177,21 @@ public class SpaceController {
         space.setAddress(fullAddress);
         space.setCapacity(capacity);
         space.setPricePerHour(pricePerHour);
-        space.setMainImageUrl(imageUrl);
         space.setAvailableYn("Y");
         space.setCreatedAt(LocalDateTime.now());
         space.setUpdatedAt(LocalDateTime.now());
-        spaceRepository.save(space);
+        spaceRepository.save(space);  // spaceId 확보
+
+        if (mainImage != null && !mainImage.isEmpty()) {
+            try {
+                spaceImageService.saveMainImage(space.getSpaceId(), mainImage);
+                space.setMainImageUrl("/space-images/main/" + space.getSpaceId());
+                spaceRepository.save(space);
+            } catch (IOException e) {
+                result.put("error", "이미지 저장 실패: " + e.getMessage());
+                return ResponseEntity.status(500).body(result);
+            }
+        }
 
         result.put("success", true);
         result.put("spaceId", space.getSpaceId());
@@ -233,7 +211,6 @@ public class SpaceController {
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
-
         Long userId = (Long) session.getAttribute("loginUserId");
         if (userId == null) {
             result.put("error", "로그인이 필요합니다.");
@@ -255,7 +232,6 @@ public class SpaceController {
             return result;
         }
 
-        // 시간 중복 체크 (PENDING·APPROVED 예약과 겹치면 거부)
         LocalDate date = LocalDate.parse(useDate);
         long overlap = reservationRepository.countOverlapping(spaceId, date, start, end);
         if (overlap > 0) {
@@ -286,7 +262,6 @@ public class SpaceController {
     @GetMapping("/my/reservations")
     public Map<String, Object> getMyReservations(HttpSession session) {
         Map<String, Object> result = new LinkedHashMap<>();
-
         Long userId = (Long) session.getAttribute("loginUserId");
         if (userId == null) {
             result.put("items",         List.of());
@@ -296,7 +271,6 @@ public class SpaceController {
 
         List<SpaceReservation> reservations =
                 reservationRepository.findByUserIdOrderByCreatedAtDesc(userId);
-
         Map<Long, Space> spaceCache = new HashMap<>();
         List<Map<String, Object>> items = new ArrayList<>();
         LocalDate today = LocalDate.now();
@@ -307,9 +281,9 @@ public class SpaceController {
 
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("reservationId", r.getReservationId());
-            item.put("spaceName",     sp != null ? sp.getName()         : "알 수 없음");
-            item.put("spaceAddress",  sp != null ? sp.getAddress()      : "");
-            item.put("mainImageUrl",  sp != null ? sp.getMainImageUrl() : null);
+            item.put("spaceName",     sp != null ? sp.getName()    : "알 수 없음");
+            item.put("spaceAddress",  sp != null ? sp.getAddress() : "");
+            item.put("mainImageUrl",  sp != null ? "/space-images/main/" + sp.getSpaceId() : null);
             item.put("useDate",       r.getUseDate().toString());
             item.put("startTime",     r.getStartTime().toString());
             item.put("endTime",       r.getEndTime().toString());
@@ -334,7 +308,6 @@ public class SpaceController {
     @GetMapping("/host/reservations")
     public Map<String, Object> getHostReservations(HttpSession session) {
         Map<String, Object> result = new LinkedHashMap<>();
-
         Long hostId = (Long) session.getAttribute("loginUserId");
         if (hostId == null) {
             result.put("error", "로그인이 필요합니다.");
@@ -343,11 +316,9 @@ public class SpaceController {
 
         List<SpaceReservation> reservations =
                 reservationRepository.findByHostIdOrderByCreatedAtDesc(hostId);
-
         Map<Long, Space> spaceCache = new HashMap<>();
         Map<Long, User>  userCache  = new HashMap<>();
         List<Map<String, Object>> items = new ArrayList<>();
-
         LocalDate today = LocalDate.now();
 
         for (SpaceReservation r : reservations) {
@@ -395,12 +366,11 @@ public class SpaceController {
     // ---------------------------------------------------------------
     @PatchMapping("/reservations/{id}/status")
     public Map<String, Object> updateReservationStatus(
-            @PathVariable("id")         Long reservationId,
-            @RequestParam("status")     String newStatus,
+            @PathVariable("id")     Long reservationId,
+            @RequestParam("status") String newStatus,
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
-
         Long hostId = (Long) session.getAttribute("loginUserId");
         if (hostId == null) {
             result.put("error", "로그인이 필요합니다.");
@@ -414,7 +384,6 @@ public class SpaceController {
         }
         SpaceReservation reservation = opt.get();
 
-        // 이 공간이 해당 호스트 소유인지 검증
         Space space = spaceRepository.findById(reservation.getSpaceId()).orElse(null);
         if (space == null || !hostId.equals(space.getHostId())) {
             result.put("error", "권한이 없습니다.");
@@ -453,7 +422,7 @@ public class SpaceController {
             item.put("spaceType",    s.getSpaceType());
             item.put("pricePerHour", s.getPricePerHour());
             item.put("availableYn",  s.getAvailableYn());
-            item.put("mainImageUrl", s.getMainImageUrl());
+            item.put("mainImageUrl", "/space-images/main/" + s.getSpaceId());
             result.add(item);
         }
         return result;
@@ -478,7 +447,6 @@ public class SpaceController {
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
-
         Long hostId = (Long) session.getAttribute("loginUserId");
         if (hostId == null) {
             result.put("error", "로그인이 필요합니다.");
@@ -493,21 +461,11 @@ public class SpaceController {
 
         Space space = spaceOpt.get();
 
-        // 새 이미지가 첨부된 경우에만 덮어쓰기
+        // 새 이미지가 첨부된 경우에만 DB에 저장 (기존 대표 이미지 교체)
         if (mainImage != null && !mainImage.isEmpty()) {
             try {
-                String ext = Optional.ofNullable(mainImage.getOriginalFilename())
-                        .filter(f -> f.contains("."))
-                        .map(f -> f.substring(f.lastIndexOf('.')))
-                        .orElse(".jpg");
-                String fileName = UUID.randomUUID().toString() + ext;
-                Path uploadDir = Paths.get(uploadPath).isAbsolute()
-                        ? Paths.get(uploadPath)
-                        : Paths.get(System.getProperty("user.dir"), uploadPath);
-                Files.createDirectories(uploadDir);
-                Files.copy(mainImage.getInputStream(), uploadDir.resolve(fileName),
-                        StandardCopyOption.REPLACE_EXISTING);
-                space.setMainImageUrl("/images/spaces/" + fileName);
+                spaceImageService.saveMainImage(spaceId, mainImage);
+                space.setMainImageUrl("/space-images/main/" + spaceId);
             } catch (IOException e) {
                 result.put("error", "이미지 저장 실패: " + e.getMessage());
                 return ResponseEntity.status(500).body(result);
@@ -541,7 +499,6 @@ public class SpaceController {
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
-
         Long userId = (Long) session.getAttribute("loginUserId");
         if (userId == null) {
             result.put("error", "로그인이 필요합니다.");

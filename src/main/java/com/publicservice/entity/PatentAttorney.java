@@ -14,25 +14,30 @@ public class PatentAttorney {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long patentAttorneyId;
+    private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "user_id")
+    private Long userId;
+
     private String name;
-
-    private Integer status;
 
     private String office;
 
-    @Column(name = "addr")
-    private String address;
+    private String city;
+
+    private String district;
+
+    @Column(name = "road_address")
+    private String roadAddress;
+
+    @Column(name = "addr", insertable = false, updatable = false)
+    private String addr;
 
     private String phone;
 
-    @Column(nullable = false)
-    private String field;
-
     private BigDecimal rating;
+
+    private String field;
 
     @Column(name = "consult_time")
     private String consultTime;
@@ -42,9 +47,13 @@ public class PatentAttorney {
 
     private Integer price;
 
-    @Column(name = "created_at")
+    private BigDecimal latitude;
+
+    private BigDecimal longitude;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 }

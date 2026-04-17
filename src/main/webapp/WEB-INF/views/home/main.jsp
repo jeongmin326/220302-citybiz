@@ -86,7 +86,7 @@
                             <p class="text-slate-500 mt-1">
                                 <c:choose>
                                     <c:when test="${sessionScope.loginRole == 'PROVIDER'}">운영 중인 공간의 새로운 예약 건이 있는지 확인해보세요.</c:when>
-                                    <c:when test="${sessionScope.loginRole == 'EXPERT'}">전문가 매칭 시스템을 통해 비즈니스 기회를 발견하세요.</c:when>
+                                    <c:when test="${sessionScope.loginRole == 'EXPERT'}">오늘 새로운 상담 요청이 들어왔을 수도 있어요.</c:when>
                                     <c:otherwise>오늘 ${sessionScope.loginName}님께 딱 맞는 지원사업 3건이 새로 올라왔습니다.</c:otherwise>
                                 </c:choose>
                             </p>
@@ -104,7 +104,7 @@
                                 <a href="/mypage/spaceManagement" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">예약 관리</a>
                             </c:when>
                             <c:when test="${sessionScope.loginRole == 'EXPERT'}">
-                                <a href="/mypage/expertProfile" class="flex-1 md:flex-none text-center bg-purple-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">전문가 프로필 수정</a>
+                                <a href="/mypage/expertProfile" class="flex-1 md:flex-none text-center bg-purple-600 text-white px-6 py-3.5 rounded-2xl font-bold hover:bg-purple-700 transition-all shadow-lg shadow-purple-200">전문가 정보 수정</a>
                                 <a href="/mypage/expertManagement" class="flex-1 md:flex-none text-center bg-white border border-slate-200 text-slate-700 px-6 py-3.5 rounded-2xl font-bold hover:bg-slate-50 transition-all">컨설팅 관리</a>
                             </c:when>
                             <c:otherwise>

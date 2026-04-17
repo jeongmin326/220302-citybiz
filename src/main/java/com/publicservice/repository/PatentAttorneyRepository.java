@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface PatentAttorneyRepository extends JpaRepository<PatentAttorney, Long>, JpaSpecificationExecutor<PatentAttorney> {
 
-    long countByAddressContaining(String keyword);
+    long countByAddrContaining(String keyword);
 
-    List<PatentAttorney> findByAddressContaining(String keyword);
+    List<PatentAttorney> findByAddrContaining(String keyword);
 }
