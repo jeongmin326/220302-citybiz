@@ -1,0 +1,301 @@
+**사용자**
+-- citybizdb.users definition
+CREATE TABLE `users` (
+  `user_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '사용자 고유 ID (PK)',
+  `email` varchar(255) NOT NULL COMMENT '로그인 이메일 (아이디 역할)',
+  `password_hash` varchar(255) NOT NULL COMMENT '비밀번호 해시 값',
+  `name` varchar(50) NOT NULL COMMENT '사용자 이름',
+  `phone` varchar(20) DEFAULT NULL COMMENT '연락처 (선택 입력)',
+  `role` varchar(20) NOT NULL DEFAULT 'USER' COMMENT '사용자 권한 (USER / ADMIN)',
+  `business_stage` varchar(30) DEFAULT NULL COMMENT '사업 단계 (예비창업자, 스타트업 등)',
+  `status` varchar(20) NOT NULL DEFAULT 'ACTIVE' COMMENT '계정 상태 (ACTIVE / INACTIVE / SUSPENDED)',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '계정 생성일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '계정 수정일시',
+  `company_name` varchar(100) DEFAULT NULL COMMENT '기업명 또는 팀명',
+  `biz_no` varchar(30) DEFAULT NULL COMMENT '사업자 등록번호',
+  `industry` varchar(50) DEFAULT NULL COMMENT '업종 또는 관심 분야',
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `uk_users_email` (`email`),
+  UNIQUE KEY `uq_users_phone` (`phone`)
+) ENGINE=InnoDB AUTO_INCREMENT=6244 DEFAULT CHARSET=utf8mb4 COMMENT='사용자 계정 정보 테이블';
+
+--
+
+**공간**
+-- citybizdb.spaces definition
+CREATE TABLE `spaces` (
+  `space_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '공간 고유 ID',
+  `host_id` bigint(20) DEFAULT NULL COMMENT '공간 등록자(호스트) user_id',
+  `name` varchar(100) NOT NULL COMMENT '공간 이름',
+  `region` varchar(50) NOT NULL COMMENT '광역 지역(예: 서울, 경기)',
+  `district` varchar(50) NOT NULL COMMENT '세부 지역(예: 강남구, 성수동)',
+  `address` varchar(255) NOT NULL COMMENT '상세 주소',
+  `space_type` varchar(30) NOT NULL COMMENT '공간 유형(shop, warehouse, studio, meeting, consulting, office)',
+  `price_per_hour` int(11) NOT NULL COMMENT '시간당 가격',
+  `capacity` int(11) NOT NULL COMMENT '최대 수용 인원',
+  `main_image_url` varchar(500) DEFAULT NULL COMMENT '대표 이미지 경로',
+  `description` text DEFAULT NULL COMMENT '공간 설명',
+  `available_yn` char(1) NOT NULL DEFAULT 'Y' COMMENT '사용 가능 여부(Y/N)',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`space_id`),
+  KEY `idx_spaces_host_id` (`host_id`),
+  CONSTRAINT `fk_spaces_host` FOREIGN KEY (`host_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COMMENT='공간 기본 정보 테이블';
+
+
+--
+
+**공간이미지**
+-- citybizdb.space_images definition
+CREATE TABLE `space_images` (
+  `image_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '이미지 고유 ID',
+  `space_id` bigint(20) NOT NULL COMMENT '공간 ID',
+  `file_name` varchar(255) DEFAULT NULL COMMENT '파일명',
+  `content_type` varchar(100) DEFAULT NULL COMMENT 'image/jpeg, image/png 등',
+  `image_data` longblob NOT NULL COMMENT '이미지 바이너리',
+  `is_main` char(1) NOT NULL DEFAULT 'N' COMMENT '대표 이미지 여부',
+  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT '정렬 순서',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`image_id`),
+  KEY `idx_space_images_space_id` (`space_id`),
+  CONSTRAINT `fk_space_images_space` FOREIGN KEY (`space_id`) REFERENCES `spaces` (`space_id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+
+--
+
+**공간예약**
+-- citybizdb.space_reservations definition
+CREATE TABLE `space_reservations` (
+  `reservation_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '예약 고유 ID',
+  `space_id` bigint(20) NOT NULL COMMENT '예약된 공간 ID',
+  `user_id` bigint(20) NOT NULL COMMENT '예약자(사용자) ID',
+  `use_date` date NOT NULL COMMENT '사용 날짜',
+  `start_time` time NOT NULL COMMENT '시작 시간',
+  `end_time` time NOT NULL COMMENT '종료 시간',
+  `total_price` int(11) NOT NULL COMMENT '총 결제 금액',
+  `status` varchar(20) NOT NULL DEFAULT 'PENDING' COMMENT '상태: PENDING / APPROVED / REJECTED / CANCELLED',
+  `user_memo` varchar(500) DEFAULT NULL COMMENT '사용자 요청 메모',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '예약 신청일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`reservation_id`),
+  KEY `idx_res_space` (`space_id`),
+  KEY `idx_res_user` (`user_id`),
+  CONSTRAINT `fk_res_space` FOREIGN KEY (`space_id`) REFERENCES `spaces` (`space_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_res_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='공간 예약 테이블';
+
+--
+
+**정책**
+-- citybizdb.policy_funds definition
+CREATE TABLE `policy_funds` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '정책자금 고유 ID (PK)',
+  `category` varchar(20) NOT NULL COMMENT '구분 (융자, 보증, 보험)',
+  `fund_name` varchar(100) NOT NULL COMMENT '자금명',
+  `support_target` varchar(500) NOT NULL COMMENT '지원대상',
+  `business_description` text NOT NULL COMMENT '사업내용',
+  `institution` varchar(100) NOT NULL COMMENT '운영 기관',
+  `hashtags` varchar(255) DEFAULT NULL COMMENT '해시태그',
+  `registered_date` date NOT NULL COMMENT '등록일자',
+  `application_available_yn` char(1) NOT NULL DEFAULT 'Y' COMMENT '접수 가능 여부 (Y/N)',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '생성일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COMMENT='정책자금 정보 테이블';
+
+--
+
+**정책 스크랩**
+-- citybizdb.policy_scraps definition
+CREATE TABLE `policy_scraps` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '스크랩 고유 ID',
+  `user_id` bigint(20) NOT NULL COMMENT '사용자 ID',
+  `policy_fund_id` int(11) NOT NULL COMMENT '정책자금 ID',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '스크랩 일시',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_policy` (`user_id`,`policy_fund_id`),
+  KEY `fk_scraps_policy` (`policy_fund_id`),
+  CONSTRAINT `fk_scraps_policy` FOREIGN KEY (`policy_fund_id`) REFERENCES `policy_funds` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_scraps_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='정책 스크랩 테이블';
+
+--
+
+**지도용좌표**
+-- citybizdb.district_centers definition
+CREATE TABLE `district_centers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '구 기준 좌표 고유 ID',
+  `city` varchar(30) NOT NULL COMMENT '시/도 (예: 서울특별시)',
+  `district` varchar(30) NOT NULL COMMENT '구/군 (예: 마포구)',
+  `center_name` varchar(100) NOT NULL COMMENT '기준 장소명 (예: 마포구청)',
+  `center_address` varchar(255) NOT NULL COMMENT '기준 장소 주소',
+  `center_latitude` decimal(10,7) NOT NULL COMMENT '기준 위도',
+  `center_longitude` decimal(10,7) NOT NULL COMMENT '기준 경도',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_city_district` (`city`,`district`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COMMENT='구별 기준 좌표 테이블';
+
+--
+
+**세무사**
+-- citybizdb.tax_accountants definition
+CREATE TABLE `tax_accountants` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '세무사 고유 ID (PK)',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '등록 유저 ID',
+  `name` varchar(50) NOT NULL COMMENT '성명',
+  `office` varchar(100) NOT NULL COMMENT '사무실명',
+  `city` varchar(30) NOT NULL COMMENT '시/도',
+  `district` varchar(30) NOT NULL COMMENT '구/군',
+  `road_address` varchar(150) NOT NULL COMMENT '도로명 주소',
+  `addr` varchar(255) GENERATED ALWAYS AS (concat(`city`,_utf8mb4' ',`district`,_utf8mb4' ',`road_address`)) STORED COMMENT '전체 주소',
+  `phone` varchar(30) NOT NULL COMMENT '전화번호',
+  `rating` decimal(2,1) NOT NULL DEFAULT 0.0 COMMENT '평점',
+  `field` varchar(50) NOT NULL COMMENT '전문분야',
+  `consult_time` varchar(30) NOT NULL COMMENT '상담 가능 시간 (평일 / 야간 / 주말 / 주말야간)',
+  `experience_years` int(11) NOT NULL DEFAULT 0 COMMENT '경력(년수)',
+  `price` int(11) NOT NULL DEFAULT 0 COMMENT '상담 가격(만원)',
+  `latitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 위도',
+  `longitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 경도',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1003 DEFAULT CHARSET=utf8mb4 COMMENT='세무사 기본 정보 테이블';
+
+--
+
+**회계사**
+-- citybizdb.accountants definition
+CREATE TABLE `accountants` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '회계사 고유 ID (PK)',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '등록 유저 ID',
+  `name` varchar(50) NOT NULL COMMENT '성명',
+  `office` varchar(100) NOT NULL COMMENT '사무실명',
+  `city` varchar(30) NOT NULL COMMENT '시/도 (예: 서울특별시)',
+  `district` varchar(30) NOT NULL COMMENT '구/군 (예: 성동구)',
+  `road_address` varchar(150) NOT NULL COMMENT '도로명 주소',
+  `addr` varchar(255) GENERATED ALWAYS AS (concat(`city`,_utf8mb4' ',`district`,_utf8mb4' ',`road_address`)) STORED COMMENT '전체 주소',
+  `phone` varchar(30) NOT NULL COMMENT '전화번호',
+  `rating` decimal(2,1) NOT NULL DEFAULT 0.0 COMMENT '평점',
+  `field` varchar(50) NOT NULL COMMENT '전문분야',
+  `consult_time` varchar(30) NOT NULL COMMENT '상담 가능 시간 (평일 / 야간 / 주말 / 주말야간)',
+  `experience_years` int(11) NOT NULL DEFAULT 0 COMMENT '경력(년수)',
+  `price` int(11) NOT NULL DEFAULT 0 COMMENT '상담 가격(만원)',
+  `latitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 위도',
+  `longitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 경도',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8mb4 COMMENT='회계사 기본 정보 테이블';
+
+--
+
+**노무사**
+-- citybizdb.labor_attorneys definition
+CREATE TABLE `labor_attorneys` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '노무사 고유 ID (PK)',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '등록 유저 ID',
+  `name` varchar(50) NOT NULL COMMENT '성명',
+  `office` varchar(100) NOT NULL COMMENT '사무실명',
+  `city` varchar(30) NOT NULL COMMENT '시/도',
+  `district` varchar(30) NOT NULL COMMENT '구/군',
+  `road_address` varchar(150) NOT NULL COMMENT '도로명 주소',
+  `addr` varchar(255) GENERATED ALWAYS AS (concat(`city`,_utf8mb4' ',`district`,_utf8mb4' ',`road_address`)) STORED COMMENT '전체 주소',
+  `phone` varchar(30) NOT NULL COMMENT '전화번호',
+  `rating` decimal(2,1) NOT NULL DEFAULT 0.0 COMMENT '평점',
+  `field` varchar(50) NOT NULL COMMENT '전문분야',
+  `consult_time` varchar(30) NOT NULL COMMENT '상담 가능 시간 (평일 / 야간 / 주말 / 주말야간)',
+  `experience_years` int(11) NOT NULL DEFAULT 0 COMMENT '경력(년수)',
+  `price` int(11) NOT NULL DEFAULT 0 COMMENT '상담 가격(만원)',
+  `latitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 위도',
+  `longitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 경도',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1001 DEFAULT CHARSET=utf8mb4 COMMENT='노무사 기본 정보 테이블';
+
+--
+
+**변호사**
+-- citybizdb.lawyers definition
+CREATE TABLE `lawyers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '변호사 고유 ID (PK)',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '등록 유저 ID',
+  `name` varchar(50) NOT NULL COMMENT '성명',
+  `office` varchar(100) NOT NULL COMMENT '사무실명',
+  `city` varchar(30) NOT NULL COMMENT '시/도',
+  `district` varchar(30) NOT NULL COMMENT '구/군',
+  `road_address` varchar(150) NOT NULL COMMENT '도로명 주소',
+  `addr` varchar(255) GENERATED ALWAYS AS (concat(`city`,_utf8mb4' ',`district`,_utf8mb4' ',`road_address`)) STORED COMMENT '전체 주소',
+  `phone` varchar(30) NOT NULL COMMENT '전화번호',
+  `rating` decimal(2,1) NOT NULL DEFAULT 0.0 COMMENT '평점',
+  `field` varchar(50) NOT NULL COMMENT '전문분야',
+  `consult_time` varchar(30) NOT NULL COMMENT '상담 가능 시간 (평일 / 야간 / 주말 / 주말야간)',
+  `experience_years` int(11) NOT NULL DEFAULT 0 COMMENT '경력(년수)',
+  `price` int(11) NOT NULL DEFAULT 0 COMMENT '상담 가격(만원)',
+  `latitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 위도',
+  `longitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 경도',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT '등록일시',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT '수정일시',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=972 DEFAULT CHARSET=utf8mb4 COMMENT='변호사 기본 정보 테이블';
+
+--
+
+**변리사**
+-- citybizdb.patent_attorneys definition
+CREATE TABLE `patent_attorneys` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '변리사 고유 ID (PK)',
+  `user_id` bigint(20) DEFAULT NULL COMMENT '등록 유저 ID',
+  `name` varchar(50) NOT NULL COMMENT '성명',
+  `office` varchar(100) NOT NULL COMMENT '사무실명',
+  `city` varchar(30) NOT NULL COMMENT '시/도',
+  `district` varchar(30) NOT NULL COMMENT '구/군',
+  `road_address` varchar(150) NOT NULL COMMENT '도로명 주소',
+  `addr` varchar(255) GENERATED ALWAYS AS (concat(`city`,_utf8mb4' ',`district`,_utf8mb4' ',`road_address`)) STORED COMMENT '전체 주소',
+  `phone` varchar(30) NOT NULL COMMENT '전화번호',
+  `rating` decimal(2,1) NOT NULL DEFAULT 0.0 COMMENT '평점',
+  `field` varchar(50) NOT NULL COMMENT '전문분야',
+  `consult_time` varchar(30) NOT NULL COMMENT '상담 가능 시간',
+  `experience_years` int(11) NOT NULL DEFAULT 0 COMMENT '경력(년수)',
+  `price` int(11) NOT NULL DEFAULT 0 COMMENT '상담 가격(만원)',
+  `latitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 위도',
+  `longitude` decimal(10,7) DEFAULT NULL COMMENT '지도 표시용 경도',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+
+**자문요청**
+-- citybizdb.consulting_requests definition
+CREATE TABLE `consulting_requests` (
+  `request_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `content` text DEFAULT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `expert_id` bigint(20) NOT NULL,
+  `expert_type` varchar(20) NOT NULL,
+  `expert_user_id` bigint(20) DEFAULT NULL,
+  `status` varchar(20) NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `updated_at` datetime(6) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`request_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+
+--
+
+**전문가채팅**
+-- citybizdb.consulting_messages definition
+CREATE TABLE `consulting_messages` (
+  `message_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `content` text NOT NULL,
+  `created_at` datetime(6) NOT NULL,
+  `request_id` bigint(20) NOT NULL,
+  `sender_id` bigint(20) NOT NULL,
+  `sender_role` varchar(10) NOT NULL,
+  PRIMARY KEY (`message_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
