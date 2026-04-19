@@ -155,6 +155,8 @@ public class SpaceController {
             @RequestParam(value = "detailAddress", defaultValue = "") String detailAddress,
             @RequestParam("maxCapacity")                       int capacity,
             @RequestParam("pricePerHour")                      int pricePerHour,
+            @RequestParam(value = "latitude",  required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude,
             @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
             HttpSession session) {
 
@@ -165,8 +167,6 @@ public class SpaceController {
             return ResponseEntity.status(401).body(result);
         }
 
-        String fullAddr = detailAddress.isBlank() ? roadAddress : roadAddress + " " + detailAddress;
-
         Space space = new Space();
         space.setHostId(hostId);
         space.setName(name);
@@ -175,7 +175,9 @@ public class SpaceController {
         space.setCity(city);
         space.setDistrict(district);
         space.setRoadAddress(roadAddress);
-        space.setAddr(fullAddr);
+        if (!detailAddress.isBlank()) space.setDetailAddress(detailAddress);
+        if (latitude  != null) space.setLatitude(latitude);
+        if (longitude != null) space.setLongitude(longitude);
         space.setCapacity(capacity);
         space.setPricePerHour(pricePerHour);
         space.setAvailableYn("Y");
@@ -444,6 +446,8 @@ public class SpaceController {
             @RequestParam(value = "detailAddress", defaultValue = "") String detailAddress,
             @RequestParam("maxCapacity")                       int capacity,
             @RequestParam("pricePerHour")                      int pricePerHour,
+            @RequestParam(value = "latitude",  required = false) Double latitude,
+            @RequestParam(value = "longitude", required = false) Double longitude,
             @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
             HttpSession session) {
 
@@ -473,18 +477,19 @@ public class SpaceController {
             }
         }
 
-        String fullAddr = detailAddress.isBlank() ? roadAddress : roadAddress + " " + detailAddress;
         space.setName(name);
         space.setSpaceType(spaceType);
         space.setDescription(description);
         space.setCity(city);
         space.setDistrict(district);
         space.setRoadAddress(roadAddress);
-        space.setAddr(fullAddr);
+        if (!detailAddress.isBlank()) space.setDetailAddress(detailAddress);
         space.setCapacity(capacity);
         space.setPricePerHour(pricePerHour);
         space.setAvailableYn("Y");
         space.setUpdatedAt(LocalDateTime.now());
+        if (latitude  != null) space.setLatitude(latitude);
+        if (longitude != null) space.setLongitude(longitude);
         spaceRepository.save(space);
 
         result.put("success", true);

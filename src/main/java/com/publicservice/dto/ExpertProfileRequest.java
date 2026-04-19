@@ -9,10 +9,13 @@ public class ExpertProfileRequest {
     private String city;
     private String district;
     private String roadAddress;
+    private String detailAddress;
     private String field;
     private String consultTime;
     private Integer experienceYears;
     private Integer price;
+    private Double latitude;
+    private Double longitude;
 
     public String getExpertType() { return expertType; }
     public void setExpertType(String expertType) { this.expertType = expertType; }
@@ -28,6 +31,8 @@ public class ExpertProfileRequest {
     public void setDistrict(String district) { this.district = district; }
     public String getRoadAddress() { return roadAddress; }
     public void setRoadAddress(String roadAddress) { this.roadAddress = roadAddress; }
+    public String getDetailAddress() { return detailAddress; }
+    public void setDetailAddress(String detailAddress) { this.detailAddress = detailAddress; }
     public String getField() { return field; }
     public void setField(String field) { this.field = field; }
     public String getConsultTime() { return consultTime; }
@@ -36,4 +41,8 @@ public class ExpertProfileRequest {
     public void setExperienceYears(Integer experienceYears) { this.experienceYears = experienceYears; }
     public Integer getPrice() { return price; }
     public void setPrice(Integer price) { this.price = price; }
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
 }

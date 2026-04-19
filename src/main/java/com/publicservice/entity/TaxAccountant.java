@@ -30,6 +30,9 @@ public class TaxAccountant {
     @Column(name = "road_address")
     private String roadAddress;
 
+    @Column(name = "detail_address")
+    private String detailAddress;
+
     @Column(name = "addr", insertable = false, updatable = false)
     private String addr;
 
@@ -47,8 +50,10 @@ public class TaxAccountant {
 
     private Integer price;
 
+    @Column(precision = 10, scale = 7)
     private BigDecimal latitude;
 
+    @Column(precision = 10, scale = 7)
     private BigDecimal longitude;
 
     @Column(name = "created_at", insertable = false, updatable = false)

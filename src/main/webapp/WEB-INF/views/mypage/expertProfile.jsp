@@ -8,6 +8,7 @@
     <title>전문가 정보 수정 - City Biz Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Pretendard', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -66,18 +67,32 @@
                     <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center gap-2">
                         <i data-lucide="map-pin" class="w-5 h-5 text-purple-500"></i> 주소
                     </h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <%-- 숨겨진 주소 필드 (네이버 지도 검색으로 자동 채워짐) --%>
+                    <input type="hidden" name="city"        id="cityHidden"    value="${profile.city}">
+                    <input type="hidden" name="district"    id="districtHidden" value="${profile.district}">
+                    <input type="hidden" name="roadAddress" id="roadAddrHidden" value="${profile.roadAddress}">
+                    <input type="hidden" name="latitude"    id="latHidden"     value="${profile.latitude}">
+                    <input type="hidden" name="longitude"   id="lngHidden"     value="${profile.longitude}">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">시/도 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="city" value="${profile.city}" placeholder="예: 서울특별시" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">주소 검색 <span class="text-rose-500">*</span></label>
+                            <button type="button" onclick="searchAddress()"
+                                class="flex items-center gap-2 px-5 py-3 bg-purple-600 text-white text-sm font-bold rounded-xl hover:bg-purple-700 transition-colors">
+                                <i data-lucide="search" class="w-4 h-4"></i> 주소 검색
+                            </button>
+                        </div>
+                        <div id="addrSelectedBox" class="${empty profile.city ? 'hidden' : ''} flex items-start gap-3 bg-purple-50 border border-purple-200 rounded-xl px-4 py-3">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <p class="text-xs text-purple-600 font-semibold mb-0.5">선택된 주소</p>
+                                <p id="addrSelectedText" class="text-sm text-slate-800 font-medium">${profile.city} ${profile.district} ${profile.roadAddress}</p>
+                                <p id="coordsText" class="text-xs text-slate-400 mt-0.5 ${empty profile.latitude ? 'hidden' : ''}">위도 ${profile.latitude}, 경도 ${profile.longitude}</p>
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">구/군 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="district" value="${profile.district}" placeholder="예: 강남구" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">도로명 주소 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="roadAddress" value="${profile.roadAddress}" placeholder="예: 테헤란로 123" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">상세 주소</label>
+                            <input type="text" name="detailAddress" value="${profile.detailAddress}" placeholder="예: 3층 302호"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
                         </div>
                     </div>
                 </section>
@@ -131,8 +146,55 @@
     <script>
         lucide.createIcons();
 
-        document.getElementById('expertProfileForm').addEventListener('submit', function (e) {
+        // === 카카오 우편번호 서비스 주소 검색 ===
+        var geocodingPromise = null;
+
+        function searchAddress() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var city     = data.sido;
+                    var district = data.sigungu;
+                    var roadAddr = data.roadAddress.replace(data.sido + ' ' + data.sigungu + ' ', '').trim();
+
+                    document.getElementById('cityHidden').value     = city;
+                    document.getElementById('districtHidden').value = district;
+                    document.getElementById('roadAddrHidden').value = roadAddr;
+                    document.getElementById('latHidden').value      = '';
+                    document.getElementById('lngHidden').value      = '';
+
+                    var displayAddr = [city, district, roadAddr].filter(Boolean).join(' ');
+                    document.getElementById('addrSelectedText').textContent = displayAddr;
+                    document.getElementById('addrSelectedBox').classList.remove('hidden');
+
+                    var coordsEl = document.getElementById('coordsText');
+                    coordsEl.textContent = '좌표 조회 중...';
+                    coordsEl.classList.remove('hidden');
+
+                    geocodingPromise = fetch('/api/geocode?query=' + encodeURIComponent(data.roadAddress))
+                        .then(function(r) { return r.json(); })
+                        .then(function(json) {
+                            if (json.addresses && json.addresses.length > 0) {
+                                var r = json.addresses[0];
+                                document.getElementById('latHidden').value = r.y;
+                                document.getElementById('lngHidden').value = r.x;
+                                coordsEl.textContent = '위도 ' + parseFloat(r.y).toFixed(6) + ', 경도 ' + parseFloat(r.x).toFixed(6);
+                            } else {
+                                coordsEl.textContent = '좌표 조회 실패';
+                            }
+                        })
+                        .catch(function() { coordsEl.textContent = '좌표 조회 실패'; });
+                }
+            }).open();
+        }
+
+        document.getElementById('expertProfileForm').addEventListener('submit', async function (e) {
             e.preventDefault();
+            if (!document.getElementById('cityHidden').value || !document.getElementById('roadAddrHidden').value) {
+                alert('주소를 검색하여 선택해 주세요.');
+                return;
+            }
+            if (geocodingPromise) await geocodingPromise;
+
             const form = e.target;
             const params = new URLSearchParams(new FormData(form));
 

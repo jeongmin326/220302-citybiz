@@ -27,6 +27,10 @@ public class Space {
     @Column(name = "road_address")
     private String roadAddress;
 
+    @Column(name = "detail_address")
+    private String detailAddress;
+
+    @Column(name = "addr", insertable = false, updatable = false)
     private String addr;
 
     @Column(name = "space_type")

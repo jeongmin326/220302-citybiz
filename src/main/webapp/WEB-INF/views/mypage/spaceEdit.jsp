@@ -8,6 +8,7 @@
     <title>공간 수정하기 - City Biz Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Pretendard', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -76,35 +77,35 @@
                     <i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i> 위치 및 상세 옵션
                 </h2>
 
+                <%-- 숨겨진 주소 필드 (기존 주소로 초기화) --%>
+                <input type="hidden" name="city"        id="cityHidden"    value="${space.city}">
+                <input type="hidden" name="district"    id="districtHidden" value="${space.district}">
+                <input type="hidden" name="roadAddress" id="roadAddrHidden" value="${space.roadAddress}">
+                <input type="hidden" name="latitude"    id="latHidden"     value="${space.latitude}">
+                <input type="hidden" name="longitude"   id="lngHidden"     value="${space.longitude}">
+
                 <div class="space-y-6">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">광역 지역 <span class="text-rose-500">*</span></label>
-                            <select id="regionSelect" name="city" required onchange="onRegionChange()"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                                <option value="">지역 선택</option>
-                                <option value="서울특별시" ${space.city == '서울특별시' ? 'selected' : ''}>서울</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">구/군 <span class="text-rose-500">*</span></label>
-                            <select id="districtSelect" name="district" required
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                                <option value="">먼저 지역을 선택하세요</option>
-                            </select>
+                    <%-- 주소 검색 --%>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">주소 검색 <span class="text-rose-500">*</span></label>
+                        <button type="button" onclick="searchAddress()"
+                            class="flex items-center gap-2 px-5 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors">
+                            <i data-lucide="search" class="w-4 h-4"></i> 주소 검색
+                        </button>
+                        <div id="addrSelectedBox" class="${empty space.city ? 'hidden' : ''} mt-2 flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                            <i data-lucide="map-pin" class="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0"></i>
+                            <div>
+                                <p class="text-xs text-blue-600 font-semibold mb-0.5">현재 주소</p>
+                                <p id="addrSelectedText" class="text-sm text-slate-800 font-medium">${space.city} ${space.district} ${space.roadAddress}</p>
+                                <p id="coordsText" class="text-xs text-slate-400 mt-0.5 ${empty space.latitude ? 'hidden' : ''}">위도 ${space.latitude}, 경도 ${space.longitude}</p>
+                            </div>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">도로명 주소 <span class="text-rose-500">*</span></label>
-                            <input type="text" id="roadAddress" name="roadAddress" required value="${space.roadAddress}"
-                                placeholder="예: 서울특별시 강남구 테헤란로 123"
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
-                        </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">상세 주소</label>
-                            <input type="text" name="detailAddress" placeholder="예: 4층 402호"
+                            <input type="text" name="detailAddress" placeholder="예: 4층 402호" value="${space.detailAddress}"
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                         </div>
                         <div>
@@ -183,40 +184,48 @@
     <script>
         lucide.createIcons();
 
-        const spaceId    = '${space.spaceId}';
-        const savedRegion    = '${space.city}';
-        const savedDistrict  = '${space.district}';
+        const spaceId = '${space.spaceId}';
 
-        // 서울 25개 구 목록
-        const districtMap = {
-            '서울특별시': ['강남구','강동구','강북구','강서구','관악구','광진구','구로구','금천구',
-                     '노원구','도봉구','동대문구','동작구','마포구','서대문구','서초구',
-                     '성동구','성북구','송파구','양천구','영등포구','용산구','은평구',
-                     '종로구','중구','중랑구']
-        };
+        // === 카카오 우편번호 서비스 주소 검색 ===
+        var geocodingPromise = null;
 
-        function onRegionChange() {
-            const regionVal   = document.getElementById('regionSelect').value;
-            const districtSel = document.getElementById('districtSelect');
-            districtSel.innerHTML = '';
-            if (regionVal && districtMap[regionVal]) {
-                districtSel.disabled = false;
-                districtSel.insertAdjacentHTML('beforeend', '<option value="">구/군 선택</option>');
-                districtMap[regionVal].forEach(function(d) {
-                    const selected = (d === savedDistrict) ? ' selected' : '';
-                    districtSel.insertAdjacentHTML('beforeend',
-                        '<option value="' + d + '"' + selected + '>' + d + '</option>');
-                });
-            } else {
-                districtSel.disabled = true;
-                districtSel.insertAdjacentHTML('beforeend',
-                    '<option value="">먼저 지역을 선택하세요</option>');
-            }
-        }
+        function searchAddress() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    var city     = data.sido;
+                    var district = data.sigungu;
+                    var roadAddr = data.roadAddress.replace(data.sido + ' ' + data.sigungu + ' ', '').trim();
 
-        // 페이지 로드 시 기존 지역/구 자동 선택
-        if (savedRegion && savedRegion !== '미설정') {
-            onRegionChange();
+                    document.getElementById('cityHidden').value     = city;
+                    document.getElementById('districtHidden').value = district;
+                    document.getElementById('roadAddrHidden').value = roadAddr;
+                    document.getElementById('latHidden').value      = '';
+                    document.getElementById('lngHidden').value      = '';
+
+                    var displayAddr = [city, district, roadAddr].filter(Boolean).join(' ');
+                    document.getElementById('addrSelectedText').textContent = displayAddr;
+                    document.querySelector('#addrSelectedBox p:first-child').textContent = '선택된 주소';
+                    document.getElementById('addrSelectedBox').classList.remove('hidden');
+
+                    var coordsEl = document.getElementById('coordsText');
+                    coordsEl.textContent = '좌표 조회 중...';
+                    coordsEl.classList.remove('hidden');
+
+                    geocodingPromise = fetch('/api/geocode?query=' + encodeURIComponent(data.roadAddress))
+                        .then(function(r) { return r.json(); })
+                        .then(function(json) {
+                            if (json.addresses && json.addresses.length > 0) {
+                                var r = json.addresses[0];
+                                document.getElementById('latHidden').value = r.y;
+                                document.getElementById('lngHidden').value = r.x;
+                                coordsEl.textContent = '위도 ' + parseFloat(r.y).toFixed(6) + ', 경도 ' + parseFloat(r.x).toFixed(6);
+                            } else {
+                                coordsEl.textContent = '좌표 조회 실패';
+                            }
+                        })
+                        .catch(function() { coordsEl.textContent = '좌표 조회 실패'; });
+                }
+            }).open();
         }
 
         // 이미지 선택 시 파일명 표시
@@ -230,6 +239,11 @@
         // 폼 제출 → PUT /api/spaces/{id}
         document.getElementById('editForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            if (!document.getElementById('cityHidden').value || !document.getElementById('roadAddrHidden').value) {
+                alert('주소를 검색하여 선택해 주세요.');
+                return;
+            }
+            if (geocodingPromise) await geocodingPromise;
             const btn = this.querySelector('button[type="submit"]');
             btn.disabled = true;
             btn.textContent = '저장 중...';
