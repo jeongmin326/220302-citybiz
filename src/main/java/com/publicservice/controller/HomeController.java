@@ -93,6 +93,15 @@ public class HomeController {
         return "mypage/status"; 
     }
 
+    @GetMapping("/mypage/profile")
+    public String userProfilePage(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId == null) return "redirect:/login";
+
+        userRepository.findById(userId).ifPresent(user -> model.addAttribute("profile", user));
+        return "mypage/userProfile";
+    }
+
     // 공급자(Host) 공간 등록 페이지 매핑
     @GetMapping("/mypage/spaceRegi")
     public String spaceRegisterPage(

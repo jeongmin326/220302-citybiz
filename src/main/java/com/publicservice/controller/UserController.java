@@ -1,5 +1,7 @@
 package com.publicservice.controller;
 
+import com.publicservice.dao.UserDAO;
+import com.publicservice.dto.UserProfileRequest;
 import com.publicservice.entity.Accountant;
 import com.publicservice.entity.LaborAttorney;
 import com.publicservice.entity.Lawyer;
@@ -13,27 +15,23 @@ import com.publicservice.repository.SpaceRepository;
 import com.publicservice.repository.TaxAccountantRepository;
 import com.publicservice.repository.UserRepository;
 import com.publicservice.service.UserService;
-import com.publicservice.dao.UserDAO;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.Optional;
 
 @Controller
 public class UserController {
@@ -374,6 +372,12 @@ public class UserController {
         result.put("businessStage", user.getBusinessStage());
         result.put("industry",      user.getIndustry());
         result.put("role",          user.getRole());
+        result.put("phone",         user.getPhone());
+        result.put("bizNo",         user.getBizNo());
+        result.put("city",          user.getCity());
+        result.put("district",      user.getDistrict());
+        result.put("roadAddress",   user.getRoadAddress());
+        result.put("detailAddress", user.getDetailAddress());
         return result;
     }
 
@@ -383,9 +387,7 @@ public class UserController {
     @PostMapping("/api/user/profile")
     @ResponseBody
     public Map<String, Object> updateUserProfile(
-            @RequestParam(value = "companyName",   required = false) String companyName,
-            @RequestParam(value = "businessStage", required = false) String businessStage,
-            @RequestParam(value = "industry",      required = false) String industry,
+            UserProfileRequest req,
             HttpSession session) {
         Map<String, Object> result = new HashMap<>();
         Long userId = (Long) session.getAttribute("loginUserId");
@@ -398,10 +400,33 @@ public class UserController {
             result.put("error", "사용자를 찾을 수 없습니다.");
             return result;
         }
+
+        String phone = req.getPhone() != null ? req.getPhone().trim() : "";
+        if (phone.isBlank() || !phone.matches("^01[0-9]{9}$")) {
+            result.put("error", "올바른 휴대폰 번호를 입력해 주세요.");
+            return result;
+        }
+
+        Optional<User> phoneOwner = userRepository.findByPhone(phone);
+        if (phoneOwner.isPresent() && !phoneOwner.get().getUserId().equals(userId)) {
+            result.put("error", "이미 사용 중인 휴대폰 번호입니다.");
+            return result;
+        }
+
+        if (req.getCity() == null || req.getCity().isBlank()
+                || req.getRoadAddress() == null || req.getRoadAddress().isBlank()) {
+            result.put("error", "주소를 검색하여 선택해 주세요.");
+            return result;
+        }
+
         User user = opt.get();
-        if (companyName   != null) user.setCompanyName(companyName.trim());
-        if (businessStage != null) user.setBusinessStage(businessStage);
-        if (industry      != null) user.setIndustry(industry);
+        user.setPhone(phone);
+        user.setCity(req.getCity().trim());
+        user.setDistrict(req.getDistrict() != null ? req.getDistrict().trim() : "");
+        user.setRoadAddress(req.getRoadAddress().trim());
+        user.setDetailAddress(req.getDetailAddress() != null ? req.getDetailAddress().trim() : "");
+        if (req.getBusinessStage() != null) user.setBusinessStage(req.getBusinessStage());
+        if (req.getIndustry() != null) user.setIndustry(req.getIndustry().trim());
         userRepository.save(user);
         result.put("success", true);
         return result;

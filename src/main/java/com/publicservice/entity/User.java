@@ -32,6 +32,16 @@ public class User {
 
     private String status;
 
+    private String city;
+
+    private String district;
+
+    @Column(name = "road_address")
+    private String roadAddress;
+
+    @Column(name = "detail_address")
+    private String detailAddress;
+
     @Column(name = "company_name")
     private String companyName;
 

@@ -23,7 +23,7 @@
     <jsp:include page="../common/header.jsp" />
     
     <%-- 2. 메인 컨텐츠 영역 --%>
-    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-12">
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 py-12">
         
         <%-- 상단 헤더 영역 --%>
         <div class="mb-8">
@@ -32,83 +32,85 @@
             <p class="text-slate-500 mt-2">${not empty sessionScope.loginName ? sessionScope.loginName : '사용자'}님의 비즈니스 활동 현황입니다.</p>
         </div>
 
-        <%-- 1. 대시보드 요약 (Overview) --%>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
-                <div class="bg-blue-100 p-4 rounded-2xl text-blue-600">
-                    <i data-lucide="calendar-check" class="w-8 h-8"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-slate-500">다가오는 예약</p>
-                    <p class="text-2xl font-bold text-slate-900"><span id="upcomingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
-                </div>
-            </div>
-            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
-                <div class="bg-indigo-100 p-4 rounded-2xl text-indigo-600">
-                    <i data-lucide="bookmark" class="w-8 h-8"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-slate-500">스크랩한 정책</p>
-                    <p class="text-2xl font-bold text-slate-900"><span id="scrapCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
-                </div>
-            </div>
-            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
-                <div class="bg-purple-100 p-4 rounded-2xl text-purple-600">
-                    <i data-lucide="message-square" class="w-8 h-8"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-semibold text-slate-500">진행 중인 컨설팅</p>
-                    <p class="text-2xl font-bold text-slate-900"><span id="consultingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
-                </div>
-            </div>
-        </div>
-
         <div>
+                <%-- 1. 대시보드 요약 (Overview) --%>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="bg-blue-100 p-4 rounded-2xl text-blue-600">
+                            <i data-lucide="calendar-check" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-500">다가오는 예약</p>
+                            <p class="text-2xl font-bold text-slate-900"><span id="upcomingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="bg-indigo-100 p-4 rounded-2xl text-indigo-600">
+                            <i data-lucide="bookmark" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-500">스크랩한 정책</p>
+                            <p class="text-2xl font-bold text-slate-900"><span id="scrapCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                        <div class="bg-purple-100 p-4 rounded-2xl text-purple-600">
+                            <i data-lucide="message-square" class="w-8 h-8"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-slate-500">진행 중인 컨설팅</p>
+                            <p class="text-2xl font-bold text-slate-900"><span id="consultingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                        </div>
+                    </div>
+                </div>
 
-            <%-- 컨텐츠 영역 --%>
-            <div class="space-y-8">
-                
-                <%-- 2. 공간 대여 이용 내역 --%>
-                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i> 공간 대여 내역
-                        </h2>
-                        <a href="/space" class="text-sm font-medium text-blue-600 hover:underline">더보기</a>
-                    </div>
-                    <div class="p-6 space-y-4" id="reservationList">
-                        <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
-                    </div>
-                </section>
+                <div>
 
-                <%-- 3. 맞춤 정책 지원 스크랩 --%>
-                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500"></i> 관심 정책 목록
-                        </h2>
-                        <a href="/policy" class="text-sm font-medium text-indigo-600 hover:underline">더보기</a>
-                    </div>
-                    <div class="p-6 space-y-4" id="scrapList">
-                        <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
-                    </div>
-                </section>
+                    <%-- 컨텐츠 영역 --%>
+                    <div class="space-y-8">
+                        
+                        <%-- 2. 공간 대여 이용 내역 --%>
+                        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                    <i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i> 공간 대여 내역
+                                </h2>
+                                <a href="/space" class="text-sm font-medium text-blue-600 hover:underline">더보기</a>
+                            </div>
+                            <div class="p-6 space-y-4" id="reservationList">
+                                <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
+                            </div>
+                        </section>
 
-                <%-- 4. 컨설팅 진행 현황 --%>
-                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i data-lucide="network" class="w-5 h-5 text-purple-500"></i> 컨설팅 진행 현황
-                        </h2>
-                        <a href="/consulting" class="text-sm font-medium text-purple-600 hover:underline">새 문의하기</a>
-                    </div>
-                    <div class="p-6 space-y-4" id="consultingList">
-                        <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
-                    </div>
-                </section>
+                        <%-- 3. 맞춤 정책 지원 스크랩 --%>
+                        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                    <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500"></i> 관심 정책 목록
+                                </h2>
+                                <a href="/policy" class="text-sm font-medium text-indigo-600 hover:underline">더보기</a>
+                            </div>
+                            <div class="p-6 space-y-4" id="scrapList">
+                                <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
+                            </div>
+                        </section>
 
-            </div>
+                        <%-- 4. 컨설팅 진행 현황 --%>
+                        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                    <i data-lucide="network" class="w-5 h-5 text-purple-500"></i> 컨설팅 진행 현황
+                                </h2>
+                                <a href="/consulting" class="text-sm font-medium text-purple-600 hover:underline">새 문의하기</a>
+                            </div>
+                            <div class="p-6 space-y-4" id="consultingList">
+                                <p class="text-sm text-slate-400 text-center py-4">불러오는 중...</p>
+                            </div>
+                        </section>
 
+                    </div>
+
+                </div>
         </div>
     </main>
 
