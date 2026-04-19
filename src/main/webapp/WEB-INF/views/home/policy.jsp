@@ -210,9 +210,14 @@
                         '<p class="text-xs text-slate-400 mb-1">운영 기관</p>' +
                         '<p class="text-sm font-extrabold text-slate-900">' + escapeHtml(p.institution) + '</p>' +
                     '</div>' +
-                    '<div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">' +
-                        '<i data-lucide="arrow-right" class="w-5 h-5"></i>' +
-                    '</div>' +
+                    (p.detailUrl
+                        ? '<a href="' + escapeHtml(p.detailUrl) + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">' +
+                              '<i data-lucide="arrow-right" class="w-5 h-5"></i>' +
+                          '</a>'
+                        : '<div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-colors">' +
+                              '<i data-lucide="arrow-right" class="w-5 h-5"></i>' +
+                          '</div>'
+                    ) +
                 '</div>' +
             '</div>';
     }

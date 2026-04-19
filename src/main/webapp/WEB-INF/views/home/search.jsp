@@ -222,7 +222,14 @@
                                             <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold">유형: ${p.category}</span>
                                         </div>
                                     </div>
-                                    <a href="/policy" class="shrink-0 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">상세보기</a>
+                                    <c:choose>
+                                        <c:when test="${not empty p.detailUrl}">
+                                            <a href="${p.detailUrl}" target="_blank" rel="noopener noreferrer" class="shrink-0 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">바로가기</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a href="/policy" class="shrink-0 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-blue-600 transition-all shadow-lg shadow-slate-200">바로가기</a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </c:forEach>
                         </c:otherwise>

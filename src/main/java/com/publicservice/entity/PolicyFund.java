@@ -42,4 +42,7 @@ public class PolicyFund {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "detail_url", length = 500)
+    private String detailUrl;
 }
