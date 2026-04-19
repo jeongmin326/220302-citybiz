@@ -52,12 +52,12 @@
                         <%-- [Backend/DB] Spring Security 적용 또는 HttpSession에 로그인 사용자 정보(loginUser, loginName)가 담겨 넘어오는 시점에 활성화됩니다. --%>
                         <c:when test="${not empty sessionScope.loginUser}">
                             <div class="flex items-center gap-4">
-                                <div class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm text-sm font-medium">
+                                <a href="${sessionScope.loginRole == 'PROVIDER' ? '/mypage/spaceManagement' : sessionScope.loginRole == 'EXPERT' ? '/mypage/expertManagement' : '/mypage/status'}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm text-sm font-medium hover:border-blue-300 hover:shadow-md transition-all">
                                     <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-inner">
                                         ${fn:substring(sessionScope.loginName, 0, 1)}
                                     </div>
                                     <span class="text-slate-700"><strong class="text-slate-900">${sessionScope.loginName}</strong> 님</span>
-                                </div>
+                                </a>
                                 <a href="/logout" class="text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors flex items-center gap-1.5">
                                     <i data-lucide="log-out" class="w-4 h-4"></i> 로그아웃
                                 </a>
