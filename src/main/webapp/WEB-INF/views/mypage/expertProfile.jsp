@@ -49,7 +49,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">성명 <span class="text-rose-500">*</span></label>
-                            <input type="text" name="name" value="${profile.name}" placeholder="홍길동" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <input type="text" name="name" value="${profile.name}" placeholder="홍길동" readonly class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm cursor-not-allowed" required>
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">사무실명 <span class="text-rose-500">*</span></label>
@@ -57,7 +57,16 @@
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">전화번호 <span class="text-rose-500">*</span></label>
-                            <input type="tel" name="phone" value="${profile.phone}" placeholder="예: 02-1234-5678" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <div class="flex gap-2">
+                                <input type="tel" id="phoneInput" name="phone" value="${profile.phone}"
+                                       placeholder="예: 01012345678" readonly
+                                       class="flex-1 px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all cursor-not-allowed"
+                                       required>
+                                <button type="button" id="phoneEditBtn"
+                                        class="px-4 py-3 bg-slate-700 text-white text-xs font-bold rounded-xl whitespace-nowrap hover:bg-slate-800 transition-colors">
+                                    번호 수정
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -187,10 +196,105 @@
             }).open();
         }
 
+        // === 전화번호 수정 및 인증 ===
+        const originalPhone = '${profile.phone}';
+        let isPhoneVerified = true; // 기존 번호는 인증된 상태로 시작
+        let phoneEditMode = false;
+
+        const phoneInput = document.getElementById('phoneInput');
+        const phoneEditBtn = document.getElementById('phoneEditBtn');
+
+        phoneEditBtn.addEventListener('click', async function () {
+            if (!phoneEditMode) {
+                // 수정 모드 진입
+                phoneInput.readOnly = false;
+                phoneInput.classList.remove('bg-slate-100', 'cursor-not-allowed');
+                phoneInput.classList.add('bg-slate-50');
+                phoneInput.focus();
+                phoneEditBtn.textContent = '인증하기';
+                phoneEditBtn.classList.remove('bg-slate-700', 'hover:bg-slate-800', 'bg-green-600');
+                phoneEditBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                phoneEditMode = true;
+                isPhoneVerified = false;
+                return;
+            }
+
+            // 인증 시도
+            const phone = phoneInput.value.trim();
+            if (!phone || !/^01[0-9]{9}$/.test(phone)) {
+                alert('올바른 휴대폰 번호를 입력해주세요. (예: 01012345678)');
+                return;
+            }
+
+            // 원래 번호와 동일하면 인증 없이 복귀
+            if (phone === originalPhone) {
+                setPhoneReadonly('번호 수정');
+                isPhoneVerified = true;
+                return;
+            }
+
+            try {
+                const res = await fetch('/check-phone?phone=' + encodeURIComponent(phone));
+                const data = await res.json();
+
+                if (data.error) {
+                    alert('전화번호 확인 중 오류가 발생했습니다.');
+                    return;
+                }
+                if (data.exists) {
+                    alert('이미 사용 중인 전화번호입니다.');
+                    return;
+                }
+
+                alert('인증번호가 발송되었습니다. (테스트 번호: 1234)');
+                const code = prompt('휴대폰으로 전송된 인증번호 4자리를 입력해주세요.');
+                if (code === '1234') {
+                    alert('본인 인증이 완료되었습니다.');
+                    isPhoneVerified = true;
+                    phoneEditMode = false;
+                    phoneInput.readOnly = true;
+                    phoneInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+                    phoneInput.classList.remove('bg-slate-50');
+                    phoneEditBtn.textContent = '인증완료';
+                    phoneEditBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                    phoneEditBtn.classList.add('bg-green-600');
+                    phoneEditBtn.disabled = true;
+                } else if (code !== null) {
+                    alert('인증번호가 일치하지 않습니다. 다시 시도해주세요.');
+                }
+            } catch (e) {
+                alert('전화번호 확인 중 서버 통신에 실패했습니다.');
+            }
+        });
+
+        phoneInput.addEventListener('input', function () {
+            if (!phoneEditMode) return;
+            isPhoneVerified = false;
+            phoneEditBtn.textContent = '인증하기';
+            phoneEditBtn.classList.remove('bg-green-600');
+            phoneEditBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+            phoneEditBtn.disabled = false;
+        });
+
+        function setPhoneReadonly(btnText) {
+            phoneInput.readOnly = true;
+            phoneInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+            phoneInput.classList.remove('bg-slate-50');
+            phoneEditBtn.textContent = btnText;
+            phoneEditBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700', 'bg-green-600');
+            phoneEditBtn.classList.add('bg-slate-700', 'hover:bg-slate-800');
+            phoneEditBtn.disabled = false;
+            phoneEditMode = false;
+        }
+
         document.getElementById('expertProfileForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             if (!document.getElementById('cityHidden').value || !document.getElementById('roadAddrHidden').value) {
                 alert('주소를 검색하여 선택해 주세요.');
+                return;
+            }
+            if (!isPhoneVerified) {
+                alert('전화번호 인증을 완료해주세요.');
                 return;
             }
             if (geocodingPromise) await geocodingPromise;

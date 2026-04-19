@@ -11,6 +11,7 @@ import com.publicservice.repository.LaborAttorneyRepository;
 import com.publicservice.repository.LawyerRepository;
 import com.publicservice.repository.PatentAttorneyRepository;
 import com.publicservice.repository.TaxAccountantRepository;
+import com.publicservice.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import org.springframework.http.ResponseEntity;
@@ -27,17 +28,20 @@ public class ExpertProfileController {
     private final LaborAttorneyRepository laborAttorneyRepository;
     private final LawyerRepository lawyerRepository;
     private final PatentAttorneyRepository patentAttorneyRepository;
+    private final UserRepository userRepository;
 
     public ExpertProfileController(TaxAccountantRepository taxAccountantRepository,
                                    AccountantRepository accountantRepository,
                                    LaborAttorneyRepository laborAttorneyRepository,
                                    LawyerRepository lawyerRepository,
-                                   PatentAttorneyRepository patentAttorneyRepository) {
+                                   PatentAttorneyRepository patentAttorneyRepository,
+                                   UserRepository userRepository) {
         this.taxAccountantRepository = taxAccountantRepository;
         this.accountantRepository = accountantRepository;
         this.laborAttorneyRepository = laborAttorneyRepository;
         this.lawyerRepository = lawyerRepository;
         this.patentAttorneyRepository = patentAttorneyRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/profile")
@@ -87,6 +91,12 @@ public class ExpertProfileController {
                 return ResponseEntity.badRequest().body("올바르지 않은 전문가 유형입니다.");
             }
         }
+
+        userRepository.findById(userId).ifPresent(user -> {
+            user.setPhone(req.getPhone());
+            userRepository.save(user);
+        });
+
         return ResponseEntity.ok("프로필이 저장되었습니다.");
     }
 
