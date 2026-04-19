@@ -158,6 +158,7 @@ public class HomeController {
                 profile.setExpertType("세무사");
                 profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
                 profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                profile.setDetailAddress(e.getDetailAddress());
                 profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
                 profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
                 found = true;
@@ -169,6 +170,7 @@ public class HomeController {
                     profile.setExpertType("회계사");
                     profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
                     profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                    profile.setDetailAddress(e.getDetailAddress());
                     profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
                     profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
                     found = true;
@@ -181,6 +183,7 @@ public class HomeController {
                     profile.setExpertType("노무사");
                     profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
                     profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                    profile.setDetailAddress(e.getDetailAddress());
                     profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
                     profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
                     found = true;
@@ -193,6 +196,20 @@ public class HomeController {
                     profile.setExpertType("변호사");
                     profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
                     profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                    profile.setDetailAddress(e.getDetailAddress());
+                    profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    found = true;
+                }
+            }
+            if (!found) {
+                java.util.Optional<com.publicservice.entity.PatentAttorney> patent = patentAttorneyRepository.findByUserId(userId);
+                if (patent.isPresent()) {
+                    com.publicservice.entity.PatentAttorney e = patent.get();
+                    profile.setExpertType("변리사");
+                    profile.setName(e.getName()); profile.setOffice(e.getOffice()); profile.setPhone(e.getPhone());
+                    profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
+                    profile.setDetailAddress(e.getDetailAddress());
                     profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
                     profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
                     found = true;

@@ -28,7 +28,7 @@
         <div class="mb-8">
             <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">공급자(Host) 전용</span>
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">공간 수정하기</h1>
-            <p class="text-slate-500 mt-2">기존 공간 정보를 수정합니다. 변경 후 저장하면 즉시 반영됩니다.</p>
+            <p class="text-slate-500 mt-2">공간의 첫인상을 다듬어 보세요. 정확한 정보가 더 많은 연결을 만듭니다.</p>
         </div>
 
         <form id="editForm" enctype="multipart/form-data" class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
@@ -142,7 +142,7 @@
                 <%-- 섹션 3: 가격 --%>
                 <section>
                     <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-5 flex items-center gap-2">
-                        <i data-lucide="credit-card" class="w-5 h-5 text-purple-500"></i> 대여료 및 이용 시간
+                        <i data-lucide="credit-card" class="w-5 h-5 text-purple-500"></i> 대여료
                     </h2>
 
                     <div class="space-y-6">

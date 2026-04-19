@@ -23,53 +23,54 @@
     <jsp:include page="../common/header.jsp" />
     
     <%-- 2. 메인 컨텐츠 영역 --%>
-    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-12">
         
         <%-- 상단 헤더 영역 --%>
-        <div class="mb-10">
-            <h1 class="text-3xl font-bold text-slate-900 tracking-tight">내 활동 내역</h1>
+        <div class="mb-8">
+            <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">내 활동 현황</span>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">내 활동 내역</h1>
             <p class="text-slate-500 mt-2">${not empty sessionScope.loginName ? sessionScope.loginName : '사용자'}님의 비즈니스 활동 현황입니다.</p>
         </div>
 
         <%-- 1. 대시보드 요약 (Overview) --%>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-5">
-                <div class="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                    <i data-lucide="calendar-check" class="w-7 h-7"></i>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-blue-100 p-4 rounded-2xl text-blue-600">
+                    <i data-lucide="calendar-check" class="w-8 h-8"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-slate-500">다가오는 예약</p>
-                    <p class="text-2xl font-bold text-slate-900 mt-1"><span id="upcomingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                    <p class="text-sm font-semibold text-slate-500">다가오는 예약</p>
+                    <p class="text-2xl font-bold text-slate-900"><span id="upcomingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-5">
-                <div class="w-14 h-14 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
-                    <i data-lucide="bookmark" class="w-7 h-7"></i>
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-indigo-100 p-4 rounded-2xl text-indigo-600">
+                    <i data-lucide="bookmark" class="w-8 h-8"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-slate-500">스크랩한 정책</p>
-                    <p class="text-2xl font-bold text-slate-900 mt-1"><span id="scrapCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                    <p class="text-sm font-semibold text-slate-500">스크랩한 정책</p>
+                    <p class="text-2xl font-bold text-slate-900"><span id="scrapCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
                 </div>
             </div>
-            <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex items-center gap-5">
-                <div class="w-14 h-14 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
-                    <i data-lucide="message-square" class="w-7 h-7"></i>
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-purple-100 p-4 rounded-2xl text-purple-600">
+                    <i data-lucide="message-square" class="w-8 h-8"></i>
                 </div>
                 <div>
-                    <p class="text-sm font-medium text-slate-500">진행 중인 컨설팅</p>
-                    <p class="text-2xl font-bold text-slate-900 mt-1"><span id="consultingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                    <p class="text-sm font-semibold text-slate-500">진행 중인 컨설팅</p>
+                    <p class="text-2xl font-bold text-slate-900"><span id="consultingCount">-</span><span class="text-base font-medium text-slate-500 ml-1">건</span></p>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <%-- 좌측 및 중앙 컨텐츠 영역 --%>
-            <div class="lg:col-span-2 space-y-8">
+        <div>
+
+            <%-- 컨텐츠 영역 --%>
+            <div class="space-y-8">
                 
                 <%-- 2. 공간 대여 이용 내역 --%>
-                <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                             <i data-lucide="map-pin" class="w-5 h-5 text-blue-500"></i> 공간 대여 내역
                         </h2>
@@ -81,8 +82,8 @@
                 </section>
 
                 <%-- 3. 맞춤 정책 지원 스크랩 --%>
-                <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                             <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-500"></i> 관심 정책 목록
                         </h2>
@@ -94,8 +95,8 @@
                 </section>
 
                 <%-- 4. 컨설팅 진행 현황 --%>
-                <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                             <i data-lucide="network" class="w-5 h-5 text-purple-500"></i> 컨설팅 진행 현황
                         </h2>
@@ -106,52 +107,6 @@
                     </div>
                 </section>
 
-            </div>
-
-            <%-- 우측 사이드바 영역 (프로필 관리) --%>
-            <div class="lg:col-span-1">
-                <%-- 5. 비즈니스 프로필 관리 --%>
-                <section class="bg-slate-900 rounded-2xl shadow-lg overflow-hidden sticky top-28">
-                    <div class="px-6 py-5 border-b border-slate-700 flex items-center justify-between">
-                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i data-lucide="settings" class="w-5 h-5 text-slate-400"></i> 맞춤 추천 설정
-                        </h2>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-sm text-slate-400 mb-6 leading-relaxed">
-                            아래 비즈니스 정보를 최신 상태로 유지하시면, 기업 조건에 맞는 <strong>지원 사업과 전문가를 더 정확하게 추천</strong>해 드립니다.
-                        </p>
-                        
-                        <form id="profileForm" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">기업명 (또는 예비창업팀명)</label>
-                                <input type="text" id="profileCompanyName" placeholder="기업명을 입력하세요"
-                                       class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-500">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">창업 단계</label>
-                                <select id="profileBusinessStage" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                                    <option value="PRE">예비 창업자</option>
-                                    <option value="EARLY">초기 창업 (3년 이내)</option>
-                                    <option value="GROWTH">도약기 창업 (3~7년)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-slate-400 mb-1">관심 산업군</label>
-                                <select id="profileIndustry" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                                    <option value="IT">IT / 소프트웨어</option>
-                                    <option value="BIO">바이오 / 헬스케어</option>
-                                    <option value="EDU">교육 / 서비스</option>
-                                    <option value="MFG">제조 / 하드웨어</option>
-                                </select>
-                            </div>
-                            <div id="profileMsg" class="hidden text-xs text-center py-1 rounded-lg"></div>
-                            <button type="button" onclick="saveProfile()" class="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-blue-900/50">
-                                정보 업데이트
-                            </button>
-                        </form>
-                    </div>
-                </section>
             </div>
 
         </div>
@@ -331,7 +286,8 @@
                       'class="mt-1.5 text-xs text-rose-500 hover:text-rose-700 hover:underline transition-colors">예약 취소</button>'
                     : '';
 
-                var imgStyle = 'background-image:url(\'/space-images/main/' + r.spaceId + '\')';
+                var imgUrl = r.mainImageUrl || '/space-images/main/0';
+                var imgStyle = 'background-image:url(\'' + imgUrl + '\')';
                 return '<div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:bg-slate-50/60 transition-colors">' +
                     '<div class="flex gap-4 items-center min-w-0">' +
                         '<div class="w-14 h-14 rounded-lg bg-slate-200 bg-cover bg-center flex-shrink-0" style="' + imgStyle + '"></div>' +
@@ -480,52 +436,6 @@
             }
         }
 
-        // ── 프로필 로드 / 저장 ───────────────────────────────────────
-        async function loadUserProfile() {
-            try {
-                var res  = await fetch('/api/user/profile');
-                var data = await res.json();
-                if (data.error) return;
-
-                var companyEl  = document.getElementById('profileCompanyName');
-                var stageEl    = document.getElementById('profileBusinessStage');
-                var industryEl = document.getElementById('profileIndustry');
-
-                if (companyEl  && data.companyName)   companyEl.value  = data.companyName;
-                if (stageEl    && data.businessStage)  stageEl.value    = data.businessStage;
-                if (industryEl && data.industry)       industryEl.value = data.industry;
-            } catch (err) {
-                console.error('프로필 로딩 오류:', err);
-            }
-        }
-
-        async function saveProfile() {
-            var msgEl = document.getElementById('profileMsg');
-            try {
-                var params = new URLSearchParams();
-                params.append('companyName',   document.getElementById('profileCompanyName').value.trim());
-                params.append('businessStage', document.getElementById('profileBusinessStage').value);
-                params.append('industry',      document.getElementById('profileIndustry').value);
-
-                var res  = await fetch('/api/user/profile', { method: 'POST', body: params });
-                var data = await res.json();
-
-                msgEl.classList.remove('hidden');
-                if (data.success) {
-                    msgEl.className = 'text-xs text-center py-1 rounded-lg text-emerald-400';
-                    msgEl.textContent = '저장되었습니다.';
-                } else {
-                    msgEl.className = 'text-xs text-center py-1 rounded-lg text-red-400';
-                    msgEl.textContent = data.error || '저장 실패';
-                }
-                setTimeout(function() { msgEl.classList.add('hidden'); }, 3000);
-            } catch (err) {
-                msgEl.classList.remove('hidden');
-                msgEl.className = 'text-xs text-center py-1 rounded-lg text-red-400';
-                msgEl.textContent = '서버 오류가 발생했습니다.';
-            }
-        }
-
         // ── 채팅 패널 (사용자 측) ──────────────────────────────────────
         let _statusChatRequestId = null;
         let _statusPollTimer = null;
@@ -636,7 +546,6 @@
         loadScrappedPolicies();
         loadMyReservations();
         loadMyConsultings();
-        loadUserProfile();
     </script>
 </body>
 </html>
