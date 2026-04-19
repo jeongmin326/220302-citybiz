@@ -264,15 +264,26 @@
                                         <span class="text-xs font-bold text-slate-400 underline decoration-slate-200 underline-offset-4">
                                             평점 ${c.rating}점 / 경력 ${c.experienceYears}년
                                         </span>
-                                        <button
-                                            data-expert-id="${c.id}"
-                                            data-expert-type="${c.expertType}"
-                                            data-expert-name="${c.name}"
-                                            data-expert-office="${c.office}"
-                                            onclick="openSearchRequestModal(this)"
-                                            class="text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 flex-shrink-0">
-                                            자문요청
-                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <button
+                                                data-expert-id="${c.id}"
+                                                data-expert-type="${c.expertType}"
+                                                data-expert-name="${c.name}"
+                                                data-expert-office="${c.office}"
+                                                onclick="openSearchMapModal(this)"
+                                                class="text-xs font-bold text-white bg-orange-500 hover:bg-orange-600 px-3 py-1.5 rounded-lg transition-colors flex-shrink-0">
+                                                위치 보기
+                                            </button>
+                                            <button
+                                                data-expert-id="${c.id}"
+                                                data-expert-type="${c.expertType}"
+                                                data-expert-name="${c.name}"
+                                                data-expert-office="${c.office}"
+                                                onclick="openSearchRequestModal(this)"
+                                                class="text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 flex-shrink-0">
+                                                자문요청
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </c:forEach>
@@ -816,6 +827,111 @@
             btn.disabled    = false;
             btn.textContent = '자문요청 보내기';
         }
+    };
+</script>
+
+<script type="text/javascript"
+        src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${naverClientId}"></script>
+
+<%-- 위치 보기 모달 --%>
+<div id="searchMapModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSearchMapModal()"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 flex flex-col" style="max-height:90vh;">
+        <div class="flex justify-between items-start px-8 pt-7 pb-5 border-b border-slate-100 shrink-0">
+            <div>
+                <p id="searchMapModalType" class="text-xs font-black tracking-widest uppercase text-purple-600 mb-1"></p>
+                <h3 id="searchMapModalTitle" class="text-xl font-extrabold text-slate-900"></h3>
+            </div>
+            <button onclick="closeSearchMapModal()" class="text-slate-400 hover:text-slate-600 transition-colors mt-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="searchMapModalInfo" class="px-8 py-3 shrink-0 text-sm text-slate-500 flex items-center gap-3">
+            <span id="searchMapModalPhone"></span>
+            <span id="searchMapModalAddress"></span>
+        </div>
+        <div id="searchModalNaverMap" style="width:100%;height:400px;border-radius:0 0 1.5rem 1.5rem;"></div>
+        <div id="searchMapModalNoLocation" class="hidden flex flex-col items-center justify-center py-16 text-slate-400">
+            <p class="text-base font-medium text-slate-500">위치 정보가 등록되지 않은 전문가입니다.</p>
+            <p class="text-sm mt-1">전화 또는 주소로 직접 문의해 주세요.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    var _searchMapInstance = null;
+
+    window.openSearchMapModal = async function (btn) {
+        var expertId     = btn.dataset.expertId;
+        var expertType   = btn.dataset.expertType;
+        var expertName   = btn.dataset.expertName;
+        var expertOffice = btn.dataset.expertOffice;
+
+        document.getElementById('searchMapModalType').textContent  = expertType;
+        document.getElementById('searchMapModalTitle').textContent = expertOffice || expertName;
+        document.getElementById('searchMapModalPhone').textContent   = '';
+        document.getElementById('searchMapModalAddress').textContent = '';
+        document.getElementById('searchModalNaverMap').style.display   = 'block';
+        document.getElementById('searchMapModalNoLocation').classList.add('hidden');
+
+        var modal = document.getElementById('searchMapModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (_searchMapInstance) {
+            _searchMapInstance = null;
+            document.getElementById('searchModalNaverMap').innerHTML = '';
+        }
+
+        try {
+            var typeCodeMap = {'세무사':'tax','회계사':'accountant','노무사':'labor','변호사':'lawyer','변리사':'patent'};
+            var typeCode = typeCodeMap[expertType] || 'tax';
+            var res = await fetch('/experts/map/data?type=' + typeCode + '&id=' + expertId);
+            if (!res.ok) throw new Error('status ' + res.status);
+            var data = await res.json();
+
+            if (data.phone)   document.getElementById('searchMapModalPhone').textContent   = data.phone;
+            if (data.address) document.getElementById('searchMapModalAddress').textContent = data.address;
+
+            if (!data.latitude || !data.longitude) {
+                document.getElementById('searchModalNaverMap').style.display = 'none';
+                document.getElementById('searchMapModalNoLocation').classList.remove('hidden');
+                return;
+            }
+
+            var lat = parseFloat(data.latitude);
+            var lng = parseFloat(data.longitude);
+            _searchMapInstance = new naver.maps.Map('searchModalNaverMap', {
+                center: new naver.maps.LatLng(lat, lng),
+                zoom: 17
+            });
+            var marker = new naver.maps.Marker({
+                position: new naver.maps.LatLng(lat, lng),
+                map: _searchMapInstance
+            });
+            var phoneHtml = data.phone ? '<div style="font-size:12px;color:#64748b;margin-top:3px;">' + data.phone + '</div>' : '';
+            var infowindow = new naver.maps.InfoWindow({
+                content: '<div style="padding:12px 16px;font-family:sans-serif;min-width:160px">'
+                    + '<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:3px;">' + (data.office || expertOffice) + '</div>'
+                    + '<div style="font-size:12px;color:#64748b;">' + expertType + ' · ' + (data.name || expertName) + '</div>'
+                    + phoneHtml
+                    + '</div>',
+                borderRadius: '12px'
+            });
+            infowindow.open(_searchMapInstance, marker);
+        } catch (e) {
+            console.error('[SearchMapModal] error:', e);
+            document.getElementById('searchModalNaverMap').style.display = 'none';
+            document.getElementById('searchMapModalNoLocation').classList.remove('hidden');
+        }
+    };
+
+    window.closeSearchMapModal = function () {
+        var modal = document.getElementById('searchMapModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        _searchMapInstance = null;
+        document.getElementById('searchModalNaverMap').innerHTML = '';
     };
 </script>
 

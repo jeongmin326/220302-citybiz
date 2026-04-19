@@ -307,6 +307,14 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         }
 
+        const expertTypeCodeMap = {
+            '세무사': 'tax', '회계사': 'accountant',
+            '노무사': 'labor', '변호사': 'lawyer', '변리사': 'patent'
+        };
+        function getExpertTypeCode(expertType) {
+            return expertTypeCodeMap[expertType] || 'tax';
+        }
+
         function getFieldLabel(fieldCode) {
             return fieldLabels[fieldCode] || fieldCode || '전문 분야';
         }
@@ -471,7 +479,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '</div>'
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
-                + '<button class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>'
+                + '<button onclick="openMapModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">위치 보기</button>'
                 + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
                 + '</div>'
                 + '</div>'
@@ -481,7 +489,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '</div>'
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
-                + '<button class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자세히 보기</button>'
+                + '<button onclick="openMapModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">위치 보기</button>'
                 + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
                 + '</div>'
                 + '</div>'
@@ -839,6 +847,113 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         setTimeout(function () { toast.style.opacity = '0'; }, 2500);
         setTimeout(function () { toast.remove(); }, 3000);
     }
+</script>
+
+<%-- 네이버 지도 SDK --%>
+<script type="text/javascript"
+        src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${naverClientId}"></script>
+
+<%-- 위치 보기 모달 --%>
+<div id="mapModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeMapModal()"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+            <div>
+                <h3 id="mapModalTitle" class="text-lg font-extrabold text-slate-900"></h3>
+                <p id="mapModalInfo" class="text-sm text-slate-500 mt-0.5"></p>
+            </div>
+            <button onclick="closeMapModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <div id="modalNaverMap" style="width:100%;height:420px;"></div>
+        <div id="mapModalNoLocation" class="hidden flex-col items-center justify-center py-16 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+            <p class="text-sm font-medium text-slate-500">위치 정보가 등록되지 않은 전문가입니다.</p>
+            <p class="text-xs mt-1">전화 또는 주소로 직접 문의해 주세요.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    var _currentMapInstance = null;
+
+    window.openMapModal = async function (expertId, expertType, expertName, expertOffice) {
+        const modal = document.getElementById('mapModal');
+        document.getElementById('mapModalTitle').textContent = expertOffice;
+        document.getElementById('mapModalInfo').textContent  = expertType + ' · ' + expertName;
+        document.getElementById('modalNaverMap').style.display = 'block';
+        document.getElementById('mapModalNoLocation').classList.add('hidden');
+        document.getElementById('mapModalNoLocation').classList.remove('flex');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (_currentMapInstance) {
+            _currentMapInstance.destroy();
+            _currentMapInstance = null;
+        }
+
+        try {
+            const typeCodeMap = {'세무사':'tax','회계사':'accountant','노무사':'labor','변호사':'lawyer','변리사':'patent'};
+            const typeCode = typeCodeMap[expertType] || 'tax';
+            const url = '/experts/map/data?type=' + typeCode + '&id=' + expertId;
+            const res  = await fetch(url);
+            if (!res.ok) throw new Error('status ' + res.status);
+            const data = await res.json();
+
+            if (!data.latitude || !data.longitude) {
+                document.getElementById('modalNaverMap').style.display = 'none';
+                document.getElementById('mapModalNoLocation').classList.remove('hidden');
+                document.getElementById('mapModalNoLocation').classList.add('flex');
+                return;
+            }
+
+            if (data.phone) {
+                document.getElementById('mapModalInfo').textContent =
+                    expertType + ' · ' + expertName + ' · ' + data.phone;
+            }
+
+            var lat = parseFloat(data.latitude);
+            var lng = parseFloat(data.longitude);
+
+            _currentMapInstance = new naver.maps.Map('modalNaverMap', {
+                center: new naver.maps.LatLng(lat, lng),
+                zoom: 17
+            });
+
+            var marker = new naver.maps.Marker({
+                position: new naver.maps.LatLng(lat, lng),
+                map: _currentMapInstance
+            });
+
+            var phone = data.phone
+                ? '<div style="font-size:12px;color:#64748b;margin-top:3px;">' + data.phone + '</div>'
+                : '';
+            var infowindow = new naver.maps.InfoWindow({
+                content: '<div style="padding:12px 16px;font-family:sans-serif;min-width:150px">'
+                    + '<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:2px;">' + data.office + '</div>'
+                    + '<div style="font-size:12px;color:#64748b;">' + data.expertType + ' · ' + data.name + '</div>'
+                    + phone + '</div>',
+                borderRadius: '12px'
+            });
+            infowindow.open(_currentMapInstance, marker);
+
+        } catch (e) {
+            document.getElementById('modalNaverMap').style.display = 'none';
+            document.getElementById('mapModalNoLocation').classList.remove('hidden');
+            document.getElementById('mapModalNoLocation').classList.add('flex');
+        }
+    };
+
+    window.closeMapModal = function () {
+        const modal = document.getElementById('mapModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        if (_currentMapInstance) {
+            _currentMapInstance.destroy();
+            _currentMapInstance = null;
+        }
+    };
 </script>
 
 <%-- 푸터 파일 로드 --%>

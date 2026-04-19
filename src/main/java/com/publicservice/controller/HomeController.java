@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,9 @@ public class HomeController {
     private final LaborAttorneyRepository laborAttorneyRepository;
     private final LawyerRepository lawyerRepository;
     private final UserRepository userRepository;
+
+    @Value("${naver.maps.client.id:}")
+    private String naverClientId;
 
     public HomeController(PolicyFundRepository policyFundRepository,
                           SpaceRepository spaceRepository,
@@ -77,8 +81,9 @@ public class HomeController {
 
     // 컨설팅 페이지 매핑
     @GetMapping("/consulting")
-    public String consultingPage() {
-        return "home/consulting"; 
+    public String consultingPage(org.springframework.ui.Model model) {
+        model.addAttribute("naverClientId", naverClientId);
+        return "home/consulting";
     }
     // 마이페이지(User) 매핑
     @GetMapping("/mypage/status")
@@ -203,6 +208,7 @@ public class HomeController {
     public String searchPage(@RequestParam(name = "keyword", required = false) String keyword,
                              @RequestParam(name = "region", required = false) String region,
                              Model model) {
+        model.addAttribute("naverClientId", naverClientId);
         // 정책자금 검색
         if (keyword != null && !keyword.isBlank()) {
             List<PolicyFund> policyResults = policyFundRepository.searchByKeyword(keyword.trim());
