@@ -45,7 +45,6 @@
                                     </div>
                                     <span class="text-slate-700">
                                         <strong class="text-slate-900">${sessionScope.loginName}</strong> 님
-                                        <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded ml-1 text-slate-500">${sessionScope.loginRole}</span>
                                     </span>
                                 </div>
                                 <a href="/logout" class="text-sm font-medium text-slate-500 hover:text-rose-500 transition-colors flex items-center gap-1.5">
