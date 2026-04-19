@@ -63,7 +63,7 @@ public class SpaceController {
     // ---------------------------------------------------------------
     @GetMapping
     public Map<String, Object> getSpaces(
-            @RequestParam(name = "region",     required = false) String region,
+            @RequestParam(name = "city",       required = false) String city,
             @RequestParam(name = "district",   required = false) String district,
             @RequestParam(name = "keyword",    required = false) String keyword,
             @RequestParam(name = "spaceTypes", required = false) List<String> spaceTypes,
@@ -80,8 +80,8 @@ public class SpaceController {
 
         Specification<Space> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (region     != null && !region.isBlank())
-                predicates.add(cb.equal(root.get("region"), region));
+            if (city       != null && !city.isBlank())
+                predicates.add(cb.equal(root.get("city"), city));
             if (district   != null && !district.isBlank())
                 predicates.add(cb.equal(root.get("district"), district));
             if (keyword    != null && !keyword.isBlank())
@@ -149,9 +149,9 @@ public class SpaceController {
             @RequestParam("name")                              String name,
             @RequestParam("spaceType")                         String spaceType,
             @RequestParam("description")                       String description,
-            @RequestParam("region")                            String region,
+            @RequestParam("city")                              String city,
             @RequestParam("district")                          String district,
-            @RequestParam("address")                           String address,
+            @RequestParam("roadAddress")                       String roadAddress,
             @RequestParam(value = "detailAddress", defaultValue = "") String detailAddress,
             @RequestParam("maxCapacity")                       int capacity,
             @RequestParam("pricePerHour")                      int pricePerHour,
@@ -165,16 +165,17 @@ public class SpaceController {
             return ResponseEntity.status(401).body(result);
         }
 
-        String fullAddress = detailAddress.isBlank() ? address : address + " " + detailAddress;
+        String fullAddr = detailAddress.isBlank() ? roadAddress : roadAddress + " " + detailAddress;
 
         Space space = new Space();
         space.setHostId(hostId);
         space.setName(name);
         space.setSpaceType(spaceType);
         space.setDescription(description);
-        space.setRegion(region);
+        space.setCity(city);
         space.setDistrict(district);
-        space.setAddress(fullAddress);
+        space.setRoadAddress(roadAddress);
+        space.setAddr(fullAddr);
         space.setCapacity(capacity);
         space.setPricePerHour(pricePerHour);
         space.setAvailableYn("Y");
@@ -282,7 +283,7 @@ public class SpaceController {
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("reservationId", r.getReservationId());
             item.put("spaceName",     sp != null ? sp.getName()    : "알 수 없음");
-            item.put("spaceAddress",  sp != null ? sp.getAddress() : "");
+            item.put("spaceAddress",  sp != null ? sp.getAddr() : "");
             item.put("mainImageUrl",  sp != null ? "/space-images/main/" + sp.getSpaceId() : null);
             item.put("useDate",       r.getUseDate().toString());
             item.put("startTime",     r.getStartTime().toString());
@@ -417,7 +418,7 @@ public class SpaceController {
             Map<String, Object> item = new LinkedHashMap<>();
             item.put("spaceId",      s.getSpaceId());
             item.put("name",         s.getName());
-            item.put("region",       s.getRegion());
+            item.put("city",         s.getCity());
             item.put("district",     s.getDistrict());
             item.put("spaceType",    s.getSpaceType());
             item.put("pricePerHour", s.getPricePerHour());
@@ -437,9 +438,9 @@ public class SpaceController {
             @RequestParam("name")                              String name,
             @RequestParam("spaceType")                         String spaceType,
             @RequestParam("description")                       String description,
-            @RequestParam("region")                            String region,
+            @RequestParam("city")                              String city,
             @RequestParam("district")                          String district,
-            @RequestParam("address")                           String address,
+            @RequestParam("roadAddress")                       String roadAddress,
             @RequestParam(value = "detailAddress", defaultValue = "") String detailAddress,
             @RequestParam("maxCapacity")                       int capacity,
             @RequestParam("pricePerHour")                      int pricePerHour,
@@ -472,13 +473,14 @@ public class SpaceController {
             }
         }
 
-        String fullAddress = detailAddress.isBlank() ? address : address + " " + detailAddress;
+        String fullAddr = detailAddress.isBlank() ? roadAddress : roadAddress + " " + detailAddress;
         space.setName(name);
         space.setSpaceType(spaceType);
         space.setDescription(description);
-        space.setRegion(region);
+        space.setCity(city);
         space.setDistrict(district);
-        space.setAddress(fullAddress);
+        space.setRoadAddress(roadAddress);
+        space.setAddr(fullAddr);
         space.setCapacity(capacity);
         space.setPricePerHour(pricePerHour);
         space.setAvailableYn("Y");

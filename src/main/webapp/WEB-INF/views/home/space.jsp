@@ -54,7 +54,7 @@
                                 <i data-lucide="map-pin" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
                                 <select id="regionSelect" onchange="onRegionChange()" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all appearance-none cursor-pointer">
                                     <option value="">전체 지역</option>
-                                    <option value="서울">서울</option>
+                                    <option value="서울특별시">서울특별시</option>
                                 </select>
                             </div>
                             <div class="relative">
@@ -229,7 +229,7 @@
         document.getElementById('modalSpaceId').value            = space.spaceId;
         document.getElementById('modalSpaceType').textContent    = getSpaceTypeLabel(space.spaceType);
         document.getElementById('modalSpaceName').textContent    = space.name;
-        document.getElementById('modalSpaceAddress').textContent = space.address;
+        document.getElementById('modalSpaceAddress').textContent = space.addr;
         document.getElementById('modalPrice').textContent        = Number(space.pricePerHour).toLocaleString() + '원 / 시간';
         document.getElementById('modalCapacity').textContent     = space.capacity;
 
@@ -478,6 +478,68 @@
         }
     }
 
+    var _currentSpaceMapInstance = null;
+
+    function openSpaceMap(spaceId) {
+        const space = spacesData[spaceId];
+        if (!space) return;
+
+        const modal = document.getElementById('spaceMapModal');
+        document.getElementById('spaceMapModalTitle').textContent = space.name;
+        document.getElementById('spaceMapModalInfo').textContent  = space.addr || '';
+        document.getElementById('spaceModalNaverMap').style.display = 'block';
+        document.getElementById('spaceMapModalNoLocation').classList.add('hidden');
+        document.getElementById('spaceMapModalNoLocation').classList.remove('flex');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        if (_currentSpaceMapInstance) {
+            _currentSpaceMapInstance.destroy();
+            _currentSpaceMapInstance = null;
+        }
+
+        const addr = space.addr || space.roadAddress || '';
+
+        if (!space.latitude || !space.longitude) {
+            document.getElementById('spaceModalNaverMap').style.display = 'none';
+            document.getElementById('spaceMapModalNoLocation').classList.remove('hidden');
+            document.getElementById('spaceMapModalNoLocation').classList.add('flex');
+            return;
+        }
+
+        const lat = parseFloat(space.latitude);
+        const lng = parseFloat(space.longitude);
+
+        _currentSpaceMapInstance = new naver.maps.Map('spaceModalNaverMap', {
+            center: new naver.maps.LatLng(lat, lng),
+            zoom: 17
+        });
+
+        var marker = new naver.maps.Marker({
+            position: new naver.maps.LatLng(lat, lng),
+            map: _currentSpaceMapInstance
+        });
+
+        var infowindow = new naver.maps.InfoWindow({
+            content: '<div style="padding:12px 16px;font-family:sans-serif;min-width:150px">'
+                + '<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:2px;">' + space.name + '</div>'
+                + '<div style="font-size:12px;color:#64748b;">' + addr + '</div>'
+                + '</div>',
+            borderRadius: '12px'
+        });
+        infowindow.open(_currentSpaceMapInstance, marker);
+    }
+
+    function closeSpaceMapModal() {
+        const modal = document.getElementById('spaceMapModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        if (_currentSpaceMapInstance) {
+            _currentSpaceMapInstance.destroy();
+            _currentSpaceMapInstance = null;
+        }
+    }
+
     // ── AI/ML ──────────────────────────────────────────────────────
     async function requestAiRecommendation() {
         try {
@@ -489,7 +551,7 @@
 
     // 서울 25개 구 목록
     const districtMap = {
-        '서울': [
+        '서울특별시': [
             '강남구', '강동구', '강북구', '강서구', '관악구',
             '광진구', '구로구', '금천구', '노원구', '도봉구',
             '동대문구', '동작구', '마포구', '서대문구', '서초구',
@@ -561,7 +623,7 @@
         const keyword = document.getElementById('spaceKeyword').value.trim();
 
         return {
-            region: region,
+            city: region,
             district: district,
             keyword: keyword,
             spaceTypes: spaceTypes,
@@ -629,8 +691,8 @@
             const filters = getSelectedFilters();
             const query = new URLSearchParams();
 
-            if (filters.region) {
-                query.append('region', filters.region);
+            if (filters.city) {
+                query.append('city', filters.city);
             }
             if (filters.district) {
                 query.append('district', filters.district);
@@ -683,21 +745,18 @@
                         '</div>' +
                         '<div class="p-6">' +
                             '<h4 class="font-extrabold text-xl mb-1.5 truncate text-slate-900 group-hover:text-blue-600 transition">' + space.name + '</h4>' +
-                            '<p class="text-sm text-slate-500 flex items-center gap-1.5 mb-4 font-light">' +
-                                '<i data-lucide="map-pin" class="w-4 h-4"></i> ' + space.address +
+                            '<p class="text-sm text-slate-500 flex items-center gap-1.5 font-light">' +
+                                '<i data-lucide="map-pin" class="w-4 h-4"></i> ' + space.addr +
                             '</p>' +
-                            '<div class="flex justify-between items-end border-t border-slate-100 pt-4 mt-auto">' +
-                                '<p class="text-2xl font-extrabold text-slate-900 tracking-tight">' +
-                                    Number(space.pricePerHour).toLocaleString() +
-                                    '<span class="text-sm font-normal text-slate-500">원 / 시간</span>' +
-                                '</p>' +
+                            '<p class="text-2xl font-extrabold text-slate-900 tracking-tight mt-2 mb-4">' +
+                                Number(space.pricePerHour).toLocaleString() +
+                                '<span class="text-sm font-normal text-slate-500">원 / 시간</span>' +
+                            '</p>' +
+                            '<div class="flex gap-2 border-t border-slate-100 pt-4">' +
+                                '<button onclick="openSpaceMap(' + space.spaceId + ')" ' +
+                                    'class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">위치보기</button>' +
                                 '<button onclick="openReservationModal(' + space.spaceId + ')" ' +
-                                    'class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm">' +
-                                    '예약하기' +
-                                '</button>' +
-                                '<span class="hidden flex items-center gap-1 text-sm text-slate-500 font-medium">' +
-                                    '<i data-lucide="users" class="w-4 h-4"></i>' + space.capacity + '명' +
-                                '</span>' +
+                                    'class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">예약하기</button>' +
                             '</div>' +
                         '</div>' +
                     '</div>';
@@ -761,11 +820,11 @@
         loadSpaces(true);
     });
 
-    // search 페이지에서 넘어온 경우 region 자동 적용
-    // region 형식: "서울특별시 강남구" → city="서울특별시", district="강남구"
+    // search 페이지에서 넘어온 경우 city 자동 적용
+    // city 형식: "서울특별시 강남구" → city="서울특별시", district="강남구"
     (function() {
         var params = new URLSearchParams(window.location.search);
-        var region = params.get('region');
+        var region = params.get('city') || params.get('region');
         if (region) {
             var parts = region.split(' ');
             var district = parts.length > 1 ? parts[parts.length - 1] : '';
@@ -882,6 +941,36 @@
                 예약 신청하기
             </button>
         </form>
+    </div>
+</div>
+
+<%-- 네이버 지도 SDK (geocoder 포함) --%>
+<script type="text/javascript"
+        src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${naverClientId}"></script>
+
+<%-- 공간 위치 보기 모달 --%>
+<div id="spaceMapModal" class="fixed inset-0 z-[200] hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeSpaceMapModal()"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden flex flex-col">
+        <div class="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+            <div>
+                <h3 id="spaceMapModalTitle" class="text-lg font-extrabold text-slate-900"></h3>
+                <p id="spaceMapModalInfo" class="text-sm text-slate-500 mt-0.5"></p>
+            </div>
+            <button onclick="closeSpaceMapModal()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div id="spaceModalNaverMap" style="width:100%;height:420px;"></div>
+        <div id="spaceMapModalNoLocation" class="hidden flex-col items-center justify-center py-16 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+            </svg>
+            <p class="text-sm font-medium text-slate-500">위치 정보를 불러올 수 없습니다.</p>
+            <p class="text-xs mt-1">주소를 직접 확인해 주세요.</p>
+        </div>
     </div>
 </div>
 

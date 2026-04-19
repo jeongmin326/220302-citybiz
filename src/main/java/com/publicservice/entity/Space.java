@@ -20,11 +20,14 @@ public class Space {
 
     private String name;
 
-    private String region;
+    private String city;
 
     private String district;
 
-    private String address;
+    @Column(name = "road_address")
+    private String roadAddress;
+
+    private String addr;
 
     @Column(name = "space_type")
     private String spaceType;
@@ -38,6 +41,10 @@ public class Space {
     private String mainImageUrl;
 
     private String description;
+
+    private Double latitude;
+
+    private Double longitude;
 
     @Column(name = "available_yn")
     private String availableYn;

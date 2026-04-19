@@ -69,8 +69,9 @@ public class HomeController {
 
     // 공간 대여 페이지 매핑
     @GetMapping("/space")
-    public String spacePage() {
-        return "home/space"; 
+    public String spacePage(Model model) {
+        model.addAttribute("naverClientId", naverClientId);
+        return "home/space";
     }
 
     // 정책 페이지 매핑
@@ -109,7 +110,7 @@ public class HomeController {
                 List<Space> hostSpaces = spaceRepository.findByHostId(userId);
                 hostSpaces.stream()
                         .filter(s -> "N".equals(s.getAvailableYn())
-                                  && "미설정".equals(s.getRegion()))
+                                  && "미설정".equals(s.getCity()))
                         .findFirst()
                         .ifPresent(draft -> model.addAttribute("draftSpace", draft));
             }

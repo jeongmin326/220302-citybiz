@@ -80,10 +80,10 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-slate-700 mb-2">광역 지역 <span class="text-rose-500">*</span></label>
-                            <select id="regionSelect" name="region" required onchange="onRegionChange()"
+                            <select id="regionSelect" name="city" required onchange="onRegionChange()"
                                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                                 <option value="">지역 선택</option>
-                                <option value="서울" ${space.region == '서울' ? 'selected' : ''}>서울</option>
+                                <option value="서울특별시" ${space.city == '서울특별시' ? 'selected' : ''}>서울</option>
                             </select>
                         </div>
                         <div>
@@ -98,7 +98,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="md:col-span-2">
                             <label class="block text-sm font-semibold text-slate-700 mb-2">도로명 주소 <span class="text-rose-500">*</span></label>
-                            <input type="text" id="address" name="address" required value="${space.address}"
+                            <input type="text" id="roadAddress" name="roadAddress" required value="${space.roadAddress}"
                                 placeholder="예: 서울특별시 강남구 테헤란로 123"
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
                         </div>
@@ -184,12 +184,12 @@
         lucide.createIcons();
 
         const spaceId    = '${space.spaceId}';
-        const savedRegion    = '${space.region}';
+        const savedRegion    = '${space.city}';
         const savedDistrict  = '${space.district}';
 
         // 서울 25개 구 목록
         const districtMap = {
-            '서울': ['강남구','강동구','강북구','강서구','관악구','광진구','구로구','금천구',
+            '서울특별시': ['강남구','강동구','강북구','강서구','관악구','광진구','구로구','금천구',
                      '노원구','도봉구','동대문구','동작구','마포구','서대문구','서초구',
                      '성동구','성북구','송파구','양천구','영등포구','용산구','은평구',
                      '종로구','중구','중랑구']

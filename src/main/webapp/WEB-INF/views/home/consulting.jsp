@@ -84,7 +84,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                             <i data-lucide="map-pin" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
                             <select id="consultingRegionSelect" onchange="onConsultingRegionChange()" class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-300 transition-all appearance-none cursor-pointer">
                                 <option value="">전체 지역</option>
-                                <option value="서울">서울</option>
+                                <option value="서울특별시">서울특별시</option>
                             </select>
                         </div>
                         <div class="relative">
@@ -360,7 +360,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         }
 
         const consultingDistrictMap = {
-            '서울': [
+            '서울특별시': [
                 '강남구', '강동구', '강북구', '강서구', '관악구',
                 '광진구', '구로구', '금천구', '노원구', '도봉구',
                 '동대문구', '동작구', '마포구', '서대문구', '서초구',

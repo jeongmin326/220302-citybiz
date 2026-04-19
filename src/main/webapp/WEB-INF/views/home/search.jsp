@@ -101,8 +101,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
-        <div class="xl:col-span-8 space-y-10">
+    <div class="space-y-10">
 
             <section class="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] overflow-hidden">
                 <div class="p-8 sm:p-10 border-b border-slate-50">
@@ -132,9 +131,9 @@
                                     <thead>
                                         <tr class="bg-slate-50/50 text-slate-500 text-xs font-bold uppercase tracking-widest border-b border-slate-100">
                                             <th class="p-5">공간명</th>
-                                            <th class="p-5">위치</th>
+                                            <th class="p-5">지역</th>
                                             <th class="p-5">수용인원</th>
-                                            <th class="p-5">상태</th>
+                                            <th class="p-5 text-center">위치</th>
                                             <th class="p-5 text-center">예약</th>
                                         </tr>
                                     </thead>
@@ -144,15 +143,14 @@
                                                 <td class="p-5 font-bold text-slate-900">${s.name}</td>
                                                 <td class="p-5 text-slate-500 text-sm">${s.district}</td>
                                                 <td class="p-5 text-slate-500 text-sm">${s.capacity}명</td>
-                                                <td class="p-5">
-                                                    <c:choose>
-                                                        <c:when test="${s.availableYn == 'Y'}">
-                                                            <span class="bg-emerald-50 text-emerald-600 px-2 py-1 rounded-md text-[11px] font-black tracking-tight">AVAILABLE</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="bg-amber-50 text-amber-600 px-2 py-1 rounded-md text-[11px] font-black tracking-tight">WAITING</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                                <td class="p-5 text-center">
+                                                    <button type="button"
+                                                        data-space-name="${s.name}"
+                                                        data-space-address="${s.addr}"
+                                                        data-latitude="${s.latitude}"
+                                                        data-longitude="${s.longitude}"
+                                                        onclick="openSpaceMapInSearch(this)"
+                                                        class="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-lg text-sm font-bold transition-all">위치보기</button>
                                                 </td>
                                                 <td class="p-5 text-center">
                                                     <c:choose>
@@ -161,11 +159,11 @@
                                                                 data-space-id="${s.spaceId}"
                                                                 data-space-name="${s.name}"
                                                                 data-space-type="${s.spaceType}"
-                                                                data-space-address="${s.address}"
+                                                                data-space-address="${s.addr}"
                                                                 data-price="${s.pricePerHour}"
                                                                 data-capacity="${s.capacity}"
                                                                 onclick="openReservationModalFromData(this)"
-                                                                class="text-blue-600 hover:bg-blue-50 px-3 py-1 rounded-lg text-sm font-bold transition-all cursor-pointer">예약하기</button>
+                                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm font-bold transition-all cursor-pointer">예약하기</button>
                                                         </c:when>
                                                         <c:otherwise>
                                                             <span class="text-slate-400 px-3 py-1 text-sm font-bold">대기중</span>
@@ -317,43 +315,26 @@
                     </c:choose>
                 </div>
             </section>
-        </div>
-
-        <aside class="xl:col-span-4 space-y-8">
-            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)]">
-                <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                    <i data-lucide="map" class="w-5 h-5 text-blue-600"></i>
-                    5. 위치 / 길안내
-                </h3>
-                <div class="aspect-square bg-slate-50 rounded-[2rem] border border-dashed border-slate-200 flex flex-col items-center justify-center p-8 text-center">
-                    <div class="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4">
-                        <i data-lucide="navigation" class="w-8 h-8 text-blue-500"></i>
-                    </div>
-                    <p class="text-slate-900 font-bold mb-2">지도 API 영역</p>
-                    <p class="text-slate-400 text-xs leading-relaxed">인근 자원 추천 결과를 기반으로<br>최적의 이동 경로를 표시합니다.</p>
-                </div>
-            </div>
 
             <div class="bg-blue-600 p-8 rounded-[2.5rem] shadow-xl shadow-blue-200 text-white relative overflow-hidden group">
-                <i data-lucide="cpu" class="absolute -right-4 -bottom-4 w-32 h-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform"></i>
-                <h3 class="text-xl font-bold mb-4 relative z-10">6. AI 추천 근거</h3>
-                <ul class="space-y-3 relative z-10">
-                    <li class="flex items-start gap-2 text-sm text-blue-100">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-300 mt-1.5 shrink-0"></span>
-                        현재 지역과의 거리 및 접근성
-                    </li>
-                    <li class="flex items-start gap-2 text-sm text-blue-100">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-300 mt-1.5 shrink-0"></span>
-                        실시간 공간 예약 가능 여부
-                    </li>
-                    <li class="flex items-start gap-2 text-sm text-blue-100">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-300 mt-1.5 shrink-0"></span>
-                        기업 성장 단계별 최적 지원사업
-                    </li>
-                </ul>
+        <i data-lucide="cpu" class="absolute -right-4 -bottom-4 w-32 h-32 text-white/10 rotate-12 group-hover:scale-110 transition-transform"></i>
+        <h3 class="text-xl font-bold mb-4 relative z-10">5. AI 추천 근거</h3>
+        <ul class="space-y-3 relative z-10">
+            <li class="flex items-start gap-2 text-sm text-blue-100">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-300 mt-1.5 shrink-0"></span>
+                현재 지역과의 거리 및 접근성
+            </li>
+            <li class="flex items-start gap-2 text-sm text-blue-100">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-300 mt-1.5 shrink-0"></span>
+                실시간 공간 예약 가능 여부
+            </li>
+            <li class="flex items-start gap-2 text-sm text-blue-100">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-300 mt-1.5 shrink-0"></span>
+                기업 성장 단계별 최적 지원사업
+            </li>
+        </ul>
             </div>
-        </aside>
-    </div>
+        </div>
 </div>
 
 <%-- ── 예약 모달 ──────────────────────────────────────────────────── --%>
@@ -932,6 +913,50 @@
         modal.classList.remove('flex');
         _searchMapInstance = null;
         document.getElementById('searchModalNaverMap').innerHTML = '';
+    };
+
+    window.openSpaceMapInSearch = function (btn) {
+        var spaceName = btn.dataset.spaceName;
+        var spaceAddr = btn.dataset.spaceAddress;
+        var lat = parseFloat(btn.dataset.latitude);
+        var lng = parseFloat(btn.dataset.longitude);
+
+        document.getElementById('searchMapModalType').textContent    = '공간';
+        document.getElementById('searchMapModalTitle').textContent   = spaceName;
+        document.getElementById('searchMapModalPhone').textContent   = '';
+        document.getElementById('searchMapModalAddress').textContent = spaceAddr || '';
+        document.getElementById('searchModalNaverMap').style.display = 'block';
+        document.getElementById('searchMapModalNoLocation').classList.add('hidden');
+
+        var modal = document.getElementById('searchMapModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        _searchMapInstance = null;
+        document.getElementById('searchModalNaverMap').innerHTML = '';
+
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            document.getElementById('searchModalNaverMap').style.display = 'none';
+            document.getElementById('searchMapModalNoLocation').classList.remove('hidden');
+            return;
+        }
+
+        _searchMapInstance = new naver.maps.Map('searchModalNaverMap', {
+            center: new naver.maps.LatLng(lat, lng),
+            zoom: 17
+        });
+        var marker = new naver.maps.Marker({
+            position: new naver.maps.LatLng(lat, lng),
+            map: _searchMapInstance
+        });
+        var infowindow = new naver.maps.InfoWindow({
+            content: '<div style="padding:12px 16px;font-family:sans-serif;min-width:160px">'
+                + '<div style="font-size:13px;font-weight:700;color:#1e293b;margin-bottom:3px;">' + spaceName + '</div>'
+                + '<div style="font-size:12px;color:#64748b;">' + (spaceAddr || '') + '</div>'
+                + '</div>',
+            borderRadius: '12px'
+        });
+        infowindow.open(_searchMapInstance, marker);
     };
 </script>
 

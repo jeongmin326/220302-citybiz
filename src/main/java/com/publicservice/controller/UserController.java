@@ -226,9 +226,10 @@ public class UserController {
                     Space draft = new Space();
                     draft.setHostId(newUser.get().getUserId());
                     draft.setName(companyName.trim());
-                    draft.setRegion("미설정");
+                    draft.setCity("미설정");
                     draft.setDistrict("미설정");
-                    draft.setAddress("미설정");
+                    draft.setRoadAddress("미설정");
+                    draft.setAddr("미설정");
                     draft.setSpaceType(spaceType != null && !spaceType.trim().isEmpty() ? spaceType.trim() : "office");
                     draft.setDescription(spaceDescription != null ? spaceDescription.trim() : "");
                     draft.setPricePerHour(0);
