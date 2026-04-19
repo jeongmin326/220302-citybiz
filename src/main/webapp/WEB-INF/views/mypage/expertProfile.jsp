@@ -133,8 +133,8 @@
                             <input type="number" name="experienceYears" min="0" max="50" value="${profile.experienceYears}" placeholder="예: 10" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-2">상담 가격 (만원) <span class="text-rose-500">*</span></label>
-                            <input type="number" name="price" min="0" value="${profile.price}" placeholder="예: 10" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">상담 가격 (원) <span class="text-rose-500">*</span></label>
+                            <input type="number" name="price" min="0" step="1000" value="${profile.price}" placeholder="예: 30000" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all" required>
                         </div>
                     </div>
                 </section>

@@ -449,6 +449,7 @@ public class SpaceController {
             @RequestParam(value = "latitude",  required = false) Double latitude,
             @RequestParam(value = "longitude", required = false) Double longitude,
             @RequestParam(value = "mainImage", required = false) MultipartFile mainImage,
+            @RequestParam(value = "phone",     required = false) String phone,
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
@@ -462,6 +463,13 @@ public class SpaceController {
         if (spaceOpt.isEmpty() || !hostId.equals(spaceOpt.get().getHostId())) {
             result.put("error", "공간을 찾을 수 없거나 권한이 없습니다.");
             return ResponseEntity.status(403).body(result);
+        }
+
+        if (phone != null && !phone.isBlank()) {
+            userRepository.findById(hostId).ifPresent(u -> {
+                u.setPhone(phone);
+                userRepository.save(u);
+            });
         }
 
         Space space = spaceOpt.get();

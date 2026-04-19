@@ -122,11 +122,11 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                             <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="price" value="3" class="accent-purple-600 w-4 h-4">
+                            <input type="radio" name="price" value="30000" class="accent-purple-600 w-4 h-4">
                             <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">3만원 이하</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="price" value="3-5" class="accent-purple-600 w-4 h-4">
+                            <input type="radio" name="price" value="30000-50000" class="accent-purple-600 w-4 h-4">
                             <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">3만원 ~ 5만원</span>
                         </label>
                     </div>
@@ -349,7 +349,10 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             if (price === null || price === undefined) {
                 return '비용 문의';
             }
-            return String(price) + '만원';
+            var n = Number(price);
+            if (n >= 10000 && n % 10000 === 0) return (n / 10000) + '만원';
+            if (n >= 10000) return Math.floor(n / 10000) + '만 ' + (n % 10000).toLocaleString() + '원';
+            return n.toLocaleString() + '원';
         }
 
         function getRatingLabel(rating) {

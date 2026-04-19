@@ -130,6 +130,10 @@ public class HomeController {
             return "redirect:/mypage/spaceManagement";
         }
         model.addAttribute("space", spaceOpt.get());
+        userRepository.findById(userId).ifPresent(u -> {
+            model.addAttribute("userName", u.getName());
+            model.addAttribute("userPhone", u.getPhone());
+        });
         return "mypage/spaceEdit";
     }
 
