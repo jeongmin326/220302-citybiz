@@ -126,8 +126,8 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                             <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">3만원 이하</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
-                            <input type="radio" name="price" value="5" class="accent-purple-600 w-4 h-4">
-                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">5만원 이하</span>
+                            <input type="radio" name="price" value="3-5" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">3만원 ~ 5만원</span>
                         </label>
                     </div>
                 </div>
@@ -139,6 +139,10 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                         <label class="flex items-center gap-3 cursor-pointer group">
                             <input type="radio" name="experienceYears" value="all" class="accent-purple-600 w-4 h-4" checked>
                             <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">전체보기</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group">
+                            <input type="radio" name="experienceYears" value="max4" class="accent-purple-600 w-4 h-4">
+                            <span class="text-sm font-medium text-slate-700 group-hover:text-purple-600 transition-colors">5년 이하</span>
                         </label>
                         <label class="flex items-center gap-3 cursor-pointer group">
                             <input type="radio" name="experienceYears" value="5" class="accent-purple-600 w-4 h-4">
@@ -410,8 +414,18 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 district: district,
                 minRating: rating && rating.value !== 'all' ? rating.value : '',
                 consultTime: consultTime,
-                minExperienceYears: experienceYears && experienceYears.value !== 'all' ? experienceYears.value : '',
-                maxPrice: price && price.value !== 'all' ? price.value : ''
+                minExperienceYears: (experienceYears && experienceYears.value !== 'all' && experienceYears.value !== 'max4') ? experienceYears.value : '',
+                maxExperienceYears: (experienceYears && experienceYears.value === 'max4') ? '4' : '',
+                minPrice: (function() {
+                    if (!price || price.value === 'all') return '';
+                    var parts = price.value.split('-');
+                    return parts.length === 2 ? parts[0] : '';
+                })(),
+                maxPrice: (function() {
+                    if (!price || price.value === 'all') return '';
+                    var parts = price.value.split('-');
+                    return parts.length === 2 ? parts[1] : price.value;
+                })()
             };
         }
 
@@ -560,6 +574,12 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             }
             if (selectedFilters.minExperienceYears) {
                 query.append('minExperienceYears', selectedFilters.minExperienceYears);
+            }
+            if (selectedFilters.maxExperienceYears) {
+                query.append('maxExperienceYears', selectedFilters.maxExperienceYears);
+            }
+            if (selectedFilters.minPrice) {
+                query.append('minPrice', selectedFilters.minPrice);
             }
             if (selectedFilters.maxPrice) {
                 query.append('maxPrice', selectedFilters.maxPrice);
@@ -774,7 +794,14 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
     let _reqExpertId   = null;
     let _reqExpertType = '';
 
+    var isLoggedIn = ${not empty sessionScope.loginUser};
+
     window.openRequestModal = function (expertId, expertType, expertName, expertOffice) {
+        if (!isLoggedIn) {
+            alert('로그인이 필요합니다.');
+            location.href = '/login';
+            return;
+        }
         _reqExpertId   = expertId;
         _reqExpertType = expertType;
 

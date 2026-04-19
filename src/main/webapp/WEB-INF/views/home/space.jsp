@@ -101,19 +101,15 @@
                         <div class="flex flex-col gap-3">
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <input type="radio" name="priceRange" value="all" class="accent-blue-600 w-4 h-4" checked>
-                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">전체</span>
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">전체보기</span>
                             </label>
                             <label class="flex items-center gap-3 cursor-pointer group">
-                                <input type="radio" name="priceRange" value="10000" class="accent-blue-600 w-4 h-4">
-                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">1만원 이하</span>
+                                <input type="radio" name="priceRange" value="30000" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">3만원 이하</span>
                             </label>
                             <label class="flex items-center gap-3 cursor-pointer group">
-                                <input type="radio" name="priceRange" value="10001-20000" class="accent-blue-600 w-4 h-4">
-                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">1만원 ~ 2만원</span>
-                            </label>
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <input type="radio" name="priceRange" value="20001-30000" class="accent-blue-600 w-4 h-4">
-                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">2만원 ~ 3만원</span>
+                                <input type="radio" name="priceRange" value="30001-50000" class="accent-blue-600 w-4 h-4">
+                                <span class="text-sm font-medium text-slate-700 group-hover:text-blue-600 transition-colors">3만원 ~ 5만원</span>
                             </label>
                         </div>
                     </div>
@@ -201,6 +197,7 @@
 <script>
     // ── 예약 모달 ───────────────────────────────────────────────────
     const spacesData = {};   // spaceId → space 객체 캐시
+    var isLoggedIn = ${not empty sessionScope.loginUser};
 
     function getSpaceTypeLabel(spaceType) {
         return spaceType;
@@ -215,6 +212,11 @@
     let tlPricePerHour = 0;
 
     function openReservationModal(spaceId) {
+        if (!isLoggedIn) {
+            alert('로그인이 필요합니다.');
+            location.href = '/login';
+            return;
+        }
         const space = spacesData[spaceId];
         if (!space) return;
 

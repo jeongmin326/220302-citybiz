@@ -436,6 +436,8 @@
 <script>
     lucide.createIcons();
 
+    var isLoggedIn = ${not empty sessionScope.loginUser};
+
     // ── 예약 모달 JS ───────────────────────────────────────────────
     const SLOT_START = 8;
     const SLOT_END   = 22;
@@ -449,6 +451,11 @@
     }
 
     function openReservationModalFromData(btn) {
+        if (!isLoggedIn) {
+            alert('로그인이 필요합니다.');
+            location.href = '/login';
+            return;
+        }
         const spaceId     = btn.dataset.spaceId;
         const name        = btn.dataset.spaceName;
         const spaceType   = btn.dataset.spaceType;
@@ -739,6 +746,11 @@
     let _searchExpertType = '';
 
     window.openSearchRequestModal = function (btn) {
+        if (!isLoggedIn) {
+            alert('로그인이 필요합니다.');
+            location.href = '/login';
+            return;
+        }
         _searchExpertId   = btn.dataset.expertId;
         _searchExpertType = btn.dataset.expertType;
         const name   = btn.dataset.expertName;
