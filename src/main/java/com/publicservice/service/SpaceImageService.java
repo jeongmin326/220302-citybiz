@@ -2,6 +2,8 @@ package com.publicservice.service;
 
 import com.publicservice.entity.SpaceImage;
 import com.publicservice.repository.SpaceImageRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,10 +22,7 @@ public class SpaceImageService {
         this.spaceImageRepository = spaceImageRepository;
     }
 
-    /**
-     * 대표 이미지 저장.
-     * 기존 대표 이미지(is_main=Y)가 있으면 N으로 변경 후 새로 저장.
-     */
+    @CacheEvict(cacheNames = "spaceImages", key = "'main-' + #spaceId")
     public SpaceImage saveMainImage(Long spaceId, MultipartFile file) throws IOException {
         Objects.requireNonNull(spaceId, "spaceId must not be null");
         spaceImageRepository.findBySpaceIdAndIsMain(spaceId, "Y").ifPresent(existing -> {
@@ -43,10 +42,12 @@ public class SpaceImageService {
         return spaceImageRepository.save(image);
     }
 
+    @Cacheable(cacheNames = "spaceImages", key = "'id-' + #imageId")
     public Optional<SpaceImage> findById(Long imageId) {
         return spaceImageRepository.findById(imageId);
     }
 
+    @Cacheable(cacheNames = "spaceImages", key = "'main-' + #spaceId")
     public Optional<SpaceImage> findMainImage(Long spaceId) {
         return spaceImageRepository.findBySpaceIdAndIsMain(spaceId, "Y");
     }

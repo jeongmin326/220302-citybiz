@@ -331,9 +331,7 @@
                       'class="mt-1.5 text-xs text-rose-500 hover:text-rose-700 hover:underline transition-colors">예약 취소</button>'
                     : '';
 
-                var imgStyle = r.mainImageUrl
-                    ? 'background-image:url(\'' + escapeHtml(r.mainImageUrl) + '\')'
-                    : 'background-color:#e2e8f0';
+                var imgStyle = 'background-image:url(\'/space-images/main/' + r.spaceId + '\')';
                 return '<div class="flex items-center justify-between p-4 rounded-xl border border-slate-100 hover:bg-slate-50/60 transition-colors">' +
                     '<div class="flex gap-4 items-center min-w-0">' +
                         '<div class="w-14 h-14 rounded-lg bg-slate-200 bg-cover bg-center flex-shrink-0" style="' + imgStyle + '"></div>' +

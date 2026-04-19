@@ -230,7 +230,7 @@ public class UserController {
                     draft.setDistrict("미설정");
                     draft.setRoadAddress("미설정");
                     draft.setAddr("미설정");
-                    draft.setSpaceType(spaceType != null && !spaceType.trim().isEmpty() ? spaceType.trim() : "office");
+                    draft.setSpaceType(spaceType != null && !spaceType.trim().isEmpty() ? spaceType.trim() : "사무실");
                     draft.setDescription(spaceDescription != null ? spaceDescription.trim() : "");
                     draft.setPricePerHour(0);
                     draft.setCapacity(1);

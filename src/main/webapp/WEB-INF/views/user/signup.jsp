@@ -320,12 +320,12 @@
                     <label class="block text-sm font-bold text-slate-700 mb-2">공간 유형 <span class="text-rose-500">*</span></label>
                     <select name="space_type" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
                         <option value="">선택하세요</option>
-                        <option value="meeting">회의실</option>
-                        <option value="office">사무실</option>
-                        <option value="consulting">상담실</option>
-                        <option value="studio">스튜디오</option>
-                        <option value="shop">상점</option>
-                        <option value="warehouse">창고</option>
+                        <option value="회의실">회의실</option>
+                        <option value="사무실">사무실</option>
+                        <option value="상담실">상담실</option>
+                        <option value="스튜디오">스튜디오</option>
+                        <option value="상점">상점</option>
+                        <option value="창고">창고</option>
                     </select>
                 </div>
                 <div>

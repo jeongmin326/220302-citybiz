@@ -438,15 +438,7 @@
     let tlPricePerHour = 0;
 
     function getSpaceTypeLabel(spaceType) {
-        switch (spaceType) {
-            case 'shop':       return '상점';
-            case 'warehouse':  return '창고';
-            case 'studio':     return '스튜디오';
-            case 'meeting':    return '회의실';
-            case 'consulting': return '상담실';
-            case 'office':     return '사무실';
-            default:           return spaceType;
-        }
+        return spaceType;
     }
 
     function openReservationModalFromData(btn) {

@@ -80,11 +80,11 @@
                         <p class="text-xs text-slate-400 mb-3">검색 필터에 노출될 카테고리입니다. 공간에 가장 잘 맞는 유형 하나를 선택해 주세요.</p>
                         <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
                             <%-- 검색 화면(space.jsp)과 동일한 value 값 사용 --%>
-                            <c:forEach var="type" items="${['shop', 'warehouse', 'studio', 'meeting', 'consulting', 'office']}">
+                            <c:forEach var="type" items="${['상점', '창고', '스튜디오', '회의실', '상담실', '사무실']}">
                                 <div class="relative">
                                     <input type="radio" id="type_${type}" name="spaceType" value="${type}" class="hidden type-radio" required>
                                     <label for="type_${type}" class="cursor-pointer block text-center px-2 py-3 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">
-                                        ${type == 'shop' ? '상점' : type == 'warehouse' ? '창고' : type == 'studio' ? '스튜디오' : type == 'meeting' ? '회의실' : type == 'consulting' ? '상담실' : '사무실'}
+                                        ${type}
                                     </label>
                                 </div>
                             </c:forEach>

@@ -325,7 +325,7 @@
                     return;
                 }
 
-                const typeLabel = { shop:'상점', warehouse:'창고', studio:'스튜디오', meeting:'회의실', consulting:'상담실', office:'사무실' };
+                const typeLabel = { '상점':'상점', '창고':'창고', '스튜디오':'스튜디오', '회의실':'회의실', '상담실':'상담실', '사무실':'사무실' };
                 list.innerHTML = items.map(function(s) {
                     const badgeHtml = s.availableYn === 'N'
                         ? '<span style="font-size:10px;background:#fef3c7;color:#d97706;font-weight:700;padding:1px 6px;border-radius:4px;margin-left:4px;">미완성</span>'

@@ -70,27 +70,27 @@
                         <label class="block text-sm font-semibold text-slate-700 mb-3 tracking-wide">공간 유형</label>
                         <div class="flex flex-wrap gap-2.5">
                             <div class="relative">
-                                <input type="checkbox" id="type_shop" name="spaceType" value="shop" class="hidden hidden-checkbox">
+                                <input type="checkbox" id="type_shop" name="spaceType" value="상점" class="hidden hidden-checkbox">
                                 <label for="type_shop" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">상점</label>
                             </div>
                             <div class="relative">
-                                <input type="checkbox" id="type_warehouse" name="spaceType" value="warehouse" class="hidden hidden-checkbox">
+                                <input type="checkbox" id="type_warehouse" name="spaceType" value="창고" class="hidden hidden-checkbox">
                                 <label for="type_warehouse" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">창고</label>
                             </div>
                             <div class="relative">
-                                <input type="checkbox" id="type_studio" name="spaceType" value="studio" class="hidden hidden-checkbox">
+                                <input type="checkbox" id="type_studio" name="spaceType" value="스튜디오" class="hidden hidden-checkbox">
                                 <label for="type_studio" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">스튜디오</label>
                             </div>
                             <div class="relative">
-                                <input type="checkbox" id="type_meeting" name="spaceType" value="meeting" class="hidden hidden-checkbox">
+                                <input type="checkbox" id="type_meeting" name="spaceType" value="회의실" class="hidden hidden-checkbox">
                                 <label for="type_meeting" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">회의실</label>
                             </div>
                             <div class="relative">
-                                <input type="checkbox" id="type_consulting" name="spaceType" value="consulting" class="hidden hidden-checkbox">
+                                <input type="checkbox" id="type_consulting" name="spaceType" value="상담실" class="hidden hidden-checkbox">
                                 <label for="type_consulting" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">상담실</label>
                             </div>
                             <div class="relative">
-                                <input type="checkbox" id="type_office" name="spaceType" value="office" class="hidden hidden-checkbox">
+                                <input type="checkbox" id="type_office" name="spaceType" value="사무실" class="hidden hidden-checkbox">
                                 <label for="type_office" class="cursor-pointer inline-block px-4 py-2 border border-slate-200 rounded-full text-sm text-slate-600 hover:bg-slate-50 transition-all shadow-sm">사무실</label>
                             </div>
                         </div>
@@ -203,15 +203,7 @@
     const spacesData = {};   // spaceId → space 객체 캐시
 
     function getSpaceTypeLabel(spaceType) {
-        switch (spaceType) {
-            case 'shop': return '상점';
-            case 'warehouse': return '창고';
-            case 'studio': return '스튜디오';
-            case 'meeting': return '회의실';
-            case 'consulting': return '상담실';
-            case 'office': return '사무실';
-            default: return spaceType;
-        }
+        return spaceType;
     }
 
     // ── 타임라인 상태 ──────────────────────────────────────────────
@@ -638,7 +630,7 @@
         loadSpaces(false);
     }
 
-    const PAGE_SIZE = 12;
+    const PAGE_SIZE = 6;
     let currentPage = 0;
     let hasNextPage = false;
     let totalElements = 0;
@@ -738,7 +730,7 @@
                 const card =
                     '<div class="bg-white rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] group">' +
                         '<div class="h-56 bg-slate-100 relative overflow-hidden">' +
-                            '<img src="' + space.mainImageUrl + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="' + space.name + '">' +
+                            '<img src="/space-images/main/' + space.spaceId + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="' + space.name + '">' +
                             '<div class="absolute top-4 left-4 bg-white/80 px-3 py-1.5 rounded-full text-xs font-bold text-blue-600 backdrop-blur-sm shadow-inner">' +
                                 getSpaceTypeLabel(space.spaceType) +
                             '</div>' +
@@ -791,15 +783,7 @@
     }
 
     function getSpaceTypeLabel(spaceType) {
-        switch (spaceType) {
-            case 'shop': return '상점';
-            case 'warehouse': return '창고';
-            case 'studio': return '스튜디오';
-            case 'meeting': return '회의실';
-            case 'consulting': return '상담실';
-            case 'office': return '사무실';
-            default: return spaceType;
-        }
+        return spaceType;
     }
 
     // 초기화 버튼

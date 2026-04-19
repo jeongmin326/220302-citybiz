@@ -1,7 +1,9 @@
 package com.publicservice.controller;
 
 import com.publicservice.entity.SpaceImage;
+import com.publicservice.repository.SpaceImageRepository;
 import com.publicservice.service.SpaceImageService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,44 +22,57 @@ import java.util.Optional;
 public class SpaceImageController {
 
     private final SpaceImageService spaceImageService;
+    private final SpaceImageRepository spaceImageRepository;
 
-    public SpaceImageController(SpaceImageService spaceImageService) {
+    public SpaceImageController(SpaceImageService spaceImageService,
+                                SpaceImageRepository spaceImageRepository) {
         this.spaceImageService = spaceImageService;
+        this.spaceImageRepository = spaceImageRepository;
     }
 
-    // ---------------------------------------------------------------
-    // GET /space-images/{imageId} — imageId 로 이미지 바이너리 응답
-    // JSP: <img src="/space-images/42">
-    // ---------------------------------------------------------------
     @GetMapping("/{imageId}")
-    public ResponseEntity<byte[]> getImage(@PathVariable("imageId") Long imageId) {
+    public ResponseEntity<byte[]> getImage(@PathVariable("imageId") Long imageId,
+                                           HttpServletRequest request) {
         Optional<SpaceImage> opt = spaceImageService.findById(imageId);
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return buildImageResponse(opt.get());
-    }
-
-    // ---------------------------------------------------------------
-    // GET /space-images/main/{spaceId} — 대표 이미지(is_main=Y) 응답
-    // JSP: <img src="/space-images/main/${space.spaceId}">
-    // ---------------------------------------------------------------
-    @GetMapping("/main/{spaceId}")
-    public ResponseEntity<byte[]> getMainImage(@PathVariable("spaceId") Long spaceId) {
-        Optional<SpaceImage> opt = spaceImageService.findMainImage(spaceId);
-        if (opt.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        SpaceImage img = opt.get();
+        String etag = "\"img-" + img.getImageId() + "\"";
+        if (etag.equals(request.getHeader("If-None-Match"))) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         }
-        return buildImageResponse(opt.get());
+        return buildImageResponse(img.getImageData(), img.getContentType(), etag);
     }
 
-    // ---------------------------------------------------------------
-    // POST /space-images/upload — 추가 이미지 업로드 (호스트 전용)
-    // ---------------------------------------------------------------
+    @GetMapping("/main/{spaceId}")
+    public ResponseEntity<byte[]> getMainImage(@PathVariable("spaceId") Long spaceId,
+                                               HttpServletRequest request) {
+        Optional<SpaceImage> opt = spaceImageService.findMainImage(spaceId);
+        if (opt.isPresent()) {
+            SpaceImage img = opt.get();
+            String etag = "\"img-" + img.getImageId() + "\"";
+            if (etag.equals(request.getHeader("If-None-Match"))) {
+                return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+            }
+            return buildImageResponse(img.getImageData(), img.getContentType(), etag);
+        }
+
+        return spaceImageRepository.findFirstByIsMain("D")
+                .map(def -> {
+                    String etag = "\"img-default\"";
+                    if (etag.equals(request.getHeader("If-None-Match"))) {
+                        return ResponseEntity.status(HttpStatus.NOT_MODIFIED).<byte[]>build();
+                    }
+                    return buildImageResponse(def.getImageData(), def.getContentType(), etag);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> uploadImage(
-            @RequestParam("spaceId")                           Long spaceId,
-            @RequestParam("image")                             MultipartFile image,
+            @RequestParam("spaceId") Long spaceId,
+            @RequestParam("image")   MultipartFile image,
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
@@ -83,18 +98,14 @@ public class SpaceImageController {
         }
     }
 
-    // ---------------------------------------------------------------
-    private ResponseEntity<byte[]> buildImageResponse(SpaceImage image) {
-        String contentType = "image/jpeg";
-        String raw = image.getContentType();
-        if (raw != null && !raw.isBlank()) {
-            contentType = raw;
-        }
-
+    private ResponseEntity<byte[]> buildImageResponse(byte[] data, String rawContentType, String etag) {
+        String contentType = (rawContentType != null && !rawContentType.isBlank())
+                ? rawContentType : "image/jpeg";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(contentType));
-        headers.setContentLength(image.getImageData().length);
-
-        return new ResponseEntity<>(image.getImageData(), headers, HttpStatus.OK);
+        headers.setContentLength(data.length);
+        headers.setCacheControl("public, max-age=86400");
+        headers.setETag(etag);
+        return new ResponseEntity<>(data, headers, HttpStatus.OK);
     }
 }
