@@ -46,75 +46,59 @@
         </div>
 
         <form id="signupForm"
-        class="hidden max-w-4xl mx-auto bg-white/90 backdrop-blur-md p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-slate-100"
+        class="hidden max-w-5xl mx-auto bg-white/90 backdrop-blur-md p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-slate-100"
         action="${pageContext.request.contextPath}/signup"
         method="post"
         onsubmit="return handleSignup(event)">
 
-        <input type="hidden" id="userRole" name="role" value="">
-        <input type="hidden" name="status" value="ACTIVE">
+            <input type="hidden" id="userRole" name="role" value="">
+            <input type="hidden" name="status" value="ACTIVE">
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-6">
+                    <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-6">
+                        <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>
+                        계정 및 담당자 정보
+                    </h2>
 
-            <div class="space-y-6">
-                <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-6">
-                    <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>
-                    계정 및 담당자 정보
-                </h2>
+                    <div>
+                        <label for="email" class="block text-sm font-bold text-slate-700 mb-2">아이디 (이메일)</label>
+                        <div class="flex gap-2">
+                            <input type="email" id="email" name="email" required
+                                class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                placeholder="example@email.com">
+                            <button type="button" id="checkEmailBtn" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">
+                                중복 확인
+                            </button>
+                        </div>
+                    </div>
 
-                <div>
-                    <label for="email" class="block text-sm font-bold text-slate-700 mb-2">아이디 (이메일)</label>
-                    <div class="flex gap-2">
-                        <input type="email"
-                            id="email"
-                            name="email"
-                            required
-                            class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                            placeholder="example@email.com">
-                        <button type="button" id="checkEmailBtn" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">
-                            중복 확인
-                        </button>
+                    <div>
+                        <label for="password" class="block text-sm font-bold text-slate-700 mb-2">비밀번호</label>
+                        <input type="password" id="password" name="password" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                            placeholder="8자 이상 입력">
+                    </div>
+
+                    <div>
+                        <label for="name" class="block text-sm font-bold text-slate-700 mb-2">이름</label>
+                        <input type="text" id="name" name="name" required
+                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                            placeholder="성함을 입력해주세요">
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-bold text-slate-700 mb-2">휴대폰 번호</label>
+                        <div class="flex gap-2">
+                            <input type="tel" id="phone" name="phone" required maxlength="11" pattern="^01[0-9]{9}$" inputmode="numeric"
+                                class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                placeholder="01012345678">
+                            <button type="button" id="verifyPhoneBtn" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">
+                                본인 인증
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-bold text-slate-700 mb-2">비밀번호</label>
-                    <input type="password"
-                        id="password"
-                        name="password"
-                        required
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        placeholder="8자 이상 입력">
-                </div>
-
-                <div>
-                    <label for="name" class="block text-sm font-bold text-slate-700 mb-2">이름</label>
-                    <input type="text"
-                        id="name"
-                        name="name"
-                        required
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                        placeholder="성함을 입력해주세요">
-                </div>
-
-                <div>
-                    <label for="phone" class="block text-sm font-bold text-slate-700 mb-2">휴대폰 번호</label>
-                    <div class="flex gap-2">
-                        <input type="tel"
-                            id="phone"
-                            name="phone"
-                            required
-                            maxlength="11"
-                            pattern="^01[0-9]{9}$"
-                            inputmode="numeric"
-                            class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-                            placeholder="01012345678">
-                        <button type="button" id="verifyPhoneBtn" class="px-4 py-3 bg-slate-800 text-white text-xs font-bold rounded-xl whitespace-nowrap">
-                            본인 인증
-                        </button>
-                    </div>
-                </div>
-            </div>
 
                 <div class="space-y-6 border-t lg:border-t-0 lg:border-l border-slate-100 pt-8 lg:pt-0 lg:pl-12">
                     <h2 id="rightSectionTitle" class="text-xl font-bold text-slate-900 flex items-center gap-2 mb-6">
@@ -126,15 +110,59 @@
                 </div>
             </div>
 
-        <div class="flex flex-col sm:flex-row gap-4 pt-12 mt-8 border-t border-slate-100">
-            <button type="button" onclick="goBack()" class="w-full sm:w-1/3 py-4 text-slate-500 font-bold hover:bg-slate-50 rounded-2xl transition-all">
-                이전으로
-            </button>
-            <button type="submit" class="w-full sm:w-2/3 py-4 bg-slate-900 text-white font-bold rounded-2xl shadow-lg hover:bg-slate-800 transform hover:-translate-y-1 transition-all">
-                가입 완료하기
-            </button>
-        </div>
-    </form>
+            <div id="planPreviewSection" class="mt-12 pt-8 border-t border-slate-100 hidden">
+                <h3 class="text-base font-bold text-slate-900 mb-6 flex items-center justify-center">
+                    <i data-lucide="info" class="w-5 h-5 mr-2 text-indigo-500"></i>
+                    선택하신 역할은 향후 서비스 플랜 가입이 필요합니다
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
+                    <div class="p-5 rounded-xl bg-slate-50 border border-slate-200">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-bold text-slate-700">무료 체험</span>
+                            <span class="text-slate-500 text-sm font-bold">0원</span>
+                        </div>
+                        <ul class="text-[11px] text-slate-500 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 mr-2 text-slate-400"></i>서비스 둘러보기 및 조회</li>
+                            <li class="flex items-center"><i data-lucide="x" class="w-3.5 h-3.5 mr-2 text-rose-400"></i>공간/프로필 등록 불가</li>
+                        </ul>
+                    </div>
+                    <div class="p-5 rounded-xl bg-white border border-slate-200 shadow-sm">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-bold text-slate-900">성장형 플랜</span>
+                            <span class="text-blue-600 text-sm font-bold">100,000원 / 월</span>
+                        </div>
+                        <ul class="text-[11px] text-slate-600 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 mr-2 text-blue-500"></i>모든 기능 이용 가능</li>
+                            <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 mr-2 text-blue-500"></i>기본 기술 지원 서비스</li>
+                        </ul>
+                    </div>
+                    <div class="p-5 rounded-xl bg-indigo-50 border border-indigo-200 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-indigo-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">17% 절약</div>
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="font-bold text-indigo-900">비즈니스 플랜</span>
+                            <span class="text-indigo-600 text-sm font-bold">1,000,000원 / 년</span>
+                        </div>
+                        <ul class="text-[11px] text-indigo-700/80 space-y-2">
+                            <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 mr-2 text-indigo-500"></i>플랫폼 메인 우선 노출</li>
+                            <li class="flex items-center"><i data-lucide="check" class="w-3.5 h-3.5 mr-2 text-indigo-500"></i>1:1 기술 지원 서비스</li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-6 text-center">
+                    * 가입 시 기본 '무료' 상태로 등록되며, 추후 마이페이지에서 플랜을 결제하여 정식 활동을 시작할 수 있습니다.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-slate-100">
+                <button type="button" onclick="goBack()" class="w-full sm:w-1/3 py-4 text-slate-500 font-bold hover:bg-slate-50 rounded-2xl transition-all">
+                    이전으로
+                </button>
+                <button type="submit" class="w-full sm:w-2/3 py-4 bg-slate-900 text-white font-bold rounded-2xl shadow-lg hover:bg-slate-800 transform hover:-translate-y-1 transition-all">
+                    가입 완료하기
+                </button>
+            </div>
+        </form>
+
     </section>
 </main>
 
@@ -268,11 +296,28 @@
     });
 
     function selectRole(role) {
-        document.getElementById('userRole').value = role;
+        // 1. 기본 요소 설정 및 섹션 전환
+        const userRoleInput = document.getElementById('userRole');
+        const planSection = document.getElementById('planPreviewSection'); // 요금제 안내 섹션
+        const dynamicFieldContainer = document.getElementById('dynamicFields'); // HTML이 삽입될 컨테이너 (ID 확인 필요)
+
+        userRoleInput.value = role;
+        
+        // 역할 선택 화면 숨기고 가입 폼 노출
         roleSelectionSection.classList.add('hidden');
         signupForm.classList.remove('hidden');
         signupForm.classList.add('animate-[fadeIn_0.5s_ease-out]');
         
+        // 2. [추가] 요금제 안내 섹션 제어 (PROVIDER 또는 EXPERT일 때만 노출)
+        if (planSection) {
+            if (role === 'PROVIDER' || role === 'EXPERT') {
+                planSection.classList.remove('hidden');
+            } else {
+                planSection.classList.add('hidden');
+            }
+        }
+
+        // 3. 역할별 맞춤 UI 및 HTML 생성
         let html = '';
         if (role === 'USER') {
             subtitle.innerText = "스타트업 성장을 위한 기업 정보를 입력해주세요.";
@@ -333,7 +378,7 @@
                     <input type="text" name="space_description" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="예: 화이트보드와 빔프로젝터가 구비된 쾌적한 회의실입니다.">
                 </div>
             `;
-        } else {
+        } else if (role === 'EXPERT') {
             subtitle.innerText = "전문가 풀 등록을 위한 정보를 입력해주세요.";
             rightSectionTitle.innerHTML = '<span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">2</span>전문가 정보';
             html = `
@@ -363,8 +408,11 @@
                 </div>
             `;
         }
-        dynamicFields.innerHTML = html;
-        if (window.lucide) { lucide.createIcons(); } // 동적 생성된 아이콘 로드
+
+        // 4. 생성된 HTML을 폼 내의 지정된 위치에 삽입
+        if (dynamicFieldContainer) {
+            dynamicFieldContainer.innerHTML = html;
+        }
     }
 
     function goBack() {
