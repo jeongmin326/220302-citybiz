@@ -435,13 +435,13 @@ public class UserController {
 
     // MyPage 관련 컨트롤러
 
-    @GetMapping("/mypage/recharge")
+    @GetMapping("/charge/recharge")
     public String rechargePage() {
         
-        return "mypage/recharge"; 
+        return "charge/recharge"; 
     }
 
-    @GetMapping("/mypage/history")
+    @GetMapping("/charge/history")
     public String pointHistory(Model model) {
         
         // [Backend 개발자 할 일]

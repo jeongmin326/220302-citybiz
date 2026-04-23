@@ -38,11 +38,11 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                    <a href="/mypage/history" class="flex-1 md:flex-none flex justify-center items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-lg py-5 px-10 rounded-2xl border border-slate-200 transition-all active:scale-[0.98]">
+                    <a href="/charge/history" class="flex-1 md:flex-none flex justify-center items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-lg py-5 px-10 rounded-2xl border border-slate-200 transition-all active:scale-[0.98]">
                         <i data-lucide="history" class="w-6 h-6 text-slate-500"></i>
                         이용 내역
                     </a>
-                    <a href="/point/recharge" class="flex-1 md:flex-none flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-5 px-10 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98]">
+                    <a href="/charge/recharge" class="flex-1 md:flex-none flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-5 px-10 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98]">
                         <i data-lucide="plus-circle" class="w-6 h-6 text-yellow-300"></i>
                         충전하기
                     </a>
