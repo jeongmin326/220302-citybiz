@@ -203,6 +203,23 @@
     <script>
         lucide.createIcons();
 
+        // =========================================================================
+        // [추가된 부분] 페이지 진입 시 요금제(구독) 가입 여부 확인
+        // URL을 직접 치고 들어오는 무료 회원을 방어하기 위한 로직입니다.
+        // =========================================================================
+        (function checkMembership() {
+            // 서버 세션에서 회원의 요금제 등급을 가져옴 ('FREE' 또는 'PAID')
+            const userMembership = '${sessionScope.loginUserMembership}'; 
+            
+            if (userMembership !== 'PAID') {
+                alert('공간 등록은 유료 플랜 가입 후 이용 가능합니다. 요금제 안내 페이지로 이동합니다.');
+                // 무료 회원이면 앞서 만든 요금제 페이지로 강제 이동시킵니다.
+                location.href = '/charge/plan';
+            }
+        })();
+        // =========================================================================
+
+
         var geocodingPromise = null;
 
         function searchAddress() {

@@ -332,7 +332,14 @@
             }
         });
 
-        document.getElementById('editForm').addEventListener('submit', async function(e) {
+        document.getElementById('expertForm').addEventListener('submit', async function(e) {
+            const userStatus = '${sessionScope.loginUserMembership}'; 
+            if (userStatus !== 'PAID') {
+                e.preventDefault();
+                alert('전문가 등록 권한이 없습니다. 요금제를 결제해주세요.');
+                location.href = '/charge/plan';
+                return;
+            }
             e.preventDefault();
             if (!document.getElementById('cityHidden').value || !document.getElementById('roadAddrHidden').value) {
                 alert('주소를 검색하여 선택해 주세요.');

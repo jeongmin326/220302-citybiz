@@ -25,7 +25,8 @@
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">예약 관리</h1>
                 <p class="text-slate-500 mt-2">내 공간에 들어온 예약 요청을 확인하고 승인/거절할 수 있습니다.</p>
             </div>
-            <a href="/mypage/spaceRegi" class="hidden sm:flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+            <%-- [수정된 부분] href를 막고 onclick 이벤트로 자바스크립트 함수를 호출하도록 변경 --%>
+            <a href="javascript:void(0);" onclick="checkSubscriptionAndRedirect()" class="hidden sm:flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
                 <i data-lucide="plus" class="w-4 h-4"></i> 새 공간 등록
             </a>
         </div>
@@ -204,6 +205,21 @@
             }
         }
 
+        // [수정된 부분] 중복된 함수들을 하나로 통합하고 경로를 컨트롤러에 맞게(/charge/plan) 설정
+        function checkSubscriptionAndRedirect() {
+            // 세션에서 로그인 유저의 멤버십 상태를 가져옴 (FREE 또는 PAID)
+            const userMembership = '${sessionScope.loginUserMembership}'; 
+
+            if (userMembership !== 'PAID') {
+                if (confirm('공간 등록은 유료 플랜 가입 후 이용 가능합니다.\n요금제 안내 페이지로 이동하시겠습니까?')) {
+                    location.href = '/charge/plan';
+                }
+            } else {
+                location.href = '/mypage/spaceRegi';
+            }
+        }
+
+        // 페이지 로드 시 예약 목록 불러오기 실행
         loadReservations();
     </script>
 </body>

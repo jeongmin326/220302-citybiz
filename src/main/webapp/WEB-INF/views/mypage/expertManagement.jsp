@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
-        body { font-family: 'Pretendard', sans-serif; }
+        body { font-family: 'Pretendard', sans-serif; -webkit-font-smoothing: antialiased; }
         .chat-bubble-expert { background: #6d28d9; color: white; border-radius: 18px 18px 4px 18px; }
         .chat-bubble-user   { background: #f1f5f9; color: #1e293b; border-radius: 18px 18px 18px 4px; }
         #chatPanel { transition: transform 0.3s ease, opacity 0.3s ease; }
@@ -22,70 +22,68 @@
 
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
-    <main class="flex-grow w-full px-4 sm:px-6 py-12">
-        <div class="max-w-6xl mx-auto" id="mainContent">
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-12" id="mainContent">
 
-            <div class="mb-8 flex justify-between items-end">
+        <div class="mb-8 flex justify-between items-end">
+            <div>
+                <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">전문가 대시보드</span>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">컨설팅 신청 관리</h1>
+                <p class="text-slate-500 mt-2">나에게 들어온 비즈니스 상담 요청 내역을 확인하고 관리합니다.</p>
+            </div>
+            <a href="/mypage/expertProfile" class="hidden sm:flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                <i data-lucide="user-cog" class="w-4 h-4"></i> 프로필 수정
+            </a>
+        </div>
+
+        <%-- 요약 카드 --%>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-indigo-100 p-4 rounded-2xl text-indigo-600"><i data-lucide="message-square" class="w-8 h-8"></i></div>
                 <div>
-                    <span class="bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">전문가 대시보드</span>
-                    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">컨설팅 신청 관리</h1>
-                    <p class="text-slate-500 mt-2">나에게 들어온 비즈니스 상담 요청 내역을 확인하고 관리합니다.</p>
-                </div>
-                <a href="/mypage/expertProfile" class="hidden sm:flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors">
-                    <i data-lucide="user-cog" class="w-4 h-4"></i> 프로필 수정
-                </a>
-            </div>
-
-            <%-- 요약 카드 --%>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="bg-indigo-100 p-4 rounded-2xl text-indigo-600"><i data-lucide="message-square" class="w-8 h-8"></i></div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-500">새 신청</p>
-                        <p class="text-2xl font-bold text-slate-900" id="summaryPending">-<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="bg-emerald-100 p-4 rounded-2xl text-emerald-600"><i data-lucide="check-circle" class="w-8 h-8"></i></div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-500">진행 중</p>
-                        <p class="text-2xl font-bold text-slate-900" id="summaryAccepted">-<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
-                    </div>
-                </div>
-                <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
-                    <div class="bg-purple-100 p-4 rounded-2xl text-purple-600"><i data-lucide="star" class="w-8 h-8"></i></div>
-                    <div>
-                        <p class="text-sm font-semibold text-slate-500">누적 신청</p>
-                        <p class="text-2xl font-bold text-slate-900" id="summaryTotal">-<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
-                    </div>
+                    <p class="text-sm font-semibold text-slate-500">새 신청</p>
+                    <p class="text-2xl font-bold text-slate-900" id="summaryPending">-<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
                 </div>
             </div>
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-emerald-100 p-4 rounded-2xl text-emerald-600"><i data-lucide="check-circle" class="w-8 h-8"></i></div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-500">진행 중</p>
+                    <p class="text-2xl font-bold text-slate-900" id="summaryAccepted">-<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                </div>
+            </div>
+            <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
+                <div class="bg-purple-100 p-4 rounded-2xl text-purple-600"><i data-lucide="star" class="w-8 h-8"></i></div>
+                <div>
+                    <p class="text-sm font-semibold text-slate-500">누적 신청</p>
+                    <p class="text-2xl font-bold text-slate-900" id="summaryTotal">-<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                </div>
+            </div>
+        </div>
 
-            <%-- 신청 목록 테이블 --%>
-            <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                    <h2 class="text-lg font-bold text-slate-900">상담 신청 내역</h2>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
-                            <tr>
-                                <th class="px-6 py-4">신청자</th>
-                                <th class="px-6 py-4">자문 제목</th>
-                                <th class="px-6 py-4">신청일</th>
-                                <th class="px-6 py-4">상태</th>
-                                <th class="px-6 py-4 text-center">관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="consulting-list" class="divide-y divide-slate-100 text-slate-600">
-                            <tr id="loadingRow">
-                                <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">불러오는 중...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </div><!-- /mainContent -->
+        <%-- 신청 목록 테이블 --%>
+        <section class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                <h2 class="text-lg font-bold text-slate-900">상담 신청 내역</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                        <tr>
+                            <th class="px-6 py-4">신청자</th>
+                            <th class="px-6 py-4">자문 제목</th>
+                            <th class="px-6 py-4">신청일</th>
+                            <th class="px-6 py-4">상태</th>
+                            <th class="px-6 py-4 text-center">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="consulting-list" class="divide-y divide-slate-100 text-slate-600">
+                        <tr id="loadingRow">
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">불러오는 중...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <%-- 내용 확인 모달 --%>
