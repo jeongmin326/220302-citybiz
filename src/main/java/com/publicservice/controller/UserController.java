@@ -432,4 +432,12 @@ public class UserController {
         return result;
     }
 
+    // MyPage 관련 컨트롤러
+
+    @GetMapping("/mypage/recharge")
+    public String rechargePage() {
+        
+        return "mypage/recharge"; 
+    }
+
 }
