@@ -27,6 +27,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -438,6 +439,20 @@ public class UserController {
     public String rechargePage() {
         
         return "mypage/recharge"; 
+    }
+
+    @GetMapping("/mypage/history")
+    public String pointHistory(Model model) {
+        
+        // [Backend 개발자 할 일]
+        // 1. 세션에서 현재 로그인한 사용자 정보(ID)를 가져옵니다.
+        // 2. Service/Repository를 통해 해당 사용자의 포인트 내역(충전/사용)을 DB에서 조회합니다.
+        // 3. 모델에 데이터를 담아 JSP로 넘깁니다.
+        // ex) model.addAttribute("historyList", pointHistoryService.getHistory(userId));
+        // ex) model.addAttribute("currentPoint", userService.getUserPoint(userId));
+
+        // jsp 파일의 물리적 경로 (application.properties 설정에 따라 다를 수 있음)
+        return "point/history"; 
     }
 
 }

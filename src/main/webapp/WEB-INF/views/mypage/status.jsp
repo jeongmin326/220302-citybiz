@@ -24,6 +24,32 @@
     
     <%-- 2. 메인 컨텐츠 영역 --%>
     <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 py-12">
+    
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mb-20"> <div class="flex items-center gap-3 mb-6">
+                <i data-lucide="coins" class="w-8 h-8 text-amber-500"></i>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">내 포인트</h1>
+            </div>
+
+            <div class="bg-white rounded-3xl p-10 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-8 md:mb-0 flex items-baseline gap-2">
+                    <%-- Backend: DB에서 가져온 실제 유저 보유 포인트를 여기에 바인딩 하세요 --%>
+                    <span class="text-6xl font-black text-slate-900">50,000</span>
+                    <span class="text-2xl font-bold text-slate-400">P</span>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                    <a href="/mypage/history" class="flex-1 md:flex-none flex justify-center items-center gap-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-lg py-5 px-10 rounded-2xl border border-slate-200 transition-all active:scale-[0.98]">
+                        <i data-lucide="history" class="w-6 h-6 text-slate-500"></i>
+                        이용 내역
+                    </a>
+                    <a href="/point/recharge" class="flex-1 md:flex-none flex justify-center items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-5 px-10 rounded-2xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98]">
+                        <i data-lucide="plus-circle" class="w-6 h-6 text-yellow-300"></i>
+                        충전하기
+                    </a>
+                </div>
+            </div>
+
+        </section>
         
         <%-- 상단 헤더 영역 --%>
         <div class="mb-8">
