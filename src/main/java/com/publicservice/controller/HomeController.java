@@ -88,9 +88,15 @@ public class HomeController {
     }
     // 마이페이지(User) 매핑
     @GetMapping("/mypage/status")
-    public String statusPage() {
-        // views/mypage 폴더 안의 status.jsp를 화면에 띄우라는 뜻입니다.
-        return "mypage/status"; 
+    public String statusPage(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId != null) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                model.addAttribute("currentPoint", user.getPoint());
+            }
+        }
+        return "mypage/status";
     }
 
     @GetMapping("/mypage/profile")

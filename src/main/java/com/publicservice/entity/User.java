@@ -50,6 +50,9 @@ public class User {
 
     private String industry;
 
+    @Column(nullable = false)
+    private Long point = 0L;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

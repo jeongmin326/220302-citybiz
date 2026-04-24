@@ -8,42 +8,39 @@
     <title>포인트 충전 - City Biz Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap');
-        body { 
-            font-family: 'Pretendard', sans-serif; 
-            -webkit-font-smoothing: antialiased; 
-            background-color: #ffffff; 
+        body {
+            font-family: 'Pretendard', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            background-color: #ffffff;
         }
-        
-        /* 얇고 검정에 가까운 회색 테두리 (1px) */
+
         .charge-card {
-            border: 1px solid #475569; /* slate-600 */
+            border: 1px solid #475569;
             background-color: #ffffff;
             transition: all 0.2s ease-in-out;
             display: flex;
-            align-items: center; /* 세로 가운데 정렬 */
+            align-items: center;
             padding: 1.25rem;
             border-radius: 1rem;
             position: relative;
         }
 
-        /* 카드 선택 상태 */
         .charge-option:checked + .charge-card {
-            border-color: #2563eb; 
-            background-color: #f0f7ff; 
-            box-shadow: 0 0 0 1px #2563eb; 
+            border-color: #2563eb;
+            background-color: #f0f7ff;
+            box-shadow: 0 0 0 1px #2563eb;
         }
 
-        /* 왼쪽 동그라미 아이콘 상태 전환 */
         .charge-card .icon-check { display: none; }
         .charge-option:checked + .charge-card .icon-uncheck { display: none; }
-        .charge-option:checked + .charge-card .icon-check { 
-            display: block; 
-            color: #2563eb; 
+        .charge-option:checked + .charge-card .icon-check {
+            display: block;
+            color: #2563eb;
         }
 
-        /* 결제 수단 선택 효과 */
         .pay-method-option:checked + .pay-method-card {
             border-color: #2563eb;
             background-color: #f0f7ff;
@@ -56,7 +53,7 @@
     <jsp:include page="/WEB-INF/views/common/header.jsp" />
 
     <main class="flex-grow max-w-xl mx-auto w-full px-6 py-12">
-        
+
         <div class="mb-8">
             <h2 class="text-2xl font-bold text-slate-900">포인트 충전</h2>
             <p class="text-slate-500 text-sm mt-1">원하는 만큼 포인트를 충전하고 서비스를 이용하세요.</p>
@@ -69,7 +66,7 @@
             <div>
                 <p class="text-sm font-semibold text-sky-700 mb-0.5">나의 보유 포인트</p>
                 <p class="text-3xl font-extrabold text-slate-900 flex items-baseline">
-                    ${currentPoint != null ? currentPoint : '12,500'} <span class="text-xl font-bold text-sky-600 ml-1">P</span>
+                    <span id="currentPointDisplay">${currentPoint != null ? currentPoint : '0'}</span> <span class="text-xl font-bold text-sky-600 ml-1">P</span>
                 </p>
             </div>
         </div>
@@ -77,7 +74,7 @@
         <div class="mb-12">
             <h4 class="font-bold text-slate-900 mb-4 px-1">충전할 금액</h4>
             <div class="grid grid-cols-2 gap-3">
-                
+
                 <label class="cursor-pointer">
                     <input type="radio" name="chargeAmount" value="5000" class="charge-option hidden" onchange="syncAmount(5000)">
                     <div class="charge-card h-full">
@@ -96,7 +93,7 @@
                     <input type="radio" name="chargeAmount" value="10000" class="charge-option hidden" onchange="syncAmount(10000)">
                     <div class="charge-card h-full overflow-hidden">
                         <div class="absolute -top-0 -right-0 bg-sky-500 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">
-                            +5% 적립
+                            +2% 적립
                         </div>
                         <div class="mr-4 flex-shrink-0">
                             <i data-lucide="circle" class="icon-uncheck w-6 h-6 text-slate-300"></i>
@@ -113,7 +110,7 @@
                     <input type="radio" name="chargeAmount" value="30000" class="charge-option hidden" onchange="syncAmount(30000)">
                     <div class="charge-card h-full overflow-hidden">
                         <div class="absolute -top-0 -right-0 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">
-                            BEST
+                            +3% 적립
                         </div>
                         <div class="mr-4 flex-shrink-0">
                             <i data-lucide="circle" class="icon-uncheck w-6 h-6 text-slate-300"></i>
@@ -128,7 +125,10 @@
 
                 <label class="cursor-pointer">
                     <input type="radio" name="chargeAmount" value="50000" class="charge-option hidden" onchange="syncAmount(50000)">
-                    <div class="charge-card h-full">
+                    <div class="charge-card h-full overflow-hidden">
+                        <div class="absolute -top-0 -right-0 bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">
+                            +5% 적립
+                        </div>
                         <div class="mr-4 flex-shrink-0">
                             <i data-lucide="circle" class="icon-uncheck w-6 h-6 text-slate-300"></i>
                             <i data-lucide="check-circle-2" class="icon-check w-6 h-6"></i>
@@ -180,8 +180,28 @@
 
     <script>
         lucide.createIcons();
+        formatCurrentPoint();
+        IMP.init('${impKey}');
 
         let currentSelectedPrice = 0;
+        let currentMerchantUid = '';
+        const channelKeys = {
+            'card': '${cardChannelKey}',
+            'kakao': '${kakaoChannelKey}',
+            'toss': '${tossChannelKey}'
+        };
+
+        // 현재 포인트 포맷팅
+        function formatCurrentPoint() {
+            const pointElement = document.getElementById('currentPointDisplay');
+            if (pointElement) {
+                const point = parseInt(pointElement.textContent);
+                if (!isNaN(point)) {
+                    pointElement.textContent = point.toLocaleString();
+                }
+            }
+        }
+
         function syncAmount(price) {
             currentSelectedPrice = price;
             document.getElementById('finalBtnText').innerText = price.toLocaleString() + '원 결제하기';
@@ -192,12 +212,66 @@
                 alert('충전할 금액을 선택해주세요.');
                 return;
             }
+
             const method = document.querySelector('input[name="payMethod"]:checked')?.value;
             if (!method) {
                 alert('결제 수단을 선택해주세요.');
                 return;
             }
-            alert(currentSelectedPrice.toLocaleString() + '원 결제를 진행합니다.');
+
+            const payMethodMap = {
+                'card': 'card',
+                'kakao': 'payco',
+                'toss': 'card'
+            };
+
+            currentMerchantUid = 'charge_' + Date.now();
+
+            IMP.request_pay({
+                channelKey: channelKeys[method],
+                pay_method: payMethodMap[method],
+                merchant_uid: currentMerchantUid,
+                name: currentSelectedPrice.toLocaleString() + '원 포인트 충전',
+                amount: currentSelectedPrice,
+                buyer_name: document.querySelector('input[name="buyerName"]')?.value || '구매자',
+                buyer_email: document.querySelector('input[name="buyerEmail"]')?.value || '',
+                buyer_tel: document.querySelector('input[name="buyerTel"]')?.value || ''
+            }, function(rsp) {
+                if (rsp.success) {
+                    verifyPayment(rsp.imp_uid, currentSelectedPrice, currentMerchantUid);
+                } else {
+                    alert('결제가 취소되었습니다: ' + rsp.error_msg);
+                }
+            });
+        }
+
+        async function verifyPayment(impUid, amount, merchantUid) {
+            try {
+                const response = await fetch('/charge/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        imp_uid: impUid,
+                        amount: amount,
+                        merchant_uid: merchantUid
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    setTimeout(() => {
+                        window.location.href = '/charge/pointHistory';
+                    }, 500);
+                } else {
+                    alert('포인트 충전 실패: ' + data.message);
+                }
+            } catch (error) {
+                alert('오류 발생: ' + error.message);
+            }
         }
     </script>
 </body>

@@ -32,8 +32,7 @@
 
             <div class="bg-white rounded-3xl p-10 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between">
                 <div class="mb-8 md:mb-0 flex items-baseline gap-2">
-                    <%-- Backend: DB에서 가져온 실제 유저 보유 포인트를 여기에 바인딩 하세요 --%>
-                    <span class="text-6xl font-black text-slate-900">50,000</span>
+                    <span class="text-6xl font-black text-slate-900" id="statusPointDisplay">${currentPoint != null ? currentPoint : '0'}</span>
                     <span class="text-2xl font-bold text-slate-400">P</span>
                 </div>
                 
@@ -569,8 +568,20 @@
             }
         };
 
+        // 포인트 포맷팅 (천단위 쉼표)
+        function formatPoint() {
+            const pointElement = document.getElementById('statusPointDisplay');
+            if (pointElement) {
+                const point = parseInt(pointElement.textContent);
+                if (!isNaN(point)) {
+                    pointElement.textContent = point.toLocaleString();
+                }
+            }
+        }
+
         // 루사이드 아이콘 초기화 및 데이터 로드
         lucide.createIcons();
+        formatPoint();
         loadScrappedPolicies();
         loadMyReservations();
         loadMyConsultings();
