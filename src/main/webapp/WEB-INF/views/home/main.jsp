@@ -254,21 +254,7 @@
         </div>
     </main>
 
-    <footer class="border-t border-slate-200 bg-white py-12 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="flex items-center gap-2 opacity-50">
-                <i data-lucide="building-2" class="w-5 h-5 text-slate-900"></i>
-                <span class="text-xl font-bold text-slate-900">CityBiz</span>
-            </div>
-            <div class="text-center md:text-left">
-                <p class="text-slate-400 text-sm">AI 소프트웨어 학과 졸업작품 프로젝트</p>
-                <p class="text-slate-400 text-sm mt-1">&copy; 2026 CityBiz Team. All rights reserved.</p>
-            </div>
-            <div class="flex gap-4">
-                <a href="#" class="text-slate-400 hover:text-slate-600 transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
-            </div>
-        </div>
-    </footer>
+    <jsp:include page="/WEB-INF/views/common/footer.jsp" />
 
     <script>
         lucide.createIcons();

@@ -31,7 +31,7 @@ public class ChargeController {
     /**
      * 3. 포인트 이용 내역 조회
      */
-    @GetMapping("/history")
+    @GetMapping("/pointHistory")
     public String pointHistory(Model model, HttpSession session) {
         // [Backend 개발자 할 일]
         // 1. 세션에서 현재 로그인한 사용자 정보(Long userId)를 가져옵니다.
@@ -41,7 +41,6 @@ public class ChargeController {
         // ex) model.addAttribute("historyList", pointHistoryService.getHistory(userId));
         // ex) model.addAttribute("currentPoint", userService.getUserPoint(userId));
 
-        // 요청하신 대로 경로는 point/history를 유지하되, 파일 관리를 위해 charge/history를 추천함
-        return "point/history"; 
+        return "charge/pointHistory"; 
     }
 }
