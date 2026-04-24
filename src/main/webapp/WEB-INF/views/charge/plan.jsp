@@ -48,7 +48,7 @@
                 <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white px-4 py-1 rounded-full text-sm font-bold">인기</div>
                 <div class="mb-8">
                     <span class="text-indigo-600 font-semibold px-3 py-1 bg-indigo-50 rounded-full text-sm">성장형</span>
-                    <h2 class="text-2xl font-bold mt-4">매달 결제</h2>
+                    <h2 class="text-2xl font-bold mt-4">월간 플랜</h2>
                     <p class="text-slate-500 mt-2">유연한 운영이 필요한 파트너용</p>
                 </div>
                 <div class="mb-8">
@@ -66,7 +66,7 @@
             <div class="plan-card bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col">
                 <div class="mb-8">
                     <span class="text-emerald-600 font-semibold px-3 py-1 bg-emerald-50 rounded-full text-sm">가성비</span>
-                    <h2 class="text-2xl font-bold mt-4">매년 결제</h2>
+                    <h2 class="text-2xl font-bold mt-4">연간 플랜</h2>
                     <p class="text-slate-500 mt-2">안정적인 사업 확장을 위한 선택</p>
                 </div>
                 <div class="mb-8">
