@@ -8,6 +8,7 @@
     <title>서비스 플랜 선택 - City Biz Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Pretendard', sans-serif; -webkit-font-smoothing: antialiased; }
@@ -45,7 +46,12 @@
             </div>
 
             <div class="plan-card bg-white rounded-3xl p-8 border-2 border-indigo-500 shadow-xl relative flex flex-col transform scale-105">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white px-4 py-1 rounded-full text-sm font-bold">인기</div>
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-indigo-500 text-white px-4 py-1 rounded-full text-sm font-bold">
+                    <c:choose>
+                        <c:when test="${currentPlan == 'MONTHLY'}">현재 이용 중</c:when>
+                        <c:otherwise>인기</c:otherwise>
+                    </c:choose>
+                </div>
                 <div class="mb-8">
                     <span class="text-indigo-600 font-semibold px-3 py-1 bg-indigo-50 rounded-full text-sm">성장형</span>
                     <h2 class="text-2xl font-bold mt-4">월간 플랜</h2>
@@ -60,7 +66,14 @@
                     <li class="flex items-center text-slate-600"><i data-lucide="check" class="w-5 h-5 mr-3 text-emerald-500"></i>AI 수요 예측 리포트 제공</li>
                     <li class="flex items-center text-slate-600"><i data-lucide="check" class="w-5 h-5 mr-3 text-emerald-500"></i>예약 관리 대시보드 이용</li>
                 </ul>
-                <button onclick="subscribe('MONTHLY')" class="w-full py-4 px-6 rounded-xl bg-indigo-600 font-semibold text-white hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">플랜 가입하기</button>
+                <c:choose>
+                    <c:when test="${currentPlan == 'MONTHLY'}">
+                        <button disabled class="w-full py-4 px-6 rounded-xl bg-slate-300 font-semibold text-slate-600 cursor-not-allowed">현재 이용 중</button>
+                    </c:when>
+                    <c:otherwise>
+                        <button onclick="subscribe('MONTHLY')" class="w-full py-4 px-6 rounded-xl bg-indigo-600 font-semibold text-white hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">플랜 가입하기</button>
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <div class="plan-card bg-white rounded-3xl p-8 border border-slate-200 shadow-sm flex flex-col">
@@ -79,7 +92,14 @@
                     <li class="flex items-center text-slate-600"><i data-lucide="check" class="w-5 h-5 mr-3 text-emerald-500"></i>플랫폼 메인 우선 노출</li>
                     <li class="flex items-center text-slate-600"><i data-lucide="check" class="w-5 h-5 mr-3 text-emerald-500"></i>1:1 기술 지원 서비스</li>
                 </ul>
-                <button onclick="subscribe('YEARLY')" class="w-full py-4 px-6 rounded-xl border border-indigo-600 font-semibold text-indigo-600 hover:bg-indigo-50 transition">연간 플랜 선택</button>
+                <c:choose>
+                    <c:when test="${currentPlan == 'YEARLY'}">
+                        <button disabled class="w-full py-4 px-6 rounded-xl bg-slate-300 font-semibold text-slate-600 cursor-not-allowed">현재 이용 중</button>
+                    </c:when>
+                    <c:otherwise>
+                        <button onclick="subscribe('YEARLY')" class="w-full py-4 px-6 rounded-xl border border-indigo-600 font-semibold text-indigo-600 hover:bg-indigo-50 transition">연간 플랜 선택</button>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
     </main>
@@ -87,13 +107,55 @@
     <script>
         lucide.createIcons();
 
-        async function subscribe(type) {
-            // [AI/Backend 개발 참고]
-            // 1. 세션에서 로그인 여부 확인
-            // 2. 가입 유형(type)에 따라 결제 로직 호출 (Axios/Fetch)
-            // 3. 성공 시 DB의 user 테이블 membership_type 필드 업데이트
-            alert(type + ' 플랜 가입 페이지로 이동합니다. (결제 모듈 연동 필요)');
-            // location.href = '/charge/checkout?type=' + type;
+        const IMP_KEY = '${impKey}';
+        const channelKeys = {
+            card:  '${cardChannelKey}',
+            kakao: '${kakaoChannelKey}',
+            toss:  '${tossChannelKey}'
+        };
+        const PLAN_AMOUNTS = { MONTHLY: 100000, YEARLY: 1000000 };
+        const PLAN_NAMES   = { MONTHLY: '월간 플랜 (100,000원)', YEARLY: '연간 플랜 (1,000,000원)' };
+
+        IMP.init(IMP_KEY);
+
+        async function subscribe(planType) {
+            const amount = PLAN_AMOUNTS[planType];
+            const merchantUid = 'plan_' + planType + '_' + Date.now();
+
+            IMP.request_pay({
+                channelKey: channelKeys['card'],
+                pay_method: 'card',
+                merchant_uid: merchantUid,
+                name: PLAN_NAMES[planType],
+                amount: amount,
+            }, async function(rsp) {
+                if (!rsp.success) {
+                    alert('결제가 취소되었습니다: ' + rsp.error_msg);
+                    return;
+                }
+
+                try {
+                    const res = await fetch('/charge/verifyPlan', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            imp_uid: rsp.imp_uid,
+                            merchant_uid: merchantUid,
+                            amount: amount,
+                            planType: planType
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        alert(PLAN_NAMES[planType] + ' 가입이 완료되었습니다!');
+                        location.reload();
+                    } else {
+                        alert('플랜 가입 실패: ' + data.message);
+                    }
+                } catch (error) {
+                    alert('오류 발생: ' + error.message);
+                }
+            });
         }
     </script>
 </body>

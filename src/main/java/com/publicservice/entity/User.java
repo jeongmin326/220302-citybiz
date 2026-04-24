@@ -53,6 +53,12 @@ public class User {
     @Column(nullable = false)
     private Long point = 0L;
 
+    @Column(name = "plan_type", nullable = false)
+    private String planType = "FREE";
+
+    @Column(name = "plan_expires_at")
+    private LocalDateTime planExpiresAt;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

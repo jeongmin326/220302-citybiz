@@ -12,8 +12,10 @@ import com.publicservice.repository.LawyerRepository;
 import com.publicservice.repository.PatentAttorneyRepository;
 import com.publicservice.repository.TaxAccountantRepository;
 import com.publicservice.repository.UserRepository;
+import com.publicservice.service.PlanService;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,9 @@ public class ExpertProfileController {
     private final LawyerRepository lawyerRepository;
     private final PatentAttorneyRepository patentAttorneyRepository;
     private final UserRepository userRepository;
+
+    @Autowired
+    private PlanService planService;
 
     public ExpertProfileController(TaxAccountantRepository taxAccountantRepository,
                                    AccountantRepository accountantRepository,
@@ -49,6 +54,10 @@ public class ExpertProfileController {
         Long userId = (Long) session.getAttribute("loginUserId");
         if (userId == null) {
             return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
+
+        if (!planService.hasActivePlan(userId)) {
+            return ResponseEntity.status(403).body("유료 플랜 구독이 필요합니다. /charge/plan");
         }
 
         switch (req.getExpertType()) {

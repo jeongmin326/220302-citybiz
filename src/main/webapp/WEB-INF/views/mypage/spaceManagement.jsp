@@ -31,6 +31,42 @@
             </a>
         </div>
 
+        <%-- 플랜 정보 카드 --%>
+        <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-6 border border-indigo-200 shadow-sm mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="bg-indigo-100 p-4 rounded-2xl text-indigo-600">
+                        <i data-lucide="star" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold text-slate-600">현재 플랜</p>
+                        <c:choose>
+                            <c:when test="${planType == 'MONTHLY'}">
+                                <p class="text-2xl font-bold text-indigo-900">월간 플랜</p>
+                            </c:when>
+                            <c:when test="${planType == 'YEARLY'}">
+                                <p class="text-2xl font-bold text-indigo-900">연간 플랜</p>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="text-2xl font-bold text-slate-500">플랜 미가입</p>
+                            </c:otherwise>
+                        </c:choose>
+                        <c:if test="${planExpiresAt != null}">
+                            <p class="text-sm text-slate-600 mt-1">
+                                <span id="daysRemaining">계산 중...</span>일 남음
+                            </p>
+                        </c:if>
+                    </div>
+                </div>
+                <c:if test="${planType == 'MONTHLY' || planType == 'YEARLY'}">
+                    <a href="/charge/plan" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">플랜 갱신</a>
+                </c:if>
+                <c:if test="${planType == 'FREE' || planType == null}">
+                    <a href="/charge/plan" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition">플랜 가입하기</a>
+                </c:if>
+            </div>
+        </div>
+
         <%-- 상단 요약 카드 --%>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
@@ -105,6 +141,16 @@
 
     <script>
         lucide.createIcons();
+
+        // 플랜 남은 일수 계산
+        const planExpiresAt = '${planExpiresAt}';
+        if (planExpiresAt) {
+            const expiresDate = new Date(planExpiresAt);
+            const today = new Date();
+            const diffTime = expiresDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            document.getElementById('daysRemaining').textContent = Math.max(0, diffDays);
+        }
 
         let allReservations = [];
 

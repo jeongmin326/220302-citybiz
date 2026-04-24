@@ -154,7 +154,14 @@ public class HomeController {
 
     // 공급자(Host) 예약 관리(대시보드) 페이지 매핑
     @GetMapping("/mypage/spaceManagement")
-    public String spaceManagementPage() {
+    public String spaceManagementPage(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId != null) {
+            userRepository.findById(userId).ifPresent(user -> {
+                model.addAttribute("planType", user.getPlanType());
+                model.addAttribute("planExpiresAt", user.getPlanExpiresAt());
+            });
+        }
         return "mypage/spaceManagement";
     }
 
@@ -237,8 +244,15 @@ public class HomeController {
 
     // 전문가(Expert) 컨설팅 신청 관리 페이지 매핑
     @GetMapping("/mypage/expertManagement")
-    public String expertManagementPage() {
-        return "mypage/expertManagement"; 
+    public String expertManagementPage(HttpSession session, Model model) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId != null) {
+            userRepository.findById(userId).ifPresent(user -> {
+                model.addAttribute("planType", user.getPlanType());
+                model.addAttribute("planExpiresAt", user.getPlanExpiresAt());
+            });
+        }
+        return "mypage/expertManagement";
     }
 
     @GetMapping("/search")

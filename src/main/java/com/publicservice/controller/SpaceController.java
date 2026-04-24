@@ -7,6 +7,8 @@ import com.publicservice.repository.SpaceRepository;
 import com.publicservice.repository.SpaceReservationRepository;
 import com.publicservice.repository.UserRepository;
 import com.publicservice.service.SpaceImageService;
+import com.publicservice.service.PlanService;
+import org.springframework.beans.factory.annotation.Autowired;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
@@ -47,6 +49,9 @@ public class SpaceController {
     private final SpaceReservationRepository reservationRepository;
     private final UserRepository userRepository;
     private final SpaceImageService spaceImageService;
+
+    @Autowired
+    private PlanService planService;
 
     public SpaceController(SpaceRepository spaceRepository,
                            SpaceReservationRepository reservationRepository,
@@ -165,6 +170,12 @@ public class SpaceController {
         if (hostId == null) {
             result.put("error", "로그인이 필요합니다.");
             return ResponseEntity.status(401).body(result);
+        }
+
+        if (!planService.hasActivePlan(hostId)) {
+            result.put("error", "유료 플랜 구독이 필요합니다.");
+            result.put("redirectUrl", "/charge/plan");
+            return ResponseEntity.status(403).body(result);
         }
 
         Space space = new Space();
@@ -457,6 +468,12 @@ public class SpaceController {
         if (hostId == null) {
             result.put("error", "로그인이 필요합니다.");
             return ResponseEntity.status(401).body(result);
+        }
+
+        if (!planService.hasActivePlan(hostId)) {
+            result.put("error", "유료 플랜 구독이 필요합니다.");
+            result.put("redirectUrl", "/charge/plan");
+            return ResponseEntity.status(403).body(result);
         }
 
         Optional<Space> spaceOpt = spaceRepository.findById(spaceId);

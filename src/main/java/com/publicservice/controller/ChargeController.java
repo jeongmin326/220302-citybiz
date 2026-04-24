@@ -3,7 +3,9 @@ package com.publicservice.controller;
 import com.publicservice.entity.PointHistory;
 import com.publicservice.entity.User;
 import com.publicservice.repository.PointHistoryRepository;
+import com.publicservice.repository.PlanHistoryRepository;
 import com.publicservice.repository.UserRepository;
+import com.publicservice.service.PlanService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,12 @@ public class ChargeController {
     @Autowired
     private PointHistoryRepository pointHistoryRepository;
 
+    @Autowired
+    private PlanHistoryRepository planHistoryRepository;
+
+    @Autowired
+    private PlanService planService;
+
     @Value("${portone.imp_key}")
     private String impKey;
 
@@ -55,7 +63,19 @@ public class ChargeController {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @GetMapping("/plan")
-    public String showSubscriptionPlan(HttpSession session) {
+    public String showSubscriptionPlan(Model model, HttpSession session) {
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId != null) {
+            User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                model.addAttribute("currentPlan", user.getPlanType());
+                model.addAttribute("planExpiresAt", user.getPlanExpiresAt());
+            }
+        }
+        model.addAttribute("impKey", impKey);
+        model.addAttribute("cardChannelKey", cardChannelKey);
+        model.addAttribute("kakaoChannelKey", kakaoChannelKey);
+        model.addAttribute("tossChannelKey", tossChannelKey);
         return "charge/plan";
     }
 
@@ -182,6 +202,91 @@ public class ChargeController {
             response.put("success", true);
             response.put("message", "포인트 충전이 완료되었습니다.");
             response.put("currentPoint", user.getPoint());
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "오류 발생: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+    @PostMapping("/verifyPlan")
+    @ResponseBody
+    public Map<String, Object> verifyPlanPayment(
+            @RequestBody Map<String, Object> request,
+            HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Long userId = (Long) session.getAttribute("loginUserId");
+            if (userId == null) {
+                response.put("success", false);
+                response.put("message", "로그인이 필요합니다.");
+                return response;
+            }
+
+            String impUid = (String) request.get("imp_uid");
+            String merchantUid = (String) request.get("merchant_uid");
+            Integer amount = ((Number) request.get("amount")).intValue();
+            String planType = (String) request.get("planType");
+
+            // 중복 결제 방지
+            if (planHistoryRepository.findByImpUid(impUid).isPresent()) {
+                response.put("success", false);
+                response.put("message", "이미 처리된 결제입니다.");
+                return response;
+            }
+
+            // 포트원 토큰 발급
+            String accessToken = getPortoneAccessToken();
+            if (accessToken == null) {
+                response.put("success", false);
+                response.put("message", "결제 검증 중 오류가 발생했습니다.");
+                return response;
+            }
+
+            // 포트원에서 결제 정보 조회
+            Map<String, Object> paymentInfo = getPaymentInfo(accessToken, impUid);
+
+            // imp_uid로 조회 실패 시, merchant_uid로 재시도
+            if (paymentInfo == null && merchantUid != null) {
+                paymentInfo = getPaymentInfoByMerchantUid(accessToken, merchantUid);
+            }
+
+            if (paymentInfo == null) {
+                response.put("success", false);
+                response.put("message", "결제 정보를 조회할 수 없습니다.");
+                return response;
+            }
+
+            // 결제 검증
+            Integer paidAmount = (Integer) paymentInfo.get("paid_amount");
+            String status = (String) paymentInfo.get("status");
+
+            // 플랜 금액 검증
+            int expectedAmount = "MONTHLY".equals(planType) ? 100000 : 1000000;
+            if (!status.equals("paid") || !paidAmount.equals(expectedAmount)) {
+                response.put("success", false);
+                response.put("message", "결제 금액 또는 상태가 일치하지 않습니다.");
+                return response;
+            }
+
+            // 플랜 활성화
+            planService.activatePlan(userId, planType, impUid, merchantUid, amount);
+
+            // 업데이트된 사용자 정보 조회
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                response.put("success", false);
+                response.put("message", "사용자를 찾을 수 없습니다.");
+                return response;
+            }
+
+            response.put("success", true);
+            response.put("message", "플랜 가입이 완료되었습니다.");
+            response.put("planType", user.getPlanType());
+            response.put("planExpiresAt", user.getPlanExpiresAt());
 
         } catch (Exception e) {
             response.put("success", false);
