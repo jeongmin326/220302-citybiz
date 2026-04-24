@@ -43,6 +43,30 @@ public class ConsultingRequest {
     @Column(nullable = false, length = 20)
     private String status;
 
+    /** VIDEO / PHONE / CHAT / OFFLINE */
+    @Column(name = "consultation_type", nullable = false, length = 20)
+    private String consultationType = "CHAT";
+
+    /** 상담 시간(초): 45 / 600(10분) / 1200(20분) */
+    @Column(name = "duration_seconds", nullable = false)
+    private Integer durationSeconds = 600;
+
+    /** 세션 가격(원) */
+    @Column(name = "session_price", nullable = false)
+    private Integer sessionPrice = 0;
+
+    /** 통화 시작 시각 */
+    @Column(name = "call_started_at")
+    private LocalDateTime callStartedAt;
+
+    /** 통화 종료 시각 */
+    @Column(name = "call_ended_at")
+    private LocalDateTime callEndedAt;
+
+    /** 연장 결제 누적액(원) */
+    @Column(name = "extra_paid", nullable = false)
+    private Integer extraPaid = 0;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

@@ -2,6 +2,7 @@ package com.publicservice.controller;
 
 import com.publicservice.entity.ConsultingMessage;
 import com.publicservice.entity.ConsultingRequest;
+import com.publicservice.entity.PointHistory;
 import com.publicservice.entity.User;
 import com.publicservice.repository.AccountantRepository;
 import com.publicservice.repository.ConsultingMessageRepository;
@@ -9,8 +10,10 @@ import com.publicservice.repository.ConsultingRequestRepository;
 import com.publicservice.repository.LaborAttorneyRepository;
 import com.publicservice.repository.LawyerRepository;
 import com.publicservice.repository.PatentAttorneyRepository;
+import com.publicservice.repository.PointHistoryRepository;
 import com.publicservice.repository.TaxAccountantRepository;
 import com.publicservice.repository.UserRepository;
+import java.time.LocalDateTime;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,6 +36,7 @@ public class ConsultingController {
     private final ConsultingRequestRepository requestRepository;
     private final ConsultingMessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final PointHistoryRepository pointHistoryRepository;
     private final PatentAttorneyRepository patentRepo;
     private final TaxAccountantRepository taxRepo;
     private final AccountantRepository accountRepo;
@@ -42,6 +46,7 @@ public class ConsultingController {
     public ConsultingController(ConsultingRequestRepository requestRepository,
                                 ConsultingMessageRepository messageRepository,
                                 UserRepository userRepository,
+                                PointHistoryRepository pointHistoryRepository,
                                 PatentAttorneyRepository patentRepo,
                                 TaxAccountantRepository taxRepo,
                                 AccountantRepository accountRepo,
@@ -50,6 +55,7 @@ public class ConsultingController {
         this.requestRepository = requestRepository;
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;
+        this.pointHistoryRepository = pointHistoryRepository;
         this.patentRepo = patentRepo;
         this.taxRepo = taxRepo;
         this.accountRepo = accountRepo;
@@ -62,16 +68,39 @@ public class ConsultingController {
     // -------------------------------------------------------------------
     @PostMapping("/requests")
     public Map<String, Object> submitRequest(
-            @RequestParam("expertId")   Long expertId,
-            @RequestParam("expertType") String expertType,
-            @RequestParam("title")      String title,
+            @RequestParam("expertId")        Long expertId,
+            @RequestParam("expertType")      String expertType,
+            @RequestParam("title")           String title,
             @RequestParam(value = "content", defaultValue = "") String content,
+            @RequestParam("consultationType") String consultationType,
+            @RequestParam("durationSeconds") Integer durationSeconds,
             HttpSession session) {
 
         Map<String, Object> result = new LinkedHashMap<>();
         Long userId = (Long) session.getAttribute("loginUserId");
         if (userId == null) {
             result.put("error", "로그인이 필요합니다.");
+            return result;
+        }
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            result.put("error", "사용자를 찾을 수 없습니다.");
+            return result;
+        }
+
+        // 서버에서 가격 계산 (10분 기준 가격에서 실제 시간에 따라 비례 계산)
+        Integer basePrice = resolveExpertPrice(expertType, expertId, consultationType);
+        if (basePrice == null || basePrice < 0) {
+            result.put("error", "전문가 정보를 찾을 수 없습니다.");
+            return result;
+        }
+        Integer sessionPrice = Math.round(basePrice * durationSeconds / 600.0f);
+
+        if (user.getPoint() < sessionPrice) {
+            result.put("error", "포인트가 부족합니다.");
+            result.put("currentPoint", user.getPoint());
+            result.put("requiredPoint", sessionPrice);
             return result;
         }
 
@@ -85,6 +114,19 @@ public class ConsultingController {
         // 전문가 userId 조회
         Long expertUserId = resolveExpertUserId(expertType, expertId);
 
+        // 포인트 차감
+        user.setPoint(user.getPoint() - sessionPrice);
+        userRepository.save(user);
+
+        // 포인트 내역 기록
+        PointHistory history = new PointHistory();
+        history.setUserId(userId);
+        history.setAmount(sessionPrice);
+        history.setType("USE");
+        history.setDescription(consultationType + " 상담 결제");
+        pointHistoryRepository.save(history);
+
+        // 자문 요청 생성
         ConsultingRequest req = new ConsultingRequest();
         req.setExpertId(expertId);
         req.setExpertType(expertType);
@@ -92,11 +134,15 @@ public class ConsultingController {
         req.setUserId(userId);
         req.setTitle(title.trim());
         req.setContent(content.isBlank() ? null : content.trim());
+        req.setConsultationType(consultationType);
+        req.setDurationSeconds(durationSeconds);
+        req.setSessionPrice(sessionPrice);
         req.setStatus("PENDING");
         requestRepository.save(req);
 
-        result.put("success",   true);
-        result.put("requestId", req.getRequestId());
+        result.put("success",       true);
+        result.put("requestId",     req.getRequestId());
+        result.put("remainingPoint", user.getPoint());
         return result;
     }
 
@@ -117,17 +163,28 @@ public class ConsultingController {
         List<Map<String, Object>> items = new ArrayList<>();
 
         for (ConsultingRequest r : requests) {
-            String expertName   = resolveExpertName(r.getExpertType(), r.getExpertId());
+            String expertName  = resolveExpertName(r.getExpertType(), r.getExpertId());
             String expertOffice = resolveExpertOffice(r.getExpertType(), r.getExpertId());
+            String expertPhone  = resolveExpertPhone(r.getExpertType(), r.getExpertId());
+            String expertAddr   = resolveExpertAddress(r.getExpertType(), r.getExpertId());
 
             Map<String, Object> item = new LinkedHashMap<>();
-            item.put("requestId",   r.getRequestId());
-            item.put("expertName",  expertName);
-            item.put("expertOffice", expertOffice);
-            item.put("expertType",  r.getExpertType());
-            item.put("title",       r.getTitle());
-            item.put("status",      r.getStatus());
-            item.put("createdAt",   r.getCreatedAt().toLocalDate().toString());
+            item.put("requestId",         r.getRequestId());
+            item.put("expertId",          r.getExpertId());
+            item.put("expertName",        expertName);
+            item.put("expertOffice",      expertOffice);
+            item.put("expertPhone",       expertPhone);
+            item.put("expertAddr",        expertAddr);
+            item.put("expertType",        r.getExpertType());
+            item.put("title",             r.getTitle());
+            item.put("status",            r.getStatus());
+            item.put("consultationType",  r.getConsultationType());
+            item.put("durationSeconds",   r.getDurationSeconds());
+            item.put("sessionPrice",      r.getSessionPrice());
+            item.put("callStartedAt",     r.getCallStartedAt());
+            item.put("callEndedAt",       r.getCallEndedAt());
+            item.put("extraPaid",         r.getExtraPaid());
+            item.put("createdAt",         r.getCreatedAt().toLocalDate().toString());
             items.add(item);
         }
 
@@ -155,13 +212,16 @@ public class ConsultingController {
             User user = userRepository.findById(r.getUserId()).orElse(null);
 
             Map<String, Object> item = new LinkedHashMap<>();
-            item.put("requestId",    r.getRequestId());
-            item.put("userName",     user != null ? user.getName()        : "알 수 없음");
-            item.put("companyName",  user != null ? user.getCompanyName() : "-");
-            item.put("title",        r.getTitle());
-            item.put("content",      r.getContent());
-            item.put("status",       r.getStatus());
-            item.put("createdAt",    r.getCreatedAt().toLocalDate().toString());
+            item.put("requestId",       r.getRequestId());
+            item.put("userName",        user != null ? user.getName()        : "알 수 없음");
+            item.put("companyName",     user != null ? user.getCompanyName() : "-");
+            item.put("userPhone",       user != null ? user.getPhone()       : "-");
+            item.put("title",           r.getTitle());
+            item.put("content",         r.getContent());
+            item.put("status",          r.getStatus());
+            item.put("consultationType",r.getConsultationType());
+            item.put("durationSeconds", r.getDurationSeconds());
+            item.put("createdAt",       r.getCreatedAt().toLocalDate().toString());
             items.add(item);
         }
 
@@ -203,7 +263,7 @@ public class ConsultingController {
             result.put("error", "권한이 없습니다.");
             return result;
         }
-        if (!"ACCEPTED".equals(newStatus) && !"REJECTED".equals(newStatus)) {
+        if (!"ACCEPTED".equals(newStatus) && !"REJECTED".equals(newStatus) && !"COMPLETED".equals(newStatus)) {
             result.put("error", "유효하지 않은 상태값입니다.");
             return result;
         }
@@ -299,9 +359,15 @@ public class ConsultingController {
             items.add(item);
         }
 
-        result.put("items",      items);
-        result.put("myRole",     isExpert ? "EXPERT" : "USER");
-        result.put("requestTitle", req.getTitle());
+        result.put("items",             items);
+        result.put("myRole",            isExpert ? "EXPERT" : "USER");
+        result.put("requestTitle",      req.getTitle());
+        result.put("consultationType",  req.getConsultationType());
+        result.put("durationSeconds",   req.getDurationSeconds());
+        result.put("sessionPrice",      req.getSessionPrice());
+        result.put("callStartedAt",     req.getCallStartedAt());
+        result.put("callEndedAt",       req.getCallEndedAt());
+        result.put("extraPaid",         req.getExtraPaid());
         return result;
     }
 
@@ -355,6 +421,156 @@ public class ConsultingController {
         return result;
     }
 
+    // -------------------------------------------------------------------
+    // POST /api/consulting/{id}/start-call — 통화 시작 (시간 기록)
+    // -------------------------------------------------------------------
+    @PostMapping("/requests/{id}/start-call")
+    public Map<String, Object> startCall(
+            @PathVariable("id") Long requestId,
+            HttpSession session) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId == null) {
+            result.put("error", "로그인이 필요합니다.");
+            return result;
+        }
+
+        Optional<ConsultingRequest> opt = requestRepository.findById(requestId);
+        if (opt.isEmpty()) {
+            result.put("error", "요청을 찾을 수 없습니다.");
+            return result;
+        }
+        ConsultingRequest req = opt.get();
+
+        if (!userId.equals(req.getUserId()) && !userId.equals(req.getExpertUserId())) {
+            result.put("error", "권한이 없습니다.");
+            return result;
+        }
+
+        if (req.getCallStartedAt() == null) {
+            req.setCallStartedAt(LocalDateTime.now());
+            requestRepository.save(req);
+        }
+
+        result.put("success", true);
+        return result;
+    }
+
+    // -------------------------------------------------------------------
+    // POST /api/consulting/{id}/end-call — 통화 종료 (시간 기록)
+    // -------------------------------------------------------------------
+    @PostMapping("/requests/{id}/end-call")
+    public Map<String, Object> endCall(
+            @PathVariable("id") Long requestId,
+            HttpSession session) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId == null) {
+            result.put("error", "로그인이 필요합니다.");
+            return result;
+        }
+
+        Optional<ConsultingRequest> opt = requestRepository.findById(requestId);
+        if (opt.isEmpty()) {
+            result.put("error", "요청을 찾을 수 없습니다.");
+            return result;
+        }
+        ConsultingRequest req = opt.get();
+
+        if (!userId.equals(req.getUserId()) && !userId.equals(req.getExpertUserId())) {
+            result.put("error", "권한이 없습니다.");
+            return result;
+        }
+
+        req.setCallEndedAt(LocalDateTime.now());
+        requestRepository.save(req);
+
+        result.put("success", true);
+        return result;
+    }
+
+    // -------------------------------------------------------------------
+    // POST /api/consulting/{id}/extend — 통화 연장 (포인트 또는 카드)
+    // -------------------------------------------------------------------
+    @PostMapping("/requests/{id}/extend")
+    public Map<String, Object> extendCall(
+            @PathVariable("id") Long requestId,
+            @RequestParam("payType") String payType,
+            @RequestParam("addSeconds") Integer addSeconds,
+            HttpSession session) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId == null) {
+            result.put("error", "로그인이 필요합니다.");
+            return result;
+        }
+
+        Optional<ConsultingRequest> opt = requestRepository.findById(requestId);
+        if (opt.isEmpty()) {
+            result.put("error", "요청을 찾을 수 없습니다.");
+            return result;
+        }
+        ConsultingRequest req = opt.get();
+
+        if (!userId.equals(req.getUserId()) && !userId.equals(req.getExpertUserId())) {
+            result.put("error", "권한이 없습니다.");
+            return result;
+        }
+
+        if ("POINT".equals(payType)) {
+            // 10분 기준 가격으로 추가 시간 계산
+            Integer basePrice = resolveExpertPrice(req.getExpertType(), req.getExpertId(), req.getConsultationType());
+            if (basePrice == null || basePrice < 0) {
+                result.put("error", "전문가 정보를 찾을 수 없습니다.");
+                return result;
+            }
+            Integer extensionCost = Math.round(basePrice * addSeconds / 600.0f);
+
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null) {
+                result.put("error", "사용자를 찾을 수 없습니다.");
+                return result;
+            }
+
+            if (user.getPoint() < extensionCost) {
+                result.put("error", "포인트가 부족합니다.");
+                result.put("required", extensionCost);
+                result.put("current", user.getPoint());
+                return result;
+            }
+
+            // 포인트 차감
+            user.setPoint(user.getPoint() - extensionCost);
+            userRepository.save(user);
+
+            // 포인트 내역 기록
+            PointHistory history = new PointHistory();
+            history.setUserId(userId);
+            history.setAmount(extensionCost);
+            history.setType("USE");
+            history.setDescription("통화 연장");
+            pointHistoryRepository.save(history);
+
+            // 시간 연장
+            req.setDurationSeconds(req.getDurationSeconds() + addSeconds);
+            req.setExtraPaid(req.getExtraPaid() + extensionCost);
+            requestRepository.save(req);
+
+            result.put("success", true);
+            result.put("newDuration", req.getDurationSeconds());
+            result.put("remainingPoint", user.getPoint());
+        } else if ("CARD".equals(payType)) {
+            result.put("error", "카드 결제는 아직 구현되지 않았습니다.");
+        } else {
+            result.put("error", "유효하지 않은 결제 방식입니다.");
+        }
+
+        return result;
+    }
+
     // expertType은 한국어 레이블("변리사","세무사","회계사","노무사","변호사") 사용
     private Long resolveExpertUserId(String expertType, Long expertId) {
         return switch (expertType) {
@@ -386,6 +602,60 @@ public class ConsultingController {
             case "노무사" -> laborRepo.findById(expertId).map(e -> e.getOffice()).orElse("-");
             case "변호사" -> lawyerRepo.findById(expertId).map(e -> e.getOffice()).orElse("-");
             default      -> "-";
+        };
+    }
+
+    private String resolveExpertPhone(String expertType, Long expertId) {
+        return switch (expertType) {
+            case "변리사" -> patentRepo.findById(expertId).map(e -> e.getPhone()).orElse("-");
+            case "세무사" -> taxRepo.findById(expertId).map(e -> e.getPhone()).orElse("-");
+            case "회계사" -> accountRepo.findById(expertId).map(e -> e.getPhone()).orElse("-");
+            case "노무사" -> laborRepo.findById(expertId).map(e -> e.getPhone()).orElse("-");
+            case "변호사" -> lawyerRepo.findById(expertId).map(e -> e.getPhone()).orElse("-");
+            default      -> "-";
+        };
+    }
+
+    private String resolveExpertAddress(String expertType, Long expertId) {
+        return switch (expertType) {
+            case "변리사" -> patentRepo.findById(expertId).map(e -> e.getAddr()).orElse("-");
+            case "세무사" -> taxRepo.findById(expertId).map(e -> e.getAddr()).orElse("-");
+            case "회계사" -> accountRepo.findById(expertId).map(e -> e.getAddr()).orElse("-");
+            case "노무사" -> laborRepo.findById(expertId).map(e -> e.getAddr()).orElse("-");
+            case "변호사" -> lawyerRepo.findById(expertId).map(e -> e.getAddr()).orElse("-");
+            default      -> "-";
+        };
+    }
+
+    // 10분 기준 가격 조회 (상담 타입에 따라 VIDEO/CHAT/CALL 가격)
+    private Integer resolveExpertPrice(String expertType, Long expertId, String consultationType) {
+        return switch (expertType) {
+            case "변리사" -> patentRepo.findById(expertId).map(e ->
+                "VIDEO".equals(consultationType) ? e.getPriceVideo() :
+                "CHAT".equals(consultationType) ? e.getPriceChat() :
+                "PHONE".equals(consultationType) ? e.getPriceCall() : 0
+            ).orElse(0);
+            case "세무사" -> taxRepo.findById(expertId).map(e ->
+                "VIDEO".equals(consultationType) ? e.getPriceVideo() :
+                "CHAT".equals(consultationType) ? e.getPriceChat() :
+                "PHONE".equals(consultationType) ? e.getPriceCall() : 0
+            ).orElse(0);
+            case "회계사" -> accountRepo.findById(expertId).map(e ->
+                "VIDEO".equals(consultationType) ? e.getPriceVideo() :
+                "CHAT".equals(consultationType) ? e.getPriceChat() :
+                "PHONE".equals(consultationType) ? e.getPriceCall() : 0
+            ).orElse(0);
+            case "노무사" -> laborRepo.findById(expertId).map(e ->
+                "VIDEO".equals(consultationType) ? e.getPriceVideo() :
+                "CHAT".equals(consultationType) ? e.getPriceChat() :
+                "PHONE".equals(consultationType) ? e.getPriceCall() : 0
+            ).orElse(0);
+            case "변호사" -> lawyerRepo.findById(expertId).map(e ->
+                "VIDEO".equals(consultationType) ? e.getPriceVideo() :
+                "CHAT".equals(consultationType) ? e.getPriceChat() :
+                "PHONE".equals(consultationType) ? e.getPriceCall() : 0
+            ).orElse(0);
+            default      -> 0;
         };
     }
 }

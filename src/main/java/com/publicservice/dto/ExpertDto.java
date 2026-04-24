@@ -17,8 +17,11 @@ public class ExpertDto {
     private BigDecimal rating;
     private String consultTime;
     private Integer experienceYears;
-    private Integer price;
+    private Integer priceCall;
+    private Integer priceVideo;
+    private Integer priceChat;
     private String address;
+    private String district;
     private String expertType;
 
     public static ExpertDto from(PatentAttorney e) {
@@ -31,8 +34,11 @@ public class ExpertDto {
         dto.rating = e.getRating();
         dto.consultTime = e.getConsultTime();
         dto.experienceYears = e.getExperienceYears();
-        dto.price = e.getPrice();
+        dto.priceCall = e.getPriceCall();
+        dto.priceVideo = e.getPriceVideo();
+        dto.priceChat = e.getPriceChat();
         dto.address = e.getAddr();
+        dto.district = e.getDistrict();
         dto.expertType = "변리사";
         return dto;
     }
@@ -47,8 +53,11 @@ public class ExpertDto {
         dto.rating = e.getRating();
         dto.consultTime = e.getConsultTime();
         dto.experienceYears = e.getExperienceYears();
-        dto.price = e.getPrice();
+        dto.priceCall = e.getPriceCall();
+        dto.priceVideo = e.getPriceVideo();
+        dto.priceChat = e.getPriceChat();
         dto.address = e.getAddr();
+        dto.district = e.getDistrict();
         dto.expertType = "세무사";
         return dto;
     }
@@ -63,8 +72,11 @@ public class ExpertDto {
         dto.rating = e.getRating();
         dto.consultTime = e.getConsultTime();
         dto.experienceYears = e.getExperienceYears();
-        dto.price = e.getPrice();
+        dto.priceCall = e.getPriceCall();
+        dto.priceVideo = e.getPriceVideo();
+        dto.priceChat = e.getPriceChat();
         dto.address = e.getAddr();
+        dto.district = e.getDistrict();
         dto.expertType = "회계사";
         return dto;
     }
@@ -79,8 +91,11 @@ public class ExpertDto {
         dto.rating = e.getRating();
         dto.consultTime = e.getConsultTime();
         dto.experienceYears = e.getExperienceYears();
-        dto.price = e.getPrice();
+        dto.priceCall = e.getPriceCall();
+        dto.priceVideo = e.getPriceVideo();
+        dto.priceChat = e.getPriceChat();
         dto.address = e.getAddr();
+        dto.district = e.getDistrict();
         dto.expertType = "노무사";
         return dto;
     }
@@ -95,8 +110,11 @@ public class ExpertDto {
         dto.rating = e.getRating();
         dto.consultTime = e.getConsultTime();
         dto.experienceYears = e.getExperienceYears();
-        dto.price = e.getPrice();
+        dto.priceCall = e.getPriceCall();
+        dto.priceVideo = e.getPriceVideo();
+        dto.priceChat = e.getPriceChat();
         dto.address = e.getAddr();
+        dto.district = e.getDistrict();
         dto.expertType = "변호사";
         return dto;
     }
@@ -109,7 +127,10 @@ public class ExpertDto {
     public BigDecimal getRating() { return rating; }
     public String getConsultTime() { return consultTime; }
     public Integer getExperienceYears() { return experienceYears; }
-    public Integer getPrice() { return price; }
+    public Integer getPriceCall() { return priceCall; }
+    public Integer getPriceVideo() { return priceVideo; }
+    public Integer getPriceChat() { return priceChat; }
     public String getAddress() { return address; }
+    public String getDistrict() { return district; }
     public String getExpertType() { return expertType; }
 }

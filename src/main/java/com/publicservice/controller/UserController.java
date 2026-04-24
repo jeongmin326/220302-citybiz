@@ -180,7 +180,7 @@ public class UserController {
                                 e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
                                 e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
                                 e.setRoadAddress(safeRoad); e.setField(safeField);
-                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPriceCall(expPrice);
                                 e.setRating(BigDecimal.ZERO);
                                 taxAccountantRepository.save(e);
                             }
@@ -189,7 +189,7 @@ public class UserController {
                                 e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
                                 e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
                                 e.setRoadAddress(safeRoad); e.setField(safeField);
-                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPriceCall(expPrice);
                                 e.setRating(BigDecimal.ZERO);
                                 accountantRepository.save(e);
                             }
@@ -198,7 +198,7 @@ public class UserController {
                                 e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
                                 e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
                                 e.setRoadAddress(safeRoad); e.setField(safeField);
-                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPriceCall(expPrice);
                                 e.setRating(BigDecimal.ZERO);
                                 laborAttorneyRepository.save(e);
                             }
@@ -207,7 +207,7 @@ public class UserController {
                                 e.setUserId(newUserId); e.setName(safeName); e.setOffice(safeOffice);
                                 e.setPhone(safePhone);  e.setCity(safeCity);  e.setDistrict(safeDist);
                                 e.setRoadAddress(safeRoad); e.setField(safeField);
-                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPrice(expPrice);
+                                e.setConsultTime(safeCT); e.setExperienceYears(expYrs); e.setPriceCall(expPrice);
                                 e.setRating(BigDecimal.ZERO);
                                 lawyerRepository.save(e);
                             }
@@ -430,6 +430,22 @@ public class UserController {
         if (req.getIndustry() != null) user.setIndustry(req.getIndustry().trim());
         userRepository.save(user);
         result.put("success", true);
+        return result;
+    }
+
+    @GetMapping("/api/user/my-info")
+    @ResponseBody
+    public Map<String, Object> getMyInfo(HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        Long userId = (Long) session.getAttribute("loginUserId");
+        if (userId != null) {
+            Optional<User> opt = userRepository.findById(userId);
+            if (opt.isPresent()) {
+                result.put("point", opt.get().getPoint());
+                return result;
+            }
+        }
+        result.put("point", 0);
         return result;
     }
 

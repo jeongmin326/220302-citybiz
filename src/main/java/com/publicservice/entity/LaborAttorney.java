@@ -48,7 +48,14 @@ public class LaborAttorney {
     @Column(name = "experience_years")
     private Integer experienceYears;
 
-    private Integer price;
+    @Column(name = "price_call", nullable = false)
+    private Integer priceCall = 0;
+
+    @Column(name = "price_video", nullable = false)
+    private Integer priceVideo = 0;
+
+    @Column(name = "price_chat", nullable = false)
+    private Integer priceChat = 0;
 
     @Column(precision = 10, scale = 7)
     private BigDecimal latitude;

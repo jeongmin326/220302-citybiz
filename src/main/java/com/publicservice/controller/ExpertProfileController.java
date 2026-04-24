@@ -120,7 +120,9 @@ public class ExpertProfileController {
         e.setField(req.getField());
         e.setConsultTime(req.getConsultTime());
         e.setExperienceYears(req.getExperienceYears());
-        e.setPrice(req.getPrice());
+        e.setPriceCall(req.getPrice());
+        if (e.getPriceVideo() == null) e.setPriceVideo(0);
+        if (e.getPriceChat() == null) e.setPriceChat(0);
         if (e.getRating() == null) e.setRating(BigDecimal.ZERO);
         if (req.getLatitude()  != null) e.setLatitude(BigDecimal.valueOf(req.getLatitude()));
         if (req.getLongitude() != null) e.setLongitude(BigDecimal.valueOf(req.getLongitude()));
@@ -137,7 +139,9 @@ public class ExpertProfileController {
         e.setField(req.getField());
         e.setConsultTime(req.getConsultTime());
         e.setExperienceYears(req.getExperienceYears());
-        e.setPrice(req.getPrice());
+        e.setPriceCall(req.getPrice());
+        if (e.getPriceVideo() == null) e.setPriceVideo(0);
+        if (e.getPriceChat() == null) e.setPriceChat(0);
         if (e.getRating() == null) e.setRating(BigDecimal.ZERO);
         if (req.getLatitude()  != null) e.setLatitude(BigDecimal.valueOf(req.getLatitude()));
         if (req.getLongitude() != null) e.setLongitude(BigDecimal.valueOf(req.getLongitude()));
@@ -154,7 +158,9 @@ public class ExpertProfileController {
         e.setField(req.getField());
         e.setConsultTime(req.getConsultTime());
         e.setExperienceYears(req.getExperienceYears());
-        e.setPrice(req.getPrice());
+        e.setPriceCall(req.getPrice());
+        if (e.getPriceVideo() == null) e.setPriceVideo(0);
+        if (e.getPriceChat() == null) e.setPriceChat(0);
         if (e.getRating() == null) e.setRating(BigDecimal.ZERO);
         if (req.getLatitude()  != null) e.setLatitude(BigDecimal.valueOf(req.getLatitude()));
         if (req.getLongitude() != null) e.setLongitude(BigDecimal.valueOf(req.getLongitude()));
@@ -171,7 +177,9 @@ public class ExpertProfileController {
         e.setField(req.getField());
         e.setConsultTime(req.getConsultTime());
         e.setExperienceYears(req.getExperienceYears());
-        e.setPrice(req.getPrice());
+        e.setPriceCall(req.getPrice());
+        if (e.getPriceVideo() == null) e.setPriceVideo(0);
+        if (e.getPriceChat() == null) e.setPriceChat(0);
         if (e.getRating() == null) e.setRating(BigDecimal.ZERO);
         if (req.getLatitude()  != null) e.setLatitude(BigDecimal.valueOf(req.getLatitude()));
         if (req.getLongitude() != null) e.setLongitude(BigDecimal.valueOf(req.getLongitude()));
@@ -188,7 +196,9 @@ public class ExpertProfileController {
         e.setField(req.getField());
         e.setConsultTime(req.getConsultTime());
         e.setExperienceYears(req.getExperienceYears());
-        e.setPrice(req.getPrice());
+        e.setPriceCall(req.getPrice());
+        if (e.getPriceVideo() == null) e.setPriceVideo(0);
+        if (e.getPriceChat() == null) e.setPriceChat(0);
         if (e.getRating() == null) e.setRating(BigDecimal.ZERO);
         if (req.getLatitude()  != null) e.setLatitude(BigDecimal.valueOf(req.getLatitude()));
         if (req.getLongitude() != null) e.setLongitude(BigDecimal.valueOf(req.getLongitude()));

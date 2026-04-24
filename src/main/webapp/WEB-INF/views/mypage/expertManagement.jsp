@@ -107,14 +107,16 @@
                         <tr>
                             <th class="px-6 py-4">신청자</th>
                             <th class="px-6 py-4">자문 제목</th>
+                            <th class="px-6 py-4">상담 방식</th>
                             <th class="px-6 py-4">신청일</th>
                             <th class="px-6 py-4">상태</th>
                             <th class="px-6 py-4 text-center">관리</th>
+                            <th class="px-6 py-4 text-center">비고</th>
                         </tr>
                     </thead>
                     <tbody id="consulting-list" class="divide-y divide-slate-100 text-slate-600">
                         <tr id="loadingRow">
-                            <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">불러오는 중...</td>
+                            <td colspan="7" class="px-6 py-10 text-center text-slate-400 text-sm">불러오는 중...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -198,10 +200,11 @@
 
         function statusBadge(status) {
             const map = {
-                PENDING:   '<span class="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-md text-xs font-bold">대기 중</span>',
-                ACCEPTED:  '<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-md text-xs font-bold">진행 중</span>',
-                REJECTED:  '<span class="bg-red-100 text-red-600 px-2.5 py-1 rounded-md text-xs font-bold">거절됨</span>',
-                CANCELLED: '<span class="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md text-xs font-bold">취소됨</span>'
+                PENDING:    '<span class="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-md text-xs font-bold">대기 중</span>',
+                ACCEPTED:   '<span class="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-md text-xs font-bold">진행 중</span>',
+                COMPLETED:  '<span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-md text-xs font-bold">완료됨</span>',
+                REJECTED:   '<span class="bg-red-100 text-red-600 px-2.5 py-1 rounded-md text-xs font-bold">거절됨</span>',
+                CANCELLED:  '<span class="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md text-xs font-bold">취소됨</span>'
             };
             return map[status] || '<span class="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md text-xs font-bold">' + escapeHtml(status) + '</span>';
         }
@@ -214,13 +217,52 @@
                     + '</div>';
             }
             if (item.status === 'ACCEPTED') {
+                let actionHtml = '';
+                if (item.consultationType === 'CHAT') {
+                    actionHtml = '<button onclick="openChat(' + item.requestId + ')" class="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors flex items-center gap-1.5">'
+                        + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>'
+                        + '채팅하기</button>';
+                } else if (item.consultationType === 'PHONE') {
+                    actionHtml = '<div class="text-center"><p class="text-sm font-bold text-slate-900">' + escapeHtml(item.userPhone) + '</p></div>';
+                } else if (item.consultationType === 'OFFLINE') {
+                    actionHtml = '<div class="text-center"><p class="text-sm font-bold text-slate-900">' + escapeHtml(item.userPhone) + '</p></div>';
+                }
                 return '<div class="flex justify-center">'
-                    + '<button onclick="openChat(' + item.requestId + ')" class="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors flex items-center gap-1.5">'
-                    + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>'
-                    + '채팅하기</button>'
+                    + actionHtml
+                    + '</div>';
+            }
+            if (item.status === 'COMPLETED') {
+                if (item.consultationType === 'PHONE') {
+                    return '<div class="text-center"><p class="text-sm font-bold text-slate-900">' + escapeHtml(item.userPhone) + '</p></div>';
+                }
+                if (item.consultationType === 'OFFLINE') {
+                    return '<div class="text-center"><p class="text-sm font-bold text-slate-900">' + escapeHtml(item.userPhone) + '</p></div>';
+                }
+                return '<div class="text-center text-slate-400 text-xs">-</div>';
+            }
+            if (item.status === 'REJECTED') {
+                return '<div class="text-center text-slate-400 text-xs">-</div>';
+            }
+            return '<div class="text-center text-slate-400 text-xs">-</div>';
+        }
+
+        function remarksButtons(item) {
+            if (item.status === 'ACCEPTED') {
+                return '<div class="flex justify-center">'
+                    + '<button onclick="updateStatus(' + item.requestId + ',\'COMPLETED\')" class="px-3 py-1.5 bg-green-600 text-white rounded-lg text-xs font-bold hover:bg-green-700 transition-colors">상담완료</button>'
                     + '</div>';
             }
             return '<div class="text-center text-slate-400 text-xs">-</div>';
+        }
+
+        function consultationTypeBadge(type) {
+            const map = {
+                'CHAT': '<span class="bg-violet-100 text-violet-700 px-2.5 py-1 rounded-md text-xs font-bold">💬 채팅</span>',
+                'VIDEO': '<span class="bg-blue-100 text-blue-700 px-2.5 py-1 rounded-md text-xs font-bold">📹 영상</span>',
+                'PHONE': '<span class="bg-cyan-100 text-cyan-700 px-2.5 py-1 rounded-md text-xs font-bold">📞 전화</span>',
+                'OFFLINE': '<span class="bg-amber-100 text-amber-700 px-2.5 py-1 rounded-md text-xs font-bold">📍 대면</span>'
+            };
+            return map[type] || '<span class="bg-slate-100 text-slate-500 px-2.5 py-1 rounded-md text-xs font-bold">-</span>';
         }
 
         function renderRow(item) {
@@ -232,9 +274,11 @@
             return '<tr class="hover:bg-slate-50 transition-colors" data-id="' + item.requestId + '">'
                 + '<td class="px-6 py-4"><p class="font-bold text-slate-900">' + escapeHtml(item.userName) + '</p><p class="text-xs text-slate-500">' + escapeHtml(item.companyName || '') + '</p></td>'
                 + '<td class="px-6 py-4">' + titleCell + '</td>'
+                + '<td class="px-6 py-4">' + consultationTypeBadge(item.consultationType) + '</td>'
                 + '<td class="px-6 py-4">' + escapeHtml(item.createdAt) + '</td>'
                 + '<td class="px-6 py-4 status-cell">' + statusBadge(item.status) + '</td>'
                 + '<td class="px-6 py-4 action-cell">' + actionButtons(item) + '</td>'
+                + '<td class="px-6 py-4 remarks-cell">' + remarksButtons(item) + '</td>'
                 + '</tr>';
         }
 
@@ -247,7 +291,7 @@
 
                 if (data.error) {
                     document.getElementById('loadingRow').innerHTML =
-                        '<td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">' + escapeHtml(data.error) + '</td>';
+                        '<td colspan="7" class="px-6 py-10 text-center text-slate-400 text-sm">' + escapeHtml(data.error) + '</td>';
                     return;
                 }
 
@@ -259,13 +303,13 @@
 
                 const tbody = document.getElementById('consulting-list');
                 if (_requestsCache.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">접수된 자문요청이 없습니다.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-10 text-center text-slate-400 text-sm">접수된 자문요청이 없습니다.</td></tr>';
                 } else {
                     tbody.innerHTML = _requestsCache.map(renderRow).join('');
                 }
             } catch (e) {
                 document.getElementById('loadingRow').innerHTML =
-                    '<td colspan="5" class="px-6 py-10 text-center text-red-400 text-sm">데이터를 불러오지 못했습니다.</td>';
+                    '<td colspan="7" class="px-6 py-10 text-center text-red-400 text-sm">데이터를 불러오지 못했습니다.</td>';
             }
         }
 
@@ -286,10 +330,11 @@
                     if (row) {
                         row.querySelector('.status-cell').innerHTML = statusBadge(newStatus);
                         row.querySelector('.action-cell').innerHTML = actionButtons(updatedItem);
+                        row.querySelector('.remarks-cell').innerHTML = remarksButtons(updatedItem);
                     }
                 }
-                // 수락 시 바로 채팅 열기
-                if (newStatus === 'ACCEPTED') {
+                // 수락 시 채팅 타입일 때만 바로 채팅 열기
+                if (newStatus === 'ACCEPTED' && updatedItem && updatedItem.consultationType === 'CHAT') {
                     loadRequests().then(function() { openChat(requestId); });
                 } else {
                     loadRequests();
@@ -346,6 +391,10 @@
             const overlay = document.getElementById('chatOverlay');
             panel.classList.add('translate-x-full', 'opacity-0', 'pointer-events-none');
             overlay.classList.add('hidden');
+        };
+
+        window.openVideoCall = function (requestId) {
+            window.open('/video/call?requestId=' + requestId, 'videoCall_' + requestId, 'width=1200,height=700,resizable=yes');
         };
 
         function startPolling() {

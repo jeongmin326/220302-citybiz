@@ -443,17 +443,16 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             const address = escapeHtml(consultant.address || '주소 정보 없음');
             const expertType = escapeHtml(consultant.expertType || '전문가');
             const fieldLabel = getFieldLabel(consultant.field);
-            const regionLabel = getRegionLabel(consultant.address);
+            const regionLabel = escapeHtml(consultant.district || '전국');
             const consultTimeLabel = getConsultTimeLabel(consultant.consultTime);
             const experienceLabel = getExperienceLabel(consultant.experienceYears);
-            const priceLabel = getPriceLabel(consultant.price);
+            const priceLabel = getPriceLabel(consultant.priceCall);
             const ratingLabel = getRatingLabel(consultant.rating);
-            const summaryTags = createTag(fieldLabel) + createTag(regionLabel);
+            const summaryTags = createTag(regionLabel);
             const detailTags = summaryTags
                 + createTag('평점 ' + ratingLabel)
                 + createTag(getConsultTimeLabel(consultant.consultTime))
-                + createTag('경력 ' + experienceLabel)
-                + createTag('비용 ' + priceLabel);
+                + createTag('경력 ' + experienceLabel);
 
             return ''
                 + '<div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm transition-all duration-500 ease-out group flex flex-col gap-3 relative h-max transform will-change-transform hover:border-blue-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.01]">'
@@ -497,7 +496,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
                 + '<button onclick="openMapModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">위치 보기</button>'
-                + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
+                + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\', ' + (consultant.priceCall || 0) + ', ' + (consultant.priceVideo || 0) + ', ' + (consultant.priceChat || 0) + ')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
                 + '</div>'
                 + '</div>'
                 + '<div class="flex md:hidden flex-col gap-3 mt-1">'
@@ -507,7 +506,7 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
                 + '<div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 leading-relaxed">' + address + '</div>'
                 + '<div class="flex gap-2 mt-2">'
                 + '<button onclick="openMapModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">위치 보기</button>'
-                + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\')" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
+                + '<button onclick="openRequestModal(' + consultant.id + ', \'' + escapeAttr(consultant.expertType) + '\', \'' + escapeAttr(consultant.name) + '\', \'' + escapeAttr(consultant.office) + '\', ' + (consultant.priceCall || 0) + ', ' + (consultant.priceVideo || 0) + ', ' + (consultant.priceChat || 0) + ')" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">자문요청 남기기</button>'
                 + '</div>'
                 + '</div>'
                 + '</div>';
@@ -772,6 +771,34 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
         <div class="flex flex-col gap-4">
             <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">상담 방식 <span class="text-red-500">*</span></label>
+                <select id="modalConsultationType" onchange="updateDurationOptions(); updateExpectedPrice();"
+                        class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all">
+                    <option value="">선택해주세요</option>
+                    <option value="VIDEO">영상통화</option>
+                    <option value="PHONE">전화</option>
+                    <option value="CHAT">채팅</option>
+                    <option value="OFFLINE">대면</option>
+                </select>
+            </div>
+
+            <div id="durationSection">
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">상담 시간 <span class="text-red-500">*</span></label>
+                <select id="modalDuration" onchange="updateExpectedPrice()"
+                        class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all">
+                    <option value="">선택해주세요</option>
+                    <option value="45">45초</option>
+                    <option value="600">10분</option>
+                    <option value="1200">20분</option>
+                </select>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
+                <p class="text-sm text-slate-600 mb-1">예상 결제 금액: <span id="expectedPrice" class="font-bold text-blue-600">-</span> 포인트</p>
+                <p class="text-xs text-slate-500">현재 보유: <span id="currentPoint" class="font-semibold">-</span> 포인트</p>
+            </div>
+
+            <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">자문 제목 <span class="text-red-500">*</span></label>
                 <input type="text" id="modalTitle" maxlength="200" placeholder="예: 초기 스타트업 절세 방법 문의"
                        class="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition-all">
@@ -799,7 +826,12 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
     var isLoggedIn = ${not empty sessionScope.loginUser};
 
-    window.openRequestModal = function (expertId, expertType, expertName, expertOffice) {
+    // 전문가별 요금 저장
+    window.expertPrices = {};
+
+    window.openRequestModal = function (expertId, expertType, expertName, expertOffice, priceCall, priceVideo, priceChat) {
+        console.log('openRequestModal called with:', {expertId, expertType, expertName, expertOffice, priceCall, priceVideo, priceChat});
+
         if (!isLoggedIn) {
             alert('로그인이 필요합니다.');
             location.href = '/login';
@@ -808,12 +840,38 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         _reqExpertId   = expertId;
         _reqExpertType = expertType;
 
-        document.getElementById('modalExpertInfo').textContent =
-            expertOffice + ' · ' + expertName + ' ' + expertType;
-        document.getElementById('modalTitle').value   = '';
-        document.getElementById('modalContent').value = '';
-        document.getElementById('modalError').classList.add('hidden');
-        document.getElementById('modalError').textContent = '';
+        expertPrices[expertId] = { VIDEO: priceVideo, CHAT: priceChat, PHONE: priceCall, OFFLINE: priceCall };
+        console.log('expertPrices set for', expertId, ':', expertPrices[expertId]);
+
+        const modalExpertInfo = document.getElementById('modalExpertInfo');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        const modalConsultationType = document.getElementById('modalConsultationType');
+        const modalDuration = document.getElementById('modalDuration');
+        const modalError = document.getElementById('modalError');
+        const expectedPriceEl = document.getElementById('expectedPrice');
+
+        if (modalExpertInfo) modalExpertInfo.textContent = expertOffice + ' · ' + expertName + ' ' + expertType;
+        if (modalTitle) modalTitle.value = '';
+        if (modalContent) modalContent.value = '';
+        if (modalConsultationType) modalConsultationType.value = '';
+        if (modalDuration) modalDuration.value = '';
+        if (modalError) {
+            modalError.classList.add('hidden');
+            modalError.textContent = '';
+        }
+        if (expectedPriceEl) expectedPriceEl.textContent = '-';
+
+        const durationSection = document.getElementById('durationSection');
+        if (durationSection) durationSection.classList.remove('hidden');
+        const durationOptions = modalDuration.querySelectorAll('option');
+        durationOptions.forEach(opt => opt.classList.remove('hidden'));
+
+        fetch('/api/user/my-info').then(r => r.json()).then(data => {
+            document.getElementById('currentPoint').textContent = (data.point || 0).toLocaleString();
+        }).catch(() => {
+            document.getElementById('currentPoint').textContent = '포인트 조회 중...';
+        });
 
         const modal = document.getElementById('requestModal');
         modal.classList.remove('hidden');
@@ -827,9 +885,83 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
         modal.classList.remove('flex');
     };
 
+    window.updateExpectedPrice = function () {
+        const type = document.getElementById('modalConsultationType').value;
+        const duration = document.getElementById('modalDuration').value;
+        const priceBox = document.querySelector('.bg-blue-50.border.border-blue-200');
+
+        console.log('updateExpectedPrice called - type:', type, 'duration:', duration);
+
+        if (!priceBox) {
+            console.error('Price box not found with selector .bg-blue-50.border.border-blue-200');
+            return;
+        }
+
+        if (!type || (type !== 'OFFLINE' && !duration)) {
+            const currentPointText = document.getElementById('currentPoint').textContent;
+            priceBox.innerHTML = '<p class="text-sm text-slate-600 mb-1">예상 결제 금액: <span id="expectedPrice" class="font-bold text-blue-600">-</span> 포인트</p><p class="text-xs text-slate-500">현재 보유: <span id="currentPoint" class="font-semibold">' + currentPointText + '</span> 포인트</p>';
+            return;
+        }
+
+        if (type === 'OFFLINE') {
+            console.log('Setting OFFLINE message');
+            const currentPointText = document.getElementById('currentPoint') ? document.getElementById('currentPoint').textContent : '-';
+            priceBox.innerHTML = '<p class="text-sm text-blue-700 font-semibold text-center mb-1">만나서 결제해주세요!</p><p class="text-xs text-slate-500">현재 보유: <span id="currentPoint" class="font-semibold">' + currentPointText + '</span> 포인트</p>';
+            return;
+        }
+
+        const durationSeconds = parseInt(duration);
+        const expertPrice = expertPrices[_reqExpertId];
+        console.log('_reqExpertId:', _reqExpertId, 'expertPrice:', expertPrice);
+
+        const basePrice = (expertPrice && expertPrice[type]) || 0;
+        console.log('basePrice for', type, ':', basePrice);
+
+        const sessionPrice = basePrice > 0 ? Math.round(basePrice * durationSeconds / 600) : 0;
+        const priceDisplay = sessionPrice > 0 ? sessionPrice.toLocaleString() : '가격 조회 중';
+        console.log('sessionPrice:', sessionPrice, 'priceDisplay:', priceDisplay);
+
+        const currentPointText = document.getElementById('currentPoint').textContent;
+        let priceHTML = '<p class="text-sm text-slate-600 mb-1">예상 결제 금액: <span id="expectedPrice" class="font-bold text-blue-600">' + priceDisplay + '</span> 포인트</p><p class="text-xs text-slate-500">현재 보유: <span id="currentPoint" class="font-semibold">' + currentPointText + '</span> 포인트</p>';
+
+        if (type === 'CHAT' || type === 'PHONE') {
+            priceHTML += '<p class="text-xs text-slate-400 mt-2">💡 상담 중 시간을 조율할 수 있습니다</p>';
+        }
+
+        priceBox.innerHTML = priceHTML;
+    };
+
+    window.updateDurationOptions = function () {
+        const consultationType = document.getElementById('modalConsultationType').value;
+        const durationSection = document.getElementById('durationSection');
+        const modalDuration = document.getElementById('modalDuration');
+
+        if (consultationType === 'OFFLINE') {
+            durationSection.classList.add('hidden');
+            modalDuration.value = '';
+            return;
+        } else {
+            durationSection.classList.remove('hidden');
+        }
+
+        const durationOptions = modalDuration.querySelectorAll('option');
+        const option45 = Array.from(durationOptions).find(opt => opt.value === '45');
+
+        if (consultationType === 'VIDEO') {
+            if (option45) option45.classList.remove('hidden');
+        } else if (consultationType === 'CHAT' || consultationType === 'PHONE') {
+            if (option45) option45.classList.add('hidden');
+            if (modalDuration.value === '45') {
+                modalDuration.value = '';
+            }
+        }
+    };
+
     window.submitRequest = async function () {
         const title   = document.getElementById('modalTitle').value.trim();
         const content = document.getElementById('modalContent').value.trim();
+        const consultationType = document.getElementById('modalConsultationType').value;
+        let durationSeconds = document.getElementById('modalDuration').value;
         const errEl   = document.getElementById('modalError');
         const btn     = document.getElementById('modalSubmitBtn');
 
@@ -838,6 +970,36 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
             errEl.classList.remove('hidden');
             return;
         }
+        if (!consultationType) {
+            errEl.textContent = '상담 방식을 선택해 주세요.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        if (consultationType !== 'OFFLINE' && !durationSeconds) {
+            errEl.textContent = '상담 시간을 선택해 주세요.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        if (consultationType === 'OFFLINE') {
+            durationSeconds = '0';
+        }
+
+        if (consultationType !== 'OFFLINE') {
+            const expectedPriceEl = document.getElementById('expectedPrice');
+            const currentPointEl = document.getElementById('currentPoint');
+            if (expectedPriceEl && currentPointEl) {
+                const priceText = expectedPriceEl.textContent.replace(/,/g, '').trim();
+                const pointText = currentPointEl.textContent.replace(/,/g, '').trim();
+                const expectedPrice = parseInt(priceText) || 0;
+                const currentPoint = parseInt(pointText) || 0;
+                if (expectedPrice > 0 && currentPoint < expectedPrice) {
+                    errEl.textContent = '포인트가 부족합니다. (' + currentPoint.toLocaleString() + ' / ' + expectedPrice.toLocaleString() + ' 포인트)';
+                    errEl.classList.remove('hidden');
+                    return;
+                }
+            }
+        }
 
         btn.disabled    = true;
         btn.textContent = '전송 중...';
@@ -845,9 +1007,11 @@ class="w-full pl-6 pr-32 py-4 rounded-2xl text-slate-900 shadow-sm focus:outline
 
         try {
             const params = new URLSearchParams();
-            params.append('expertId',   _reqExpertId);
-            params.append('expertType', _reqExpertType);
-            params.append('title',      title);
+            params.append('expertId',          _reqExpertId);
+            params.append('expertType',        _reqExpertType);
+            params.append('title',             title);
+            params.append('consultationType',  consultationType);
+            params.append('durationSeconds',   durationSeconds);
             if (content) params.append('content', content);
 
             const res  = await fetch('/api/consulting/requests', { method: 'POST', body: params });

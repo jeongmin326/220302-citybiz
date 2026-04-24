@@ -96,6 +96,7 @@ public class HomeController {
                 model.addAttribute("currentPoint", user.getPoint());
             }
         }
+        model.addAttribute("naverClientId", naverClientId);
         return "mypage/status";
     }
 
@@ -182,7 +183,7 @@ public class HomeController {
                 profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
                 profile.setDetailAddress(e.getDetailAddress());
                 profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
-                profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPriceCall());
                 found = true;
             }
             if (!found) {
@@ -194,7 +195,7 @@ public class HomeController {
                     profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
                     profile.setDetailAddress(e.getDetailAddress());
                     profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
-                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPriceCall());
                     found = true;
                 }
             }
@@ -207,7 +208,7 @@ public class HomeController {
                     profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
                     profile.setDetailAddress(e.getDetailAddress());
                     profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
-                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPriceCall());
                     found = true;
                 }
             }
@@ -220,7 +221,7 @@ public class HomeController {
                     profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
                     profile.setDetailAddress(e.getDetailAddress());
                     profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
-                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPriceCall());
                     found = true;
                 }
             }
@@ -233,7 +234,7 @@ public class HomeController {
                     profile.setCity(e.getCity()); profile.setDistrict(e.getDistrict()); profile.setRoadAddress(e.getRoadAddress());
                     profile.setDetailAddress(e.getDetailAddress());
                     profile.setField(e.getField()); profile.setConsultTime(e.getConsultTime());
-                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPrice());
+                    profile.setExperienceYears(e.getExperienceYears()); profile.setPrice(e.getPriceCall());
                     found = true;
                 }
             }
