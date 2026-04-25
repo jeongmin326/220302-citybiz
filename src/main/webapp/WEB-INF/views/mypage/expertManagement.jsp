@@ -88,10 +88,10 @@
                 </div>
             </div>
             <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex items-center gap-4">
-                <div class="bg-purple-100 p-4 rounded-2xl text-purple-600"><i data-lucide="star" class="w-8 h-8"></i></div>
+                <div class="bg-amber-100 p-4 rounded-2xl text-amber-600"><i data-lucide="banknote" class="w-8 h-8"></i></div>
                 <div>
-                    <p class="text-sm font-semibold text-slate-500">누적 신청</p>
-                    <p class="text-2xl font-bold text-slate-900" id="summaryTotal">-<span class="text-base font-medium text-slate-500 ml-1">건</span></p>
+                    <p class="text-sm font-semibold text-slate-500">이번 달 수익</p>
+                    <p class="text-2xl font-bold text-slate-900"><span id="summaryMonthRevenue">-</span><span class="text-base font-medium text-slate-500 ml-1">원</span></p>
                 </div>
             </div>
         </div>
@@ -303,7 +303,7 @@
 
                 document.getElementById('summaryPending').innerHTML  = data.pendingCount  + '<span class="text-base font-medium text-slate-500 ml-1">건</span>';
                 document.getElementById('summaryAccepted').innerHTML = data.acceptedCount + '<span class="text-base font-medium text-slate-500 ml-1">건</span>';
-                document.getElementById('summaryTotal').innerHTML    = data.totalCount    + '<span class="text-base font-medium text-slate-500 ml-1">건</span>';
+                document.getElementById('summaryMonthRevenue').textContent = Number(data.monthRevenue || 0).toLocaleString();
 
                 const tbody = document.getElementById('consulting-list');
                 if (_requestsCache.length === 0) {

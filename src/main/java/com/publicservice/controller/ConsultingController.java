@@ -13,6 +13,7 @@ import com.publicservice.repository.PatentAttorneyRepository;
 import com.publicservice.repository.PointHistoryRepository;
 import com.publicservice.repository.TaxAccountantRepository;
 import com.publicservice.repository.UserRepository;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import jakarta.servlet.http.HttpSession;
@@ -231,10 +232,19 @@ public class ConsultingController {
         long acceptedCount = requestRepository.countByExpertUserIdAndStatus(expertUserId, "ACCEPTED");
         long totalCount    = requests.size();
 
+        LocalDate today = LocalDate.now();
+        int monthRevenue = requests.stream()
+                .filter(r -> "COMPLETED".equals(r.getStatus())
+                          && r.getCreatedAt().getYear()       == today.getYear()
+                          && r.getCreatedAt().getMonthValue() == today.getMonthValue())
+                .mapToInt(r -> r.getSessionPrice() + (r.getExtraPaid() != null ? r.getExtraPaid() : 0))
+                .sum();
+
         result.put("items",         items);
         result.put("pendingCount",  pendingCount);
         result.put("acceptedCount", acceptedCount);
         result.put("totalCount",    totalCount);
+        result.put("monthRevenue",  monthRevenue);
         return result;
     }
 
