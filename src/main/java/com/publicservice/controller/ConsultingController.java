@@ -14,6 +14,7 @@ import com.publicservice.repository.PointHistoryRepository;
 import com.publicservice.repository.TaxAccountantRepository;
 import com.publicservice.repository.UserRepository;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -448,17 +450,20 @@ public class ConsultingController {
             return result;
         }
 
-        if (req.getCallStartedAt() == null) {
-            req.setCallStartedAt(LocalDateTime.now());
-            requestRepository.save(req);
-        }
+        // 통화 세션 시작 - callStartedAt을 현재 시간으로 설정
+        req.setCallStartedAt(LocalDateTime.now());
+        requestRepository.save(req);
 
+        long callStartedAtMs = req.getCallStartedAt()
+            .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         result.put("success", true);
+        result.put("callStartedAtMs", callStartedAtMs);
+        result.put("durationSeconds", req.getDurationSeconds());
         return result;
     }
 
     // -------------------------------------------------------------------
-    // POST /api/consulting/{id}/end-call — 통화 종료 (시간 기록)
+    // POST /api/consulting/{id}/end-call — 상담 종료
     // -------------------------------------------------------------------
     @PostMapping("/requests/{id}/end-call")
     public Map<String, Object> endCall(
@@ -484,7 +489,9 @@ public class ConsultingController {
             return result;
         }
 
+        // 상담 종료 처리
         req.setCallEndedAt(LocalDateTime.now());
+        req.setStatus("COMPLETED");
         requestRepository.save(req);
 
         result.put("success", true);
@@ -568,6 +575,41 @@ public class ConsultingController {
             result.put("error", "유효하지 않은 결제 방식입니다.");
         }
 
+        return result;
+    }
+
+    // -------------------------------------------------------------------
+    // POST /api/consulting/{id}/complete-call — 상담 완료 (전문가용)
+    // -------------------------------------------------------------------
+    @PostMapping("/requests/{id}/complete-call")
+    public Map<String, Object> completeCall(
+            @PathVariable("id") Long requestId,
+            HttpSession session) {
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        Long expertUserId = (Long) session.getAttribute("loginUserId");
+        if (expertUserId == null) {
+            result.put("error", "로그인이 필요합니다.");
+            return result;
+        }
+
+        Optional<ConsultingRequest> opt = requestRepository.findById(requestId);
+        if (opt.isEmpty()) {
+            result.put("error", "요청을 찾을 수 없습니다.");
+            return result;
+        }
+        ConsultingRequest req = opt.get();
+
+        if (!expertUserId.equals(req.getExpertUserId())) {
+            result.put("error", "권한이 없습니다.");
+            return result;
+        }
+
+        req.setRemainingSeconds(0);
+        req.setStatus("COMPLETED");
+        requestRepository.save(req);
+
+        result.put("success", true);
         return result;
     }
 

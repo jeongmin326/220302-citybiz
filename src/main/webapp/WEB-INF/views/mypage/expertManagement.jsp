@@ -222,6 +222,10 @@
                     actionHtml = '<button onclick="openChat(' + item.requestId + ')" class="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-bold hover:bg-violet-700 transition-colors flex items-center gap-1.5">'
                         + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>'
                         + '채팅하기</button>';
+                } else if (item.consultationType === 'VIDEO') {
+                    actionHtml = '<button onclick="openVideoCall(' + item.requestId + ')" class="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-colors flex items-center gap-1.5">'
+                        + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>'
+                        + '영상통화</button>';
                 } else if (item.consultationType === 'PHONE') {
                     actionHtml = '<div class="text-center"><p class="text-sm font-bold text-slate-900">' + escapeHtml(item.userPhone) + '</p></div>';
                 } else if (item.consultationType === 'OFFLINE') {
@@ -479,6 +483,14 @@
                 input.focus();
             }
         };
+
+        // 통화 종료 감지 후 새로고침
+        window.addEventListener('storage', function(event) {
+            if (event.key && event.key.startsWith('callEnded_')) {
+                console.log('통화 종료 감지, 페이지 새로고침');
+                location.reload();
+            }
+        });
 
         loadRequests();
     </script>

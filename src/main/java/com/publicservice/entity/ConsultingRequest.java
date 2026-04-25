@@ -67,6 +67,14 @@ public class ConsultingRequest {
     @Column(name = "extra_paid", nullable = false)
     private Integer extraPaid = 0;
 
+    /** 재개 시 남은 시간(초) - 통화 중단 시 저장 */
+    @Column(name = "remaining_seconds")
+    private Integer remainingSeconds;
+
+    /** 통화 요청 중인지 여부 */
+    @Column(name = "call_initiated", nullable = false)
+    private Boolean callInitiated = false;
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 

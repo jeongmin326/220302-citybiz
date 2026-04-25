@@ -422,6 +422,12 @@
                             + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>'
                             + '채팅하기</button>'
                             + '</div>';
+                    } else if (r.consultationType === 'VIDEO') {
+                        actionBtn = '<div class="mt-2">'
+                            + '<button onclick="openVideoCall(' + r.requestId + ')" class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">'
+                            + '<svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>'
+                            + '영상통화</button>'
+                            + '</div>';
                     } else if (r.consultationType === 'PHONE') {
                         actionBtn = '<div class="mt-2"><p class="text-xs font-bold text-slate-700">' + escapeHtml(r.expertPhone) + '</p></div>';
                     } else if (r.consultationType === 'OFFLINE') {
@@ -814,6 +820,18 @@
                 _currentMapInstance = null;
             }
         };
+
+        window.openVideoCall = function (requestId) {
+            window.open('/video/call?requestId=' + requestId, 'VideoCall', 'width=1000,height=700,resizable=yes');
+        };
+
+        // 통화 종료 감지 후 새로고침
+        window.addEventListener('storage', function(event) {
+            if (event.key && event.key.startsWith('callEnded_')) {
+                console.log('통화 종료 감지, 컨설팅 목록 새로고침');
+                loadMyConsultings();
+            }
+        });
 
         // 루사이드 아이콘 초기화 및 데이터 로드
         lucide.createIcons();
